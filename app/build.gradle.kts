@@ -22,6 +22,14 @@ dependencies {
 
     // This dependency is used by the application.
     implementation("com.google.guava:guava:30.1.1-jre")
+
+    // https://github.com/google/gson
+    implementation ("com.google.code.gson:gson:2.10")
+
+    // https://mvnrepository.com/artifact/org.fxmisc.richtext/richtextfx
+    implementation("org.fxmisc.richtext:richtextfx:0.11.0")
+
+
 }
 
 application {
