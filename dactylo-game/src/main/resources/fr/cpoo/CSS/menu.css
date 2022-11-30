@@ -1,0 +1,21 @@
+.borderPaneBackground {
+    -fx-background-color: #323437;
+    -fx-border-color: #e2b714;
+    -fx-border-width: 6px;
+}
+
+.Button {
+    -fx-background-color: #54585d;
+    -fx-border-color: #000000;
+    -fx-border-width: 1px;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+    -fx-font-size: 35px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #f4f3e6;
+    -fx-pref-width: 250px;
+}
+
+.Title {
+    -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.5) , 1,2,4,4 );
+}
