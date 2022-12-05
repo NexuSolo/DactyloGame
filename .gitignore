@@ -1,5 +1,6 @@
 .jar
 target
+bin
 .vscode
 # Ignore Gradle project-specific cache directory
 .gradle
