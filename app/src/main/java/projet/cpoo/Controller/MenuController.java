@@ -1,10 +1,11 @@
-package fr.cpoo;
+package projet.cpoo.Controller;
 
 import java.io.IOException;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
+import projet.cpoo.App;
 
 public class MenuController {
 
