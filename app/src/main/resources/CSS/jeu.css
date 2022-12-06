@@ -3,3 +3,28 @@
     -fx-border-color: #e2b714;
     -fx-border-width: 6px;
 }
+
+.text-to-do {
+    -fx-font-size: 25px;
+    -fx-font-family: "Arial";
+    -fx-fill: #646669;
+}
+
+.text-done {
+    -fx-font-size: 25px;
+    -fx-font-family: "Arial";
+    -fx-fill: #d1d0c5;
+}
+
+.text-error {
+    -fx-font-size: 25px;
+    -fx-font-family: "Arial";
+    -fx-fill: #ca4754;
+}
+
+.space-error {
+    -fx-font-size: 25px;
+    -fx-font-family: "Arial";
+    -fx-fill: #ca4754;
+    -fx-underline: true;
+}

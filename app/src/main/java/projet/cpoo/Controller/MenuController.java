@@ -3,10 +3,8 @@ package projet.cpoo.Controller;
 import java.io.IOException;
 
 import javafx.fxml.FXML;
-import javafx.geometry.Bounds;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import javafx.scene.shape.Polygon;
 import projet.cpoo.App;
 
