@@ -40,3 +40,13 @@ application {
     // Define the main class for the application.
     mainClass.set("projet.cpoo.App")
 }
+
+tasks {
+    register("serveur") {
+            group = "application"
+            application {
+                mainClass.set("projet.cpoo.Serveur")
+            }
+            dependsOn(run)
+        }
+}

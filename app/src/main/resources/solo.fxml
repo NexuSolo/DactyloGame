@@ -28,9 +28,9 @@
                   <HBox fx:id="ligne_3" alignment="CENTER" prefHeight="100.0" prefWidth="200.0" />
                </children>
             </VBox>
-            <TextArea onKeyPressed="#keyDetect" opacity="0.0" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2">
+            <TextArea mouseTransparent="true" onKeyPressed="#keyDetect" opacity="0.0" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2">
                <cursor>
-                  <Cursor fx:constant="WAIT" />
+                  <Cursor fx:constant="DEFAULT" />
                </cursor>
             </TextArea>
          </children>

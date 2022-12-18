@@ -1,7 +1,5 @@
 package projet.cpoo.Controller;
 
-import java.security.Key;
-
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -9,7 +7,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 
 public class JeuxController {
-    int pos = 0;
+    private int pos = 0;
+    
     @FXML
     private HBox ligne_1;
 

@@ -3,3 +3,13 @@
     -fx-border-color: #e2b714;
     -fx-border-width: 6px;
 }
+
+.buttonRetour {
+    -fx-background-color: #323437;
+    -fx-text-fill: #e2b714;
+}
+
+.buttonRetour:hover {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #e2b714;
+}

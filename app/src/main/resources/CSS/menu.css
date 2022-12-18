@@ -16,6 +16,10 @@
     -fx-pref-width: 250px;
 }
 
+.Button:hover {
+    -fx-background-color: #6a6f75;
+}
+
 .Title {
     -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.5) , 1,2,4,4 );
 }

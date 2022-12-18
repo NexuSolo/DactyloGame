@@ -18,6 +18,8 @@ public class App extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         scene = new Scene(loadFXML("menu"), 1240, 720);
+        primaryStage.setMinHeight(650);
+        primaryStage.setMinWidth(1160);
         primaryStage.setScene(scene);
         primaryStage.show();
     }

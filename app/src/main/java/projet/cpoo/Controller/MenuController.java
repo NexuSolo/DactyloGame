@@ -29,7 +29,6 @@ public class MenuController {
     @FXML
     private void highlightButton(MouseEvent e) throws IOException {
         Button button = (Button) e.getSource();
-        button.setStyle("-fx-background-color: #6a6f75");
         if(button == soloButton) {
             soloArrow.setVisible(true);
         }
@@ -47,7 +46,6 @@ public class MenuController {
     @FXML
     private void removeHighlightButton(MouseEvent e) throws IOException { 
         Button button = (Button) e.getSource();
-        button.setStyle("-fx-background-color: #54585d");
         if(button == soloButton) {
             soloArrow.setVisible(false);
         }
