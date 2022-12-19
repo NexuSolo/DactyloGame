@@ -1,0 +1,5 @@
+.borderPaneBackground {
+    -fx-background-color: #323437;
+    -fx-border-color: #e2b714;
+    -fx-border-width: 6px;
+}

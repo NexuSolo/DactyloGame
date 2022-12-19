@@ -14,6 +14,13 @@ import javafx.stage.Stage;
 public class App extends Application {
 
     private static Scene scene;
+    private static String pseudo = "Joueur";
+    private static String ip = "localhost";
+    private static int port = 5000;
+
+    public static void main(String[] args) {
+        launch();
+    }
     
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -22,6 +29,10 @@ public class App extends Application {
         primaryStage.setMinWidth(1160);
         primaryStage.setScene(scene);
         primaryStage.show();
+        // primaryStage.toFront();
+        //La fonction toFront() ne fonctionne pas chez moi donc j'utilise a la place :
+        primaryStage.setAlwaysOnTop(true);
+        primaryStage.setAlwaysOnTop(false);
     }
 
     public static void setRoot(String fxml) throws IOException {
@@ -33,7 +44,28 @@ public class App extends Application {
         return fxmlLoader.load();
     }
 
-    public static void main(String[] args) {
-        launch();
+    public static String getPseudo() {
+        return pseudo;
     }
+
+    public static void setPseudo(String pseudo) {
+        App.pseudo = pseudo;
+    }
+
+    public static String getIp() {
+        return ip;
+    }
+
+    public static void setIp(String ip) {
+        App.ip = ip;
+    }
+
+    public static int getPort() {
+        return port;
+    }
+
+    public static void setPort(int port) {
+        App.port = port;
+    }
+
 }

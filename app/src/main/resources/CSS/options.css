@@ -13,3 +13,8 @@
     -fx-background-color: #FFFFFF;
     -fx-text-fill: #e2b714;
 }
+
+.TextModeDeJeu {
+    -fx-underline: true;
+    -fx-test-size: 20;
+}

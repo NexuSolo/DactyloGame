@@ -2,46 +2,55 @@ package projet.cpoo;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
-
-/*
- * www.codeurjava.com
- */
+import java.util.ArrayList;
+import java.io.InputStreamReader;
 public class Serveur {
 
-    public static void main(String[] test) {
-
-        final ServerSocket serveurSocket;
-        final Socket clientSocket;
-        final BufferedReader in;
-
+    public static void main (String[] args) {
+        ArrayList<Socket> sockets = new ArrayList<Socket>();
         try {
-            serveurSocket = new ServerSocket(5000);
-            clientSocket = serveurSocket.accept();
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            try (ServerSocket server = new ServerSocket(5000)) {
+                System.out.println(server.getInetAddress());
+                System.out.println("Serveur en écoute...");
+                while (true) {
+                    Socket client = server.accept();
+                    sockets.add(client);
+                    System.out.println("Client connecté");
 
-            Thread recevoir = new Thread(() -> {
-                String msg;
-                    try {
-                        msg = in.readLine();
-                        // tant que le client est connecté
-                        while (msg != null) {
-                            System.out.println("Client : " + msg);
-                            msg = in.readLine();
-                            //TODO : Traitement serveur
-                        }
-                        // sortir de la boucle si le client a déconecté
-                        System.out.println("Client déconecté");
-                        // fermer le flux et la session socket
-                        clientSocket.close();
-                        serveurSocket.close();
-                    } catch (IOException e) {
-                    e.printStackTrace();
+                    //Creation d'un thread pour chaque client
+                    Thread t = new Thread(new ClientThread(client, sockets));
+                    t.start();
                 }
-            });
-            recevoir.start();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+class ClientThread implements Runnable {
+    private Socket client;
+    private ArrayList<Socket> sockets;
+
+    public ClientThread(Socket client, ArrayList<Socket> sockets) {
+        this.client = client;
+        this.sockets = sockets;
+    }
+
+    public void run() {
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            String message;
+            while ((message = reader.readLine()) != null) {
+                System.out.println("Message reçu: " + message);
+            }
+            reader.close();
+            client.close();
+            sockets.remove(client);
+            System.out.println("Client déconnecté");
         } catch (IOException e) {
             e.printStackTrace();
         }
