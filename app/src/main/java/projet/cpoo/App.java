@@ -3,7 +3,11 @@
  */
 package projet.cpoo;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Properties;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -19,14 +23,44 @@ public class App extends Application {
     private static int port = 5000;
 
     public static void main(String[] args) {
+        Properties prop = new Properties();
+        try {
+            File file = new File("config.properties");
+            if(!file.exists()) {
+                createProperties();
+            }
+            prop.load(new FileInputStream("config.properties"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        pseudo = prop.getProperty("pseudo", "joueur");
+        ip = prop.getProperty("ip", "localhost");
+        try {
+            port = Integer.parseInt(prop.getProperty("port", "5000"));
+        } catch (NumberFormatException e) {
+            prop.setProperty("port", "5000");
+            port = 5000;
+        }
         launch();
+    }
+
+    public static void createProperties() {
+        Properties prop = new Properties();
+        try {
+            prop.setProperty("pseudo", pseudo);
+            prop.setProperty("ip", ip);
+            prop.setProperty("port", String.valueOf(port));
+            prop.store(new FileOutputStream("config.properties"), "Configuration du jeu");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     
     @Override
     public void start(Stage primaryStage) throws Exception {
-        scene = new Scene(loadFXML("menu"), 1240, 720);
-        primaryStage.setMinHeight(650);
-        primaryStage.setMinWidth(1160);
+        scene = new Scene(loadFXML("menu"),1280, 720);
+        primaryStage.setMinHeight(675);
+        primaryStage.setMinWidth(1200);
         primaryStage.setScene(scene);
         primaryStage.show();
         // primaryStage.toFront();
@@ -50,6 +84,7 @@ public class App extends Application {
 
     public static void setPseudo(String pseudo) {
         App.pseudo = pseudo;
+        createProperties();
     }
 
     public static String getIp() {
@@ -58,6 +93,7 @@ public class App extends Application {
 
     public static void setIp(String ip) {
         App.ip = ip;
+        createProperties();
     }
 
     public static int getPort() {
@@ -66,6 +102,7 @@ public class App extends Application {
 
     public static void setPort(int port) {
         App.port = port;
+        createProperties();
     }
 
 }

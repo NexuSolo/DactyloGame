@@ -10,6 +10,8 @@ import projet.cpoo.App;
 
 public class MenuController {
     @FXML
+    private Button entrainementButton;
+    @FXML
     private Button soloButton;
     @FXML
     private Button multijoueurButton;
@@ -17,6 +19,8 @@ public class MenuController {
     private Button optionsButton;
     @FXML
     private Button quitterButton;
+    @FXML
+    private Polygon entrainementArrow;
     @FXML
     private Polygon soloArrow;
     @FXML
@@ -41,6 +45,9 @@ public class MenuController {
         else if(button == quitterButton) {
             quitterArrow.setVisible(true);
         }
+        else if(button == entrainementButton) {
+            entrainementArrow.setVisible(true);
+        }
     }
 
     @FXML
@@ -58,6 +65,14 @@ public class MenuController {
         else if(button == quitterButton) {
             quitterArrow.setVisible(false);
         }
+        else if(button == entrainementButton) {
+            entrainementArrow.setVisible(false);
+        }
+    }
+
+    @FXML
+    private void switchToEntrainement() throws IOException {
+        App.setRoot("entrainement");
     }
 
     @FXML
@@ -67,17 +82,17 @@ public class MenuController {
 
     @FXML
     private void switchToMultijoueur() throws IOException {
-        App.setRoot("multijoueur");
-    }
-    
-    @FXML
-    private void quit() throws IOException {
-        System.exit(0);
+        App.setRoot("attenteJoueur");
     }
 
     @FXML
     private void switchToOptions() throws IOException {
         App.setRoot("options");
+    }
+
+    @FXML
+    private void quit() throws IOException {
+        System.exit(0);
     }
 
 }

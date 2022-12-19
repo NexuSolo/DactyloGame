@@ -5,12 +5,13 @@
 }
 
 .buttonRetour {
-    -fx-background-color: #323437;
+    -fx-background-color: none;
     -fx-text-fill: #e2b714;
+    -fx-font-size: 35;
 }
 
 .buttonRetour:hover {
-    -fx-background-color: #FFFFFF;
+    -fx-background-color: #ffffffc4;
     -fx-text-fill: #e2b714;
 }
 

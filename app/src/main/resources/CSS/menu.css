@@ -13,7 +13,9 @@
     -fx-font-size: 35px;
     -fx-font-weight: bold;
     -fx-text-fill: #f4f3e6;
-    -fx-pref-width: 250px;
+    -fx-pref-width: 275px;
+    -fx-pref-height: 100px;
+    -fx-alignment: center;
 }
 
 .Button:hover {
