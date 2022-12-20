@@ -3,7 +3,6 @@
  */
 package projet.cpoo;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -21,35 +20,71 @@ public class App extends Application {
     private static String pseudo = "Joueur";
     private static String ip = "localhost";
     private static int port = 5000;
+    private static String langue = "Français";
+    private static boolean accent = true;
+    private static String mode = "Temps";
+    private static int modenbr = 60;
 
     public static void main(String[] args) {
-        Properties prop = new Properties();
-        try {
-            File file = new File("config.properties");
-            if(!file.exists()) {
-                createProperties();
-            }
-            prop.load(new FileInputStream("config.properties"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        pseudo = prop.getProperty("pseudo", "joueur");
-        ip = prop.getProperty("ip", "localhost");
-        try {
-            port = Integer.parseInt(prop.getProperty("port", "5000"));
-        } catch (NumberFormatException e) {
-            prop.setProperty("port", "5000");
-            port = 5000;
-        }
+        loadProperties();
         launch();
     }
 
-    public static void createProperties() {
+    private static void loadProperties() {
+        try {
+            Properties prop = new Properties();
+            prop.load(new FileInputStream("config.properties"));
+            pseudo = prop.getProperty("pseudo", "joueur");
+            ip = prop.getProperty("ip", "localhost");
+            try {
+                port = Integer.parseInt(prop.getProperty("port", "5000"));
+                if(port < 0 || port > 65535) {
+                    prop.setProperty("port", "5000");
+                    port = 5000;
+                }
+            } catch (NumberFormatException e) {
+                prop.setProperty("port", "5000");
+                port = 5000;
+            }
+            langue = prop.getProperty("langue", "Français");
+            if(!langue.equals("Français") && !langue.equals("English")) {
+                prop.setProperty("langue", "Français");
+                langue = "Français";
+            }
+            try {
+                accent = Boolean.parseBoolean(prop.getProperty("accent", "true"));
+            } catch (NumberFormatException e) {
+                prop.setProperty("accent", "true");
+                accent = true;
+            }
+            if(!mode.equals("Temps") && !mode.equals("Points")) {
+                prop.setProperty("mode", "Temps");
+                mode = "Temps";
+            }
+            else {
+                mode = prop.getProperty("mode", "Temps");
+            }
+            try {
+                modenbr = Integer.parseInt(prop.getProperty("modenbr", "60"));
+            } catch (NumberFormatException e) {
+                prop.setProperty("modenbr", "60");
+                modenbr = 60;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void createProperties() {
         Properties prop = new Properties();
         try {
             prop.setProperty("pseudo", pseudo);
             prop.setProperty("ip", ip);
             prop.setProperty("port", String.valueOf(port));
+            prop.setProperty("langue", langue);
+            prop.setProperty("accent", String.valueOf(accent));
+            prop.setProperty("mode", mode);
+            prop.setProperty("modenbr", String.valueOf(modenbr));
             prop.store(new FileOutputStream("config.properties"), "Configuration du jeu");
         } catch (IOException e) {
             e.printStackTrace();
@@ -102,6 +137,42 @@ public class App extends Application {
 
     public static void setPort(int port) {
         App.port = port;
+        createProperties();
+    }
+
+    public static String getLangue() {
+        return langue;
+    }
+
+    public static void setLangue(String langue) {
+        App.langue = langue;
+        createProperties();
+    }
+
+    public static boolean isAccent() {
+        return accent;
+    }
+
+    public static void setAccent(boolean accent) {
+        App.accent = accent;
+        createProperties();
+    }
+
+    public static String getMode() {
+        return mode;
+    }
+
+    public static void setMode(String mode) {
+        App.mode = mode;
+        createProperties();
+    }
+
+    public static int getModenbr() {
+        return modenbr;
+    }
+
+    public static void setModenbr(int modenbr) {
+        App.modenbr = modenbr;
         createProperties();
     }
 

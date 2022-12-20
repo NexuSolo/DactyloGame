@@ -43,10 +43,10 @@ application {
 
 tasks {
     register("serveur") {
-            group = "application"
-            application {
-                mainClass.set("projet.cpoo.Serveur")
-            }
-            dependsOn(run)
+        group = "application"
+        application {
+            mainClass.set("projet.cpoo.Serveur")
         }
+        dependsOn(run)
+    }
 }

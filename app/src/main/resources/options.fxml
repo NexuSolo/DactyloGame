@@ -6,6 +6,7 @@
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
@@ -68,12 +69,12 @@
                                        <children>
                                           <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
                                              <children>
-                                                <RadioButton fx:id="tempsRadioButton" mnemonicParsing="false" text="Temps" textFill="#000001">
+                                                <RadioButton fx:id="tempsRadioButton" mnemonicParsing="false" onAction="#temps" text="Temps" textFill="#000001">
                                                    <font>
                                                       <Font size="15.0" />
                                                    </font>
                                                 </RadioButton>
-                                                <RadioButton fx:id="MotsRadioButton" mnemonicParsing="false" text="Mots" textFill="#000001">
+                                                <RadioButton fx:id="MotsRadioButton" mnemonicParsing="false" onAction="#mots" text="Mots" textFill="#000001">
                                                    <font>
                                                       <Font size="15.0" />
                                                    </font>
@@ -88,8 +89,8 @@
                                     </Text>
                                     <MenuButton fx:id="langueMenuButton" contentDisplay="CENTER" mnemonicParsing="false" text="Français" GridPane.rowIndex="2">
                                        <items>
-                                          <MenuItem mnemonicParsing="false" text="Action 1" />
-                                          <MenuItem mnemonicParsing="false" text="Action 2" visible="false" />
+                                          <MenuItem mnemonicParsing="false" onAction="#langueFrancais" text="Français" />
+                                          <MenuItem mnemonicParsing="false" onAction="#langueEnglish" text="English" />
                                        </items>
                                        <font>
                                           <Font size="16.0" />
@@ -99,7 +100,7 @@
                                     <Line endX="100.0" opacity="0.66" startX="-100.0" stroke="#6b6b6b" GridPane.rowIndex="6" />
                                     <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="20.0" GridPane.rowIndex="5">
                                        <children>
-                                          <CheckBox fx:id="accentCheckBox" mnemonicParsing="false" />
+                                          <CheckBox fx:id="accentCheckBox" mnemonicParsing="false" onAction="#accent" />
                                        </children>
                                     </VBox>
                                     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Accents :" GridPane.rowIndex="4">
@@ -113,16 +114,12 @@
                                        </font>
                                     </Text>
                                     <Line endX="100.0" opacity="0.66" startX="-100.0" stroke="#6b6b6b" GridPane.rowIndex="9" />
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Nombres de mots :" GridPane.rowIndex="10">
+                                    <Text fx:id="nombreDeText" strokeType="OUTSIDE" strokeWidth="0.0" text="Nombres de mots :" GridPane.rowIndex="10">
                                        <font>
                                           <Font size="25.0" />
                                        </font>
                                     </Text>
-                                    <TextField fx:id="tempsMotsTextField" promptText="100" GridPane.rowIndex="11">
-                                       <font>
-                                          <Font size="16.0" />
-                                       </font>
-                                    </TextField>
+                                    <Spinner fx:id="spin" GridPane.rowIndex="11" />
                                  </children>
                               </GridPane>
                            </children>
@@ -182,7 +179,7 @@
                                           <Font size="25.0" />
                                        </font>
                                     </Text>
-                                    <MenuButton fx:id="serveurMenuButton" contentDisplay="CENTER" mnemonicParsing="false" text="Serveur 1" GridPane.rowIndex="11">
+                                    <MenuButton fx:id="serveurMenuButton" contentDisplay="CENTER" mnemonicParsing="false" GridPane.rowIndex="11">
                                        <items>
                                           <MenuItem mnemonicParsing="false" onAction="#serveurOVH" text="Serveur OVH" />
                                        </items>
