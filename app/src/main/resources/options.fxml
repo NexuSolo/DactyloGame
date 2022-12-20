@@ -114,7 +114,7 @@
                                        </font>
                                     </Text>
                                     <Line endX="100.0" opacity="0.66" startX="-100.0" stroke="#6b6b6b" GridPane.rowIndex="9" />
-                                    <Text fx:id="nombreDeText" strokeType="OUTSIDE" strokeWidth="0.0" text="Nombres de mots :" GridPane.rowIndex="10">
+                                    <Text fx:id="nombreDeText" strokeType="OUTSIDE" strokeWidth="0.0" text="Nombre de mots :" GridPane.rowIndex="10">
                                        <font>
                                           <Font size="25.0" />
                                        </font>

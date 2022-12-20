@@ -16,7 +16,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="720.0" minWidth="1280.0" stylesheets="@CSS/menu.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="projet.cpoo.Controller.MenuController">
    <children>
-      <BorderPane id="borderPaneBackground" prefHeight="720.0" prefWidth="1280.0" styleClass="borderPaneBackground" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <BorderPane id="borderPaneBackground" pickOnBounds="false" prefHeight="720.0" prefWidth="1280.0" styleClass="borderPaneBackground" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
             <Text id="Title" fill="#e2b714" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Title" text="Dactylo-Game" textAlignment="CENTER" BorderPane.alignment="CENTER">
                <font>
@@ -139,6 +139,9 @@
                </children>
             </GridPane>
          </center>
+         <bottom>
+            <Text fill="RED" opacity="0.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Impossible de rejoindre le serveur. Vérifier vos options de connexion" underline="true" BorderPane.alignment="CENTER" />
+         </bottom>
       </BorderPane>
    </children>
 </AnchorPane>
