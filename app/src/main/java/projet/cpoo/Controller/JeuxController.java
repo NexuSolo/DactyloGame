@@ -6,18 +6,21 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 
-import java.awt.Desktop;  
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.print.attribute.standard.PrinterMessageFromOperator;  
 
 public class JeuxController {
-    private static int CHAR_PER_LINE = 20;
+    private static int CHAR_PER_LINE = 40;
     private int pos = 0;
+    private int posMin = 0;
+    private int motComplete = 0;
+
+    @FXML 
+    private HBox ligne_stat;
     
     @FXML
     private HBox ligne_1;
@@ -37,7 +40,6 @@ public class JeuxController {
     private void initialize() {
         try {
             ligne_act = ligne_1;
-            
             BufferedReader reader = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResource("liste_mots/liste_francais.txt").openStream()));
             List<String> list = new ArrayList<String>();
             for (int i = 0 ; i < 100 ; i++) {
@@ -55,40 +57,31 @@ public class JeuxController {
                         break;
                     }
                 }
-                for(char c : text.toCharArray()) {
-                // for(char c : text.toCharArray()) {
-                    Text t = new Text(String.valueOf(c));
-                    t.getStyleClass().add("text-to-do");
-                    ligne_act.getChildren().add(t);
-                    pos++;
-                }
-                ligne_act.getChildren().add(new Text("  "));
+                pos += addWordtoLine(text, ligne_act);
+                ligne_act.getChildren().add(new Text(" "));
                 pos++;
             }
-            // for(String text : list) {
-            //     if(pos + text.length() > CHAR_PER_LINE) {
-            //         pos = 0;
-            //         if (!updateActualLine()) break;
-            //     }
-            //     for(char c : m.toCharArray()) {
-            //     // for(char c : text.toCharArray()) {
-            //         Text t = new Text(String.valueOf(c));
-            //         t.getStyleClass().add("text-to-do");
-            //         ligne_act.getChildren().add(t);
-            //         pos++;
-            //     }
-            //     ligne_act.getChildren().add(new Text("  "));
-            //     pos++;
-            // }
             reader.close();
             ligne_act = ligne_1;
+            ligne_stat.getChildren().add(new Text("Mots completes : "));
+            ligne_stat.getChildren().add(new Text(String.valueOf(motComplete)));
         }
         catch (Exception e) {
             System.out.println("ERROR + ligne = "+ligne_act);
-            // e.printStackTrace();
+            e.printStackTrace();
         }
         
     }
+    private int addWordtoLine(String s,HBox line) {
+        int pos = 0;
+        for(char c : s.toCharArray()) {
+                Text t = new Text(String.valueOf(c));
+                t.getStyleClass().add("text-to-do");
+                line.getChildren().add(t);
+                pos++;
+            }
+        return pos;
+    } 
 
     private boolean updateActualLine(){
         if (ligne_act == ligne_1) ligne_act = ligne_2;
@@ -97,40 +90,61 @@ public class JeuxController {
         return true;
     }
 
-    // private boolean addLine() {
-    //     int pos = 0;
-    //     HBox tmpLigne_3 = new HBox();
-    //     while(stringIter.hasNext()) {
-    //         String text = stringIter.next();
-    //         if(pos + text.length() > CHAR_PER_LINE) {
-    //             HBox tmp = ligne_2;
-    //             ligne_2 = ligne_3;
-    //             this.ligne_3 = tmpLigne_3;
-    //             return true;
-    //         }
-    //         System.out.println("Nouveau mot = " + text);
-    //         for(char c : text.toCharArray()) {
-    //             Text t = new Text(String.valueOf(c));
-    //             t.getStyleClass().add("text-to-do");
-    //             tmpLigne_3.getChildren().add(t);
-    //             pos++;
-    //         }
-    //         ligne_act.getChildren().add(new Text(" "));
-    //         pos++;
-    //     }
-    //     return false;
-    // }
+    private boolean addLine() {
+        int pos = 0;
+        ligne_1.getChildren().clear();
+        ligne_1.getChildren().addAll(ligne_2.getChildren());
+        ligne_2.getChildren().clear();
+        ligne_2.getChildren().addAll(ligne_3.getChildren());
+        ligne_3.getChildren().clear();
+        if (tmpIter != null) {
+            pos += addWordtoLine(tmpIter,ligne_3);
+            ligne_act.getChildren().add(new Text(" "));
+            pos++;
+        }
+        while(stringIter.hasNext()) {
+            String text = stringIter.next();
+            if(pos + text.length() > CHAR_PER_LINE) {
+                tmpIter = text;                
+                return true;
+            }
+            pos += addWordtoLine(text,ligne_3);
+            ligne_act.getChildren().add(new Text(" "));
+            pos++;
+        }
+        return false;
+    }
+
+    private boolean motCorrect(int finMot){
+        int i = finMot;
+        while (i >=0) {
+            Text t = (Text) ligne_act.getChildren().get(i);
+            System.out.print(t.getText()+" ");
+            if (t.getText().equals(" ")) return true;
+            if (t.getStyleClass().contains("text-error")) return false; 
+            i--;
+        }
+        return true;
+    }
+
+    public void updateMotComplete() {
+        ligne_stat.getChildren().remove(ligne_stat.getChildren().size() - 1);
+        ligne_stat.getChildren().add(new Text(String.valueOf(motComplete)));
+    }
 
     @FXML
     private void keyDetect(KeyEvent e) {
         if(e.getCode().isLetterKey()) {
-            // System.out.println("Nb char = "+pos+"max = "+CHAR_PER_LINE+" line = "+ligne_act + "ligneMax = "+ligne_act.getChildren().size());
-            if(pos >= 20 || pos >= ligne_act.getChildren().size() ) {
+            if(pos >= CHAR_PER_LINE || pos >= ligne_act.getChildren().size() ) {
                 pos = 0;
-                if (!updateActualLine()) { return;
-                    // if (!addLine()) {
-                    //     return;
-                    // }
+                if (!updateActualLine()) { 
+                    if (!addLine()) {
+                        return;
+                    }
+                }
+                else if (ligne_act == ligne_3) {
+                    addLine();
+                    ligne_act = ligne_2;
                 }
             }
             Text t = (Text) ligne_act.getChildren().get(pos);
@@ -156,11 +170,18 @@ public class JeuxController {
                 t.getStyleClass().remove("text-to-do");
                 t.getStyleClass().add("text-error");
             }
+            else {
+                if (motCorrect(pos-1)) {
+                    posMin = pos + 1;
+                    motComplete++;
+                }
+                updateMotComplete();
+            }                
                 pos++;
         } else {
             e.getCode();
             if (e.getCode().equals(KeyCode.BACK_SPACE)) {
-                if(pos > 0) {
+                if(pos > 0 && pos > posMin) {
                     pos--;
                     Text t = (Text) ligne_act.getChildren().get(pos);
                     t.getStyleClass().remove("text-done");

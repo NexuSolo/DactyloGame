@@ -4,6 +4,10 @@
     -fx-border-width: 6px;
 }
 
+.title {
+    -fx-fill : #e0b414;    
+}
+
 .text-to-do {
     -fx-font-size: 25px;
     -fx-font-family: "Arial";
