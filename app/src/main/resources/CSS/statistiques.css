@@ -1,0 +1,48 @@
+
+.borderPaneBackground {
+    -fx-background-color: #323437;
+    -fx-border-color: #e2b714;
+    -fx-border-width: 6px;
+}
+
+.buttonRetour {
+    -fx-background-color: none;
+    -fx-text-fill: #e2b714;
+    -fx-font-size: 35;
+}
+
+.congratText{
+    -fx-text-fill: #e2b714;
+    -fx-font-size: 25;
+}
+
+.chart {
+    -fx-padding: -5px;
+}
+
+.chart-title {
+    -fx-text-fill: #ddc49ef9;
+    -fx-font-size: 2em;
+    -fx-underline: true;
+  }
+
+.axis {
+    -fx-font-size: 1.5em;    
+    -fx-tick-label-fill: #e2b714;
+    -fx-font-family: Tahoma;
+    -fx-tick-length: 20;
+    -fx-minor-tick-length: 10;
+}
+
+.axis-label {
+    -fx-text-fill: #e2b714; 
+ }
+.chart-plot-background {
+    -fx-background-color: #e2b714;
+}
+.chart-vertical-grid-lines {
+    -fx-stroke: transparent;
+}
+.chart-horizontal-grid-lines {
+    -fx-stroke: #323437;
+}

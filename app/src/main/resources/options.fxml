@@ -221,7 +221,7 @@
                   </HBox>
                </center>
             </BorderPane>
-            <Button mnemonicParsing="false" onAction="#retour" styleClass="buttonRetour" text="&lt;- Retour">
+            <Button fx:id="button" mnemonicParsing="false" onAction="#retour" styleClass="buttonRetour" text="&lt;- Retour">
                <font>
                   <Font size="25.0" />
                </font>

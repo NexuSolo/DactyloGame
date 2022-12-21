@@ -35,4 +35,14 @@ public abstract class Settings {
     public void setModeMots() {
         Settings.modeTemps = false;
     }
+
+    private static int TEMPS_MAX = 100;
+
+    public static int getTEMPS_MAX() {
+        return TEMPS_MAX;
+    }
+
+    public static void setTEMPS_MAX(int TEMPS_MAX) {
+        Settings.TEMPS_MAX = TEMPS_MAX;
+    }
 }

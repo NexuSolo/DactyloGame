@@ -7,13 +7,16 @@ import java.util.Optional;
 
 import javafx.fxml.FXML;
 import javafx.scene.chart.AreaChart;
+import javafx.scene.chart.Chart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Series;
+import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Text;
 import projet.cpoo.App;
 import projet.cpoo.GameData;
 import projet.cpoo.Settings;
@@ -27,63 +30,107 @@ public class StatistiquesController {
     GridPane gridPane;
 
     @FXML
+    Button button;
+
+    @FXML
+    Text congrats;
+
+    @FXML
     public void initialize() throws Exception {
-        setGraph();
+        button.setFocusTraversable(false);
         anchor.setFocusTraversable(true);
         anchor.requestFocus();
+        setGraph();
+        setText();
     }
 
     private void setGraph() {
-
         //TODO : faire en fonction du temps
-        int dataTab[] = GameData.getPrecisionList();
+        setMotGraph();
+        setPrecGraph();
+        setFreqGraph();
+    }
+
+    private void setText(){
+        int mots = GameData.getMotComplete();
+        int temps = Settings.getTEMPS_MAX()/10;
+        int mpm = (60*mots)/temps;
+        String s = "Felicitations vous avez tape " + mots + " mots en " + temps + " secondes";
+        s += "\n Cela fait donc " + mpm + " mots par minute"; 
+        congrats.getStyleClass().add("congratText");
+        congrats.setStyle("-fx-text-fill: #e2b714;-fx-font-size: 25;");
+        congrats.setText(s);
+    }
+
+    private void setMotGraph() {
+        int wordTab[] = GameData.getWordList();
+        final NumberAxis xAxis = new NumberAxis(0, wordTab.length, 1);
+        final NumberAxis yAxis = new NumberAxis(0, Settings.getTEMPS_MAX()/10,Settings.getTEMPS_MAX()/100);
+        yAxis.setLabel("Temps en s");
+        xAxis.setLabel("Nombre de mots");
+        final AreaChart<Number, Number> motChart = new AreaChart<Number, Number>(xAxis, yAxis);
+
+        XYChart.Series serie1 = new Series<>();
+        serie1.getData().add(new XYChart.Data<>(0, 0));
+        for (int i = 0; i < wordTab.length; i++) {
+            System.out.println("Data " + (i+1) + " = " + wordTab[i]);
+            serie1.getData().add(new XYChart.Data<>(i + 1, wordTab[i]));
+        }
+        motChart.setTitle("Mot par minutes");
+        motChart.setLegendVisible(false);
+        motChart.getData().addAll(serie1);
+        gridPane.add(motChart, 1,1);
+    }
+
+    private void setPrecGraph() {
+        int precisionTab[] = GameData.getPrecisionList();
         String s = (Settings.isModeTemps())?"Temps en s":"Nombre de mots";
 
-        // dataTab[1] = 100;
-        final NumberAxis xAxis = new NumberAxis(0, dataTab.length, 1);
+        final NumberAxis xAxis = new NumberAxis(0, precisionTab.length, 1);
         final NumberAxis yAxis = new NumberAxis(0, 100, 10);
         yAxis.setLabel("Precision en %");
         xAxis.setLabel(s);
-        final AreaChart<Number, Number> ac = new AreaChart<Number, Number>(xAxis, yAxis);
+        final AreaChart<Number, Number> precChart = new AreaChart<Number, Number>(xAxis, yAxis);
 
         XYChart.Series serie1 = new Series<>();
         serie1.getData().add(new XYChart.Data<>(0, 100));
-        for (int i = 0; i < dataTab.length; i++) {
-            System.out.println("Data " + (i+1) + " = " + dataTab[i]);
-            serie1.getData().add(new XYChart.Data<>(i + 1, dataTab[i]));
+        for (int i = 0; i < precisionTab.length; i++) {
+            System.out.println("Data " + (i+1) + " = " + precisionTab[i]);
+            serie1.getData().add(new XYChart.Data<>(i + 1, precisionTab[i]));
         }
-        // serie1.setName("Precision en moyenne");
-        ac.setTitle("Precision lors de la partie");
-        ac.getData().addAll(serie1);
-        // ac.setTranslateY(350);
-        // anchor.getChildren().add(ac);
+        precChart.setLegendVisible(false);
+        precChart.setTitle("Precision lors de la partie");
+        precChart.getData().addAll(serie1);
+        gridPane.add(precChart, 0,2);
 
-        List<Integer> dataFreq = GameData.getFreqList();
-        Optional<Integer> opt = dataFreq.stream().max(Comparator.naturalOrder());
+    }
+
+    private void setFreqGraph () {
+        List<Integer> freqList = GameData.getFreqList();
+        Optional<Integer> opt = freqList.stream().max(Comparator.naturalOrder());
         int max = 50;
         if (opt.isPresent()) max = opt.get();
-        
-        final NumberAxis xAxisFreq = new NumberAxis(0, dataFreq.size(), 1);
-        final NumberAxis yAxisFreq = new NumberAxis(0,max,10);
-        final AreaChart<Number,Number> freq =
-        new AreaChart<Number,Number>(xAxisFreq,yAxisFreq);
+        final NumberAxis xAxisFreq = new NumberAxis(0, freqList.size()-1, 1);
+        final NumberAxis yAxisFreq = new NumberAxis(0,max,max*0.1);
+        final AreaChart<Number,Number> freqChart = new AreaChart<Number,Number>(xAxisFreq,yAxisFreq);
         yAxisFreq.setLabel("Fluidite en ?");
-        xAxisFreq.setLabel(s);
-        freq.setTitle("Fluidite lors de la partie");
+        xAxisFreq.setLabel("Numero de caractère");
+        freqChart.setTitle("Fluidite lors de la partie");
         XYChart.Series serieFreq = new Series<>();
-        for (int i = 0; i < dataFreq.size(); i++) {
-            serieFreq.getData().add(new XYChart.Data<>(i, dataFreq.get(i)));
+        for (int i = 0; i < freqList.size(); i++) {
+            serieFreq.getData().add(new XYChart.Data<>(i, freqList.get(i)));
         }
         serieFreq.setName("Fluidité en moyenne");
-        freq.getData().addAll(serieFreq);
-        // freq.setTranslateX(700);
-        // freq.setTranslateY(350);
-        freq.setTitle("Title freq");
-        freq.setId("null");
-        gridPane.add(ac, 0,2);
-        gridPane.add(freq, 1,2);
-        // anchor.getChildren().add(freq);
+        freqChart.getData().addAll(serieFreq);
+        freqChart.setLegendVisible(false);
+        freqChart.setTitle("Fluidite lors de la partie");
+        gridPane.add(freqChart, 1,2);
+    }
 
+    @FXML
+    public void retour() throws IOException {
+        GameData.resetAll();
+        App.setRoot("menu");
     }
     @FXML
     public void keyPressed(KeyEvent e) throws IOException {

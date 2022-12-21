@@ -26,6 +26,13 @@
     -fx-fill: #ca4754;
 }
 
+.text-skipped {
+    -fx-font-size: 25px;
+    -fx-font-family: "Arial";
+    -fx-fill: #64666940;
+;
+}
+
 .space-error {
     -fx-font-size: 25px;
     -fx-font-family: "Arial";
