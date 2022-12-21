@@ -97,6 +97,9 @@ public class App extends Application {
         primaryStage.setMinHeight(675);
         primaryStage.setMinWidth(1200);
         primaryStage.setScene(scene);
+        primaryStage.setOnCloseRequest( event -> {
+            System.exit(0);
+        });
         primaryStage.show();
         // primaryStage.toFront();
         //La fonction toFront() ne fonctionne pas chez moi donc j'utilise a la place :

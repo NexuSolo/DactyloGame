@@ -4,17 +4,19 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 public class Serveur {
-
+    private static ParametrePartie parametrePartie = new ParametrePartie(false, "Francais");
     public static void main (String[] args) {
         Map<Socket,String> sockets = new HashMap<Socket,String>();
         try {
@@ -32,6 +34,14 @@ public class Serveur {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static ParametrePartie getParametrePartie() {
+        return new ParametrePartie(parametrePartie.isAccent(), parametrePartie.getLangue());
+    }
+
+    public static void setParametrePartie(ParametrePartie p) {
+        parametrePartie = new ParametrePartie(p.isAccent(), p.getLangue());
     }
 }
 
@@ -58,21 +68,55 @@ class ClientThread implements Runnable {
                     break;
                 }
             }
-        } catch (IOException e) {
+            
+        }
+        catch (SocketException e) {
+            sockets.remove(client);
+            try {
+                listeJoueurs();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
+        catch (IOException e) {
             sockets.remove(client);
             e.printStackTrace();
         }
+        
     }
 
     private void traitement(Message message) throws IOException {
         if(message.getTransmition() == Transmission.CLIENT_CONNEXION) {
-            sockets.put(client, (String) message.getMessage());
+            LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) message.getMessage();
+            sockets.put(client, (String) map.get("pseudo"));
             listeJoueurs();
         }
         if(message.getTransmition() == Transmission.CLIENT_DECONNEXION) {
             sockets.remove(client);
             client.close();
             listeJoueurs();
+        }
+        if(message.getTransmition() == Transmission.CLIENT_OPTION) {
+            LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) message.getMessage();
+            Serveur.setParametrePartie(new ParametrePartie((boolean) map.get("accent"), (String) map.get("langue")));
+            miseAJourOptions();
+        }
+        if(message.getTransmition() == Transmission.CLIENT_LANCER) {
+            lancementPartie();
+        }
+    }
+
+    private void miseAJourOptions() {
+        for(Socket socket : sockets.keySet()) {
+            LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
+            map.put("accent", Serveur.getParametrePartie().isAccent());
+            map.put("langue", Serveur.getParametrePartie().getLangue());
+            Message m = new Message(Transmission.SERVEUR_OPTION, map);
+            try {
+                envoiMessage(socket, m);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -82,11 +126,21 @@ class ClientThread implements Runnable {
             joueurs.add(sockets.get(socket));
         }
         for(Socket socket : sockets.keySet()) {
-            Message m = new Message(Transmission.SERVEUR_CONNEXION, joueurs);
-            Gson gson = new Gson();
-            String json = gson.toJson(m);
-            PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
-            out.println(json);
+            LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
+            map.put("listeJoueur", joueurs);
+            Message m = new Message(Transmission.SERVEUR_CONNEXION, map);
+            envoiMessage(socket, m);
         }
+    }
+
+    private void envoiMessage(Socket socket, Message message) throws IOException {
+        Gson gson = new Gson();
+        String json = gson.toJson(message);
+        PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
+        out.println(json);
+    }
+
+    private void lancementPartie() {
+        //TODO
     }
 }

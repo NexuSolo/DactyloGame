@@ -1,12 +1,14 @@
 package projet.cpoo;
 
+import com.google.gson.internal.LinkedTreeMap;
+
 public class Message {
     Transmission transmition;
-    Object message;
+    LinkedTreeMap<String,Object> message = new LinkedTreeMap<String,Object>();
 
-    public Message(Transmission t, Object s) {
+    public Message(Transmission t, LinkedTreeMap<String,Object> l) {
         this.transmition = t;
-        this.message = s;
+        this.message = l;
     }
 
     public Transmission getTransmition() {

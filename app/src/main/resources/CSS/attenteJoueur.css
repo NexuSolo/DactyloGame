@@ -14,3 +14,12 @@
     -fx-background-color: #ffffffc4;
     -fx-text-fill: #e2b714;
 }
+
+.separator {
+    -fx-background-color:  #6b6b6b;
+    -fx-pref-height: 1;
+}
+
+.textListeJoueur{
+    -fx-font-size: 25px;
+}

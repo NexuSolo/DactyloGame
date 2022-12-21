@@ -6,16 +6,24 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+
 import java.io.InputStreamReader;
 
 import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import projet.cpoo.App;
 import projet.cpoo.Message;
+import projet.cpoo.ParametrePartie;
 import projet.cpoo.Transmission;
 
 public class AttenteJoueurController {
@@ -23,7 +31,20 @@ public class AttenteJoueurController {
     private Thread reception;
     List<Text> joueurs = new ArrayList<Text>();
 
-    @FXML VBox listeJoueurVBox;
+    @FXML
+    VBox listeJoueurVBox;
+
+    @FXML
+    private MenuButton langueMenuButton;
+
+    @FXML
+    private MenuItem francaisMenuItem;
+
+    @FXML
+    private MenuItem englishMenuItem;
+
+    @FXML
+    private CheckBox accentCheckBox;
     
     @FXML
     private void initialize() {
@@ -33,7 +54,9 @@ public class AttenteJoueurController {
             reception.start();
             //envoyer un message au serveur pour dire que le client est connecté
             PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
-            Message message = new Message(Transmission.CLIENT_CONNEXION, App.getPseudo());
+            LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
+            map.put("pseudo", App.getPseudo());
+            Message message = new Message(Transmission.CLIENT_CONNEXION, map);
             Gson gson = new Gson();
             String json = gson.toJson(message);
             out.println(json);
@@ -43,16 +66,47 @@ public class AttenteJoueurController {
     }
 
     @FXML
+    private void lancer() throws IOException {
+        Message message = new Message(Transmission.CLIENT_LANCER, null);
+        envoiMessage(message);
+    }
+
+    @FXML
+    private void modificationOption(ActionEvent e) throws IOException {
+        if(e.getSource() == francaisMenuItem) {
+            langueMenuButton.setText("Français");
+        } else if(e.getSource() == englishMenuItem) {
+            langueMenuButton.setText("English");
+        }
+        LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
+        map.put("accent", accentCheckBox.isSelected());
+        map.put("langue", langueMenuButton.getText());
+        Message message = new Message(Transmission.CLIENT_OPTION, map);
+        envoiMessage(message);
+    }
+
+    @FXML
     private void retour() throws IOException, InterruptedException {
-        PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
-        Message message = new Message(Transmission.CLIENT_DECONNEXION, App.getPseudo());
-        Gson gson = new Gson();
-        String json = gson.toJson(message);
-        out.println(json);
+        LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
+        map.put("pseudo", App.getPseudo());
+        Message message = new Message(Transmission.CLIENT_DECONNEXION, map);
+        envoiMessage(message);
         reception.interrupt();
         reception.join();
         socket.close();
         App.setRoot("menu");
+    }
+
+    void envoiMessage(Message message) throws IOException {
+        PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
+        Gson gson = new Gson();
+        String json = gson.toJson(message);
+        out.println(json);
+    }
+
+    void miseAJourOptions(boolean b, String langue) {
+        accentCheckBox.setSelected(b);
+        langueMenuButton.setText(langue);
     }
 }
 
@@ -84,12 +138,20 @@ class Reception implements Runnable {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void traitement(Message message) {
         if (message.getTransmition() == Transmission.SERVEUR_DECONNEXION) {
             Thread.currentThread().interrupt();
         }
         if(message.getTransmition() == Transmission.SERVEUR_CONNEXION) {
-            miseAJourListeJoueur((ArrayList<String>) message.getMessage());
+            LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) message.getMessage();
+            miseAJourListeJoueur((ArrayList<String>) map.get("listeJoueur"));
+        }
+        if(message.getTransmition() == Transmission.SERVEUR_OPTION) {
+            LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) message.getMessage();
+            boolean accent = (boolean) map.get("accent");
+            String langue = (String) map.get("langue");
+            attenteJoueurController.miseAJourOptions(accent, langue);
         }
     }
 
@@ -98,8 +160,15 @@ class Reception implements Runnable {
             @Override
             public void run() {
                 attenteJoueurController.listeJoueurVBox.getChildren().clear();
+                Text joueurs = new Text("Joueurs :");
+                joueurs.getStyleClass().add("textListeJoueur");
+                attenteJoueurController.listeJoueurVBox.getChildren().add(joueurs);
+                Pane p = new Pane();
+                p.getStyleClass().add("separator");
+                attenteJoueurController.listeJoueurVBox.getChildren().add(p);
                 for (String s : l) {
                     Text t = new Text(s);
+                    t.getStyleClass().add("textListeJoueur");
                     attenteJoueurController.listeJoueurVBox.getChildren().add(t);
                 }
             }
