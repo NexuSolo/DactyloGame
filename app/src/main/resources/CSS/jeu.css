@@ -33,6 +33,12 @@
 ;
 }
 
+.stats {
+    -fx-font-size: 25px;
+    -fx-fill : #e2b714;
+}
+
+
 .space-error {
     -fx-font-size: 25px;
     -fx-font-family: "Arial";

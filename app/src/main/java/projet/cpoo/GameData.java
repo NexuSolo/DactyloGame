@@ -5,23 +5,19 @@ import java.util.List;
 
 public abstract class GameData {
     
-    public static final int LEN_MIN = 10;
-    private static int precisionList[] = new int [LEN_MIN];
 
-    public static int[] getPrecisionList() {
-        return precisionList.clone();
+    private static List<Integer> precList = new LinkedList<Integer>();
+
+    public static  List<Integer> getPrecList() {
+        return new LinkedList<Integer>(precList);
     }
 
-    public static void setPrecisionList(int val,int index) {
-        GameData.precisionList[index] = val;
+    public static void addPrecList(int val) {
+        GameData.precList.add(val);
     }
 
-    public static void resetPrecisionList() {
-        resetPrecisionList(LEN_MIN);
-    }
-
-    public static void resetPrecisionList(int length) {
-        GameData.precisionList = new int[length];
+    public static void resetPrecList() {
+        GameData.precList = new LinkedList<Integer>();
     }
 
     private static List<Integer> freqList = new LinkedList<Integer>();
@@ -40,25 +36,22 @@ public abstract class GameData {
     
     public static void resetAll() {
         resetFreqList();
-        resetPrecisionList();
+        resetPrecList();
+        resetWordList();
     }
 
-    private static int wordList[] = new int [LEN_MIN];
+    private static List<Integer> wordList = new LinkedList<Integer>();
 
-    public static int[] getWordList() {
-        return wordList.clone();
+    public static  List<Integer> getWordList() {
+        return new LinkedList<Integer>(wordList);
     }
 
-    public static void setWordList(int val,int index) {
-        GameData.wordList[index] = val;
+    public static void addWordList(int val) {
+        GameData.wordList.add(val);
     }
 
     public static void resetWordList() {
-        resetWordList(LEN_MIN);
-    }
-
-    public static void resetWordList(int length) {
-        GameData.wordList = new int[length];
+        GameData.wordList = new LinkedList<Integer>();
     }
 
     private static int motComplete = 0;
@@ -69,6 +62,16 @@ public abstract class GameData {
 
     public static void setMotComplete(int motComplete) {
         GameData.motComplete = motComplete;
+    }
+
+    private static int tempsFinal = 0;
+
+    public static int getTempsFinal() {
+        return tempsFinal;
+    }
+
+    public static void setTempsFinal(int tempsFinal) {
+        GameData.tempsFinal = tempsFinal;
     }
 
     

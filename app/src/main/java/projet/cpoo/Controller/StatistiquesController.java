@@ -2,6 +2,7 @@ package projet.cpoo.Controller;
 
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,30 +54,43 @@ public class StatistiquesController {
 
     private void setText(){
         int mots = GameData.getMotComplete();
-        int temps = Settings.getTEMPS_MAX()/10;
+        int temps = GameData.getTempsFinal()/10;
         int mpm = (60*mots)/temps;
         String s = "Bravo vous avez tape " + mots + " mots en " + temps + " secondes";
-        s += "\n Cela fait donc " + mpm + " mots par minute"; 
-        congrats.getStyleClass().add("congratText");
-        congrats.setStyle("-fx-text-fill: #e2b714;-fx-font-size: 25;");
+        s += "\nCela fait donc " + mpm + " mots par minute"; 
         congrats.setText(s);
     }
 
     private void setMotGraph() {
-        int wordTab[] = GameData.getWordList();
-        final NumberAxis xAxis = new NumberAxis(0, wordTab.length, 1);
-        final NumberAxis yAxis = new NumberAxis(0, Settings.getTEMPS_MAX()/10,Settings.getTEMPS_MAX()/100);
-        xAxis.setLabel("Nombre de mots");
-        yAxis.setLabel("Temps en s");
+        System.out.println("GD TF = " + GameData.getTempsFinal()*0.01);
+        List<Integer> wordTab = GameData.getWordList();
+        final NumberAxis yAxis;
+        final NumberAxis xAxis;
+        if (Settings.isModeTemps()) {
+            yAxis = new NumberAxis(0, GameData.getMotComplete(), 1);
+            xAxis = new NumberAxis(0, GameData.getTempsFinal()*.1,GameData.getTempsFinal()*.01);
+            yAxis.setLabel("Nombre de mots");
+            xAxis.setLabel("Temps en s");
+        }
+        else {
+            yAxis = new NumberAxis(0, GameData.getMotComplete(), 1);
+            xAxis = new NumberAxis(0, GameData.getTempsFinal()*.1,GameData.getTempsFinal()*.01);
+            xAxis.setLabel("Nombre de mots");
+            yAxis.setLabel("Temps en s");
+        }
+       
+        
         yAxis.setMinorTickVisible(false);
         xAxis.setMinorTickVisible(false);
         final AreaChart<Number, Number> motChart = new AreaChart<Number, Number>(xAxis, yAxis);
 
         XYChart.Series serie1 = new Series<>();
         serie1.getData().add(new XYChart.Data<>(0, 0));
-        for (int i = 0; i < wordTab.length; i++) {
-            System.out.println("Data " + (i+1) + " = " + wordTab[i]);
-            serie1.getData().add(new XYChart.Data<>(i + 1, wordTab[i]));
+        for (int i = 0; i < wordTab.size(); i++) {
+            double x = i * (GameData.getTempsFinal()*0.01);
+            System.out.println("Add x " + (x) + " y  " + wordTab.get(i));
+            if (Settings.isModeTemps()) serie1.getData().add(new XYChart.Data<>(x,wordTab.get(i)));
+            else serie1.getData().add(new XYChart.Data<>(wordTab.get(i),x));
         }
         motChart.setTitle("Mot par minutes");
         motChart.setLegendVisible(false);
@@ -85,13 +99,13 @@ public class StatistiquesController {
     }
 
     private void setPrecGraph() {
-        int precisionTab[] = GameData.getPrecisionList();
+        List<Integer> precList = GameData.getPrecList();
         String s = (Settings.isModeTemps())?"Temps en s":"Nombre de mots";
 
-        final NumberAxis xAxis = new NumberAxis(0, precisionTab.length, precisionTab.length/10);
+        final NumberAxis xAxis = new NumberAxis(0, precList.size(), precList.size()/10);
         final NumberAxis yAxis = new NumberAxis(0, 100, 10);
         xAxis.setLabel(s);
-        yAxis.setLabel("Precision en %");
+        yAxis.setLabel("Pr\u00e9cision en %");
         yAxis.setMinorTickVisible(false);
         xAxis.setMinorTickVisible(false);
         xAxis.setTickMarkVisible(false);
@@ -100,12 +114,11 @@ public class StatistiquesController {
         
         XYChart.Series serie1 = new Series<>();
         serie1.getData().add(new XYChart.Data<>(0, 100));
-        for (int i = 0; i < precisionTab.length; i++) {
-            System.out.println("Data " + (i+1) + " = " + precisionTab[i]);
-            serie1.getData().add(new XYChart.Data<>(i + 1, precisionTab[i]));
+        for (int i = 0; i < precList.size(); i++) {
+            serie1.getData().add(new XYChart.Data<>(i + 1, precList.get(i)));
         }
         precChart.setLegendVisible(false);
-        precChart.setTitle("Precision lors de la partie");
+        precChart.setTitle("Pr\u00e9cision lors de la partie");
         precChart.getData().addAll(serie1);
         gridPane.add(precChart, 0,2);
 
@@ -117,22 +130,22 @@ public class StatistiquesController {
         int max = 50;
         if (opt.isPresent()) max = opt.get();
         final NumberAxis xAxis = new NumberAxis(0, freqList.size()-1, 1);
-        final NumberAxis yAxis = new NumberAxis(0,max,max*0.1);
+        final NumberAxis yAxis = new NumberAxis(0,max,max*0.01);
         final AreaChart<Number,Number> freqChart = new AreaChart<Number,Number>(xAxis,yAxis);
-        xAxis.setLabel("Numero de caractère");
-        yAxis.setLabel("Fluidite en ?");
+        xAxis.setLabel("Numero de caract\u00e8re");
+        yAxis.setLabel("Temps entre 2 caractères en 10e de secondes");
         yAxis.setMinorTickVisible(false);
         xAxis.setMinorTickVisible(false);
 
-        freqChart.setTitle("Fluidite lors de la partie");
+        freqChart.setTitle("Fluidit\u00e9 lors de la partie");
         XYChart.Series serieFreq = new Series<>();
         for (int i = 0; i < freqList.size(); i++) {
             serieFreq.getData().add(new XYChart.Data<>(i, freqList.get(i)));
         }
-        serieFreq.setName("Fluidité en moyenne");
+        serieFreq.setName("Fluidit\u00e9 en moyenne");
         freqChart.getData().addAll(serieFreq);
         freqChart.setLegendVisible(false);
-        freqChart.setTitle("Fluidite lors de la partie");
+        freqChart.setTitle("Fluidit\u00e9 lors de la partie");
         xAxis.setTickLabelsVisible(false);
         yAxis.setTickMarkVisible(false);
         gridPane.add(freqChart, 1,2);

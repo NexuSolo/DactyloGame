@@ -35,7 +35,7 @@
                   <Cursor fx:constant="DEFAULT" />
                </cursor>
             </TextArea>
-            <GridPane>
+            <GridPane styleClass="stats">
               <columnConstraints>
                 <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                 <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -46,12 +46,12 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title" text="Mots completes : " />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="stats" text="Mots completes : " />
                   <Text fx:id="stat_mot" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.rowIndex="1" />
-                  <Text fx:id="stat_prec" strokeType="OUTSIDE" strokeWidth="0.0" text="100%" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title" text="Precision" GridPane.columnIndex="1" />
-                  <Text fx:id="texte_restant" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title" text="Mots restants" GridPane.columnIndex="2" />
-                  <Text fx:id="stat_restant" strokeType="OUTSIDE" strokeWidth="0.0" text="10" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                  <Text fx:id="stat_prec" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="stats" text="100%" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="stats" text="Precision" GridPane.columnIndex="1" />
+                  <Text fx:id="texte_restant" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="stats" text="Mots restants" GridPane.columnIndex="2" />
+                  <Text fx:id="stat_restant" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="stats" text="10" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                </children>
             </GridPane>
          </children>

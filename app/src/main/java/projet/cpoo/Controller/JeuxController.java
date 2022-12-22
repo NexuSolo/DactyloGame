@@ -24,18 +24,18 @@ import javax.swing.text.html.HTMLDocument.HTMLReader.CharacterAction;
 
 
 public class JeuxController {
-    private static int CHAR_PER_LINE = 10;
+    private static int CHAR_PER_LINE = 30;
     private int pos = 0;
     private int posMin = 0;
     private int motComplete = 0;
     private double entreesClavier = 0;
     private double lettresCorrectes = 0;
-    private int motMax = 3;
+    private int motMax = Settings.getLIMITE_MAX();
     private int tmpTemps = 0;
     private int derCharUtile = 0;
     private boolean modeTemps;
-    private static int TEMPS_MAX = Settings.getTEMPS_MAX();
-    private int temps = TEMPS_MAX;
+    private static int TEMPS_MAX = Settings.getLIMITE_MAX();
+    private int temps = 0;
     private Timer timer = new Timer();
     private boolean start = false;
     private boolean circonflexe = false;
@@ -76,31 +76,32 @@ public class JeuxController {
     @FXML
     private void initialize() {
         try {
+            TEMPS_MAX = Settings.getLIMITE_MAX();
+            motMax = Settings.getLIMITE_MAX();
             modeTemps = Settings.isModeTemps();
             ligne_act = ligne_1;
             BufferedReader reader = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResource("liste_mots/liste_francais.txt").openStream()));
             List<String> list = new ArrayList<String>();
             // pos += addWordtoLine("ï", ligne_act);
             // ligne_act.getChildren().add(new Text(" "));
-            for (int i = 0 ; i < 100 ; i++) {
-                String text = new String(reader.readLine().getBytes(),"UTF-8");
+            String text = new String(reader.readLine().getBytes(),"UTF-8");
+            while (text != null) {
+                text = new String(text.getBytes(),"UTF-8");
                 list.add(text);
+                text = reader.readLine();
             }
-            System.out.println("et é");
-            // Collections.shuffle(list);
+            // for (int i = 0 ; i < 5000 ; i++) {
+            //     String text = new String(reader.readLine().getBytes(),"UTF-8");
+            //     list.add(text);
+            // }
+            Collections.shuffle(list);
             //TODO Enlever les trucs qui facilitent les tests
                 // list = list.stream().filter((x -> x.length() < 9)).toList();
             stringIter = list.iterator();
             while(stringIter.hasNext()) {
-                //faire un string text qui est egal a stringIter.next() avec le codage utf-8
-                String text = new String(stringIter.next().getBytes(),"UTF-8");
-
-                // for (char c : text.toCharArray()) {
-                //     String s = new String(Character.toString(c).getBytes(), "UTF-8");
-                //     System.out.print(" " + s);
-                // }
-                System.out.println();
-                System.out.println(text);
+                text = stringIter.next();
+                for (char c : text.toCharArray()) {
+                }
                 if(pos + text.length() > CHAR_PER_LINE) {
                     pos = 0;
                     if (!updateActualLine()) {
@@ -114,6 +115,8 @@ public class JeuxController {
             }
             reader.close();
             ligne_act = ligne_1;
+            if(modeTemps) updateTempsRestant();
+            else updateMotRestant();
 
         }
         catch (Exception e) {
@@ -125,33 +128,36 @@ public class JeuxController {
 
     private void timerStart() {
         start = true;
-        if (modeTemps) {
-            texte_restant.setText("Temps restant");
-            timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        Platform.runLater( () -> {
-                        temps-= 0.1;
-                        updateTempsRestant();
-                        if (tempsPasse()% (TEMPS_MAX/10) == 0) updateData();
-                        try {
-                            finDuJeu();
-                        }
-                        catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                    });
-                }
-                    },0,100);
-                    stat_mot.setText("0");
+        if (modeTemps) texte_restant.setText("Temps restant");
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater( () -> {
+                temps+= 1;
+                if (modeTemps) updateModeTemps();
+                });
             }
+        },0,100);
+        if(modeTemps) stat_mot.setText("0");
     }
+
+    private void updateModeTemps() {
+        updateTempsRestant();
+        if (temps % (TEMPS_MAX/10) == 0) updateData();
+        try {
+            finDuJeu();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
     private int addWordtoLine(String s,HBox line) {
         int pos = 0;
         for(char c : s.toCharArray()) {
                 Text t = new Text(String.valueOf(c));
                 // System.out.println("char = " + String.valueOf(c));
-                t.setFont(new Font("Arial",12));
+                // t.setFont(new Font("Arial",12));
                 t.getStyleClass().add("text-to-do");
                 line.getChildren().add(t);
                 pos++;
@@ -196,7 +202,6 @@ public class JeuxController {
         int i = finMot;
         while (i >=0) {
             Text t = (Text) ligne_act.getChildren().get(i);
-            System.out.print(t.getText()+" ");
             if (t.getText().equals(" ")) return true;
             if (t.getStyleClass().contains("text-error") || t.getStyleClass().contains("text-skipped")) return false;
             i--;
@@ -206,7 +211,7 @@ public class JeuxController {
 
     private void updatePrecision() {
         double ratio = lettresCorrectes/entreesClavier;
-        // System.out.println("Prec : " + (ratio*100) + " LC " + (lettresCorrectes) + " EC "+(entreesClavier));
+        System.out.println("Prec : " + (ratio*100) + " LC " + (lettresCorrectes) + " EC "+(entreesClavier));
         stat_prec.setText(String.valueOf((int)(ratio*100) + "%"));
     }
 
@@ -219,23 +224,22 @@ public class JeuxController {
     }
 
     private void updateTempsRestant() {
-        stat_restant.setText(String.valueOf(temps/10));
+        stat_restant.setText(String.valueOf((TEMPS_MAX-temps)/10));
     }
 
-    private int tempsPasse() {
-        return TEMPS_MAX - temps;
-    }
+  
 
     private void updateData() {
         if(modeTemps) {
-            int tempsPasse = tempsPasse();
             int diviseur = TEMPS_MAX/100;
             if (diviseur == 0) diviseur = 1;
-            if(tempsPasse % diviseur == 0) {
+            if(temps % diviseur == 0) {
                 double ratio = lettresCorrectes/entreesClavier;
-                System.out.println("case print : " + (tempsPasse/(TEMPS_MAX/10) -1));
-                GameData.setPrecisionList((int)(ratio*100),tempsPasse/(TEMPS_MAX/10) - 1);
-                GameData.setWordList(motComplete,tempsPasse/(TEMPS_MAX/10) - 1);
+                System.out.println("case print : " + (temps/(TEMPS_MAX/10) -1) + "  nb mots = " + motComplete);
+                System.out.println("LC = " + lettresCorrectes);
+                // System.out.println("case print : " + (temps/(TEMPS_MAX/10) -1));
+                GameData.addPrecList((int)(ratio*100));
+                GameData.addWordList(motComplete);
             }
         }
         else {
@@ -243,7 +247,9 @@ public class JeuxController {
             if (diviseur == 0) diviseur = 1;
             if (motComplete % diviseur == 0) {
                 double ratio = lettresCorrectes/entreesClavier;
-                GameData.setPrecisionList((int)(ratio*100),(motComplete/diviseur)-1);
+                System.out.println("case print : " + (motComplete) + " Temps = " + temps);
+                GameData.addPrecList((int)(ratio*100));
+                GameData.addWordList(temps/10);
             }
         }
     }
@@ -262,22 +268,27 @@ public class JeuxController {
     }
 
     private void finDuJeu() throws IOException {
-        if (modeTemps && temps <= 0) {
+        if ( ( modeTemps && temps >= TEMPS_MAX) || (!modeTemps && motMax - motComplete  == 0) ) {
             timer.cancel();
+            if(modeTemps) {
+                GameData.addWordList(motComplete);
+                double a = temps - tmpTemps;
+                if (a > GameData.getFreqList().get(GameData.getFreqList().size() - 1)) GameData.addFreqList(temps-tmpTemps);
+            }
             GameData.setMotComplete(motComplete);
+            GameData.setTempsFinal(temps);
             App.setRoot("statistiques");
         }
-        else if (!modeTemps && motMax - motComplete  == 0) App.setRoot("statistiques");
     }
 
 
     private boolean isAccentedChar(String s) {
         switch (s) {
-            case "à" : return true;
-            case "ç" : return true;
-            case "é" : return true;
-            case "è" : return true;
-            case "ù" : return true;
+            case "\u00f9" : return true;
+            case "\u00e0" : return true;
+            case "\u00e9" : return true;
+            case "\u00e8" : return true;
+            case "\u00e7" : return true;
             default : return false;
         }
     }
@@ -290,40 +301,68 @@ public class JeuxController {
         }
     }
 
-    private String formatString(String text) {
+    private String inputToChars(KeyEvent e) {
+        switch(e.getCode()) {
+            case DIGIT2 : return "\u00e9";
+            case DIGIT7 : return "\u00e8";
+            case DIGIT9 : return "\u00e7";
+            case DIGIT0 : return "\u00e0";
+            case UNDEFINED : return "\u00f9";
+            default : return e.getCharacter();
+        }
+    }
+
+    private String toAccent(String text) {
         switch (text) {
-            case "a" : if (circonflexe){
-                System.out.println("vyuijopk â é" +'\u00a9');
-                return "â";
-            }
-            else if (trema) return "ä";
+            case "a" : if (circonflexe) return "\u00e2";
+            else if (trema) return "\u00e4";
             break;
-            case "e" : if (circonflexe) return "ê";
-            else if (trema) return "ë";
+            case "e" : if (circonflexe) return "\u00ea";
+            else if (trema) return "\u00eb";
             break;
-            case "u" : if (circonflexe) return "û";
-            else if (trema) return "ü";
+            case "u" : if (circonflexe) return "\u00fb";
+            else if (trema) return "\u00fc";
             break;
-            case "i" : if (circonflexe) return "î";
-            else if (trema) return "ï";
+            case "i" : if (circonflexe) return "\u00ee";
+            else if (trema) return "\u00ef";
             break;
-            case "o" : if (circonflexe) return "ô";
-            else if (trema) return "ö";
+            case "o" : if (circonflexe) return "u00f4";
+            else if (trema) return "u00f6";
             break;
             default : break;
         }
         return text;
     }
 
+    private String formatString(String text,boolean shift) {
+        if (shift) return toAccent(text).toUpperCase();
+        else return toAccent(text); 
+    }
+    
+    private int posBack() {
+        Text t = (Text) ligne_act.getChildren().get(pos);
+        System.out.println("texte = " + t.getText());
+        if(t.getStyleClass().contains("text-skipped")) {
+            System.out.println("skipped");
+            int tmp = pos;
+            while (t.getStyleClass().contains("text-skipped")) {
+                tmp--; 
+                t = (Text) ligne_act.getChildren().get(tmp);
+            }
+            return pos-tmp; 
+        }
+        else return 1;
+    }
     @FXML
     private void keyDetect(KeyEvent e) {
-        // System.out.println(" char = " + formatString(e.getText()));
-        if(e.getCode().isLetterKey() || isAccentedChar(e.getCharacter())) {
+        // System.out.println(" char = " + inputToChars(e)+  "\u00e9" );
+        if(e.getCode().isLetterKey() || isAccentedChar(inputToChars(e)) || e.getCode() == KeyCode.MINUS) {
             if (!start) timerStart();
             entreesClavier++;
             if(pos >= CHAR_PER_LINE || pos >= ligne_act.getChildren().size() ) {
                 pos = 0;
                 posMin = 0;
+                derCharUtile = 0;
                 if (!updateActualLine()) {
                     if (!addLine()) {
                         return;
@@ -335,16 +374,16 @@ public class JeuxController {
                 }
             }
             Text t = (Text) ligne_act.getChildren().get(pos);
-            System.out.println("T text = " + t.getText() + " char = " + formatString(e.getText()));
-            if(t.getText().equals(formatString(e.getText()))) {
+            if(t.getText().equals(formatString(e.getText(),e.isShiftDown()))) {
                 t.getStyleClass().remove("text-to-do");
                 t.getStyleClass().add("text-done");
                 pos++;
                 if (derCharUtile < pos) {
                     lettresCorrectes++;
                     derCharUtile = pos;
-                    int a = tempsPasse() - tmpTemps;
-                    tmpTemps = tempsPasse();
+                    //Pour avoir le temps en secondes
+                    int a = temps - tmpTemps;
+                    tmpTemps = temps;
                     GameData.addFreqList(a);
                 }
             }
@@ -361,7 +400,7 @@ public class JeuxController {
             circonflexe = false;
             trema = false;
         }
-        else if(e.getCode().isWhitespaceKey()) {
+        else if(e.getCode() == KeyCode.SPACE) {
             circonflexe = false;
             trema = false;
             Text t = (Text) ligne_act.getChildren().get(pos);
@@ -382,7 +421,7 @@ public class JeuxController {
                     }
                 }
                 updateMotComplete();
-                updateMotRestant();
+                if (!modeTemps) updateMotRestant();
                 try {
                     finDuJeu();
                 }
