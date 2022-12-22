@@ -3,6 +3,7 @@ package projet.cpoo.Controller;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import projet.cpoo.App;
 import projet.cpoo.Message;
-import projet.cpoo.ParametrePartie;
 import projet.cpoo.Transmission;
 
 public class AttenteJoueurController {
@@ -107,7 +107,13 @@ public class AttenteJoueurController {
     void miseAJourOptions(boolean b, String langue) {
         Platform.runLater(() -> {
             accentCheckBox.setSelected(b);
-            langueMenuButton.setText(langue);
+            String s;
+            try {
+                s = new String(langue.getBytes(), "UTF-8");
+                langueMenuButton.setText(s);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
         });
     }
 }
@@ -141,19 +147,26 @@ class Reception implements Runnable {
     }
 
     @SuppressWarnings("unchecked")
-    private void traitement(Message message) {
-        if (message.getTransmition() == Transmission.SERVEUR_DECONNEXION) {
-            Thread.currentThread().interrupt();
-        }
-        if(message.getTransmition() == Transmission.SERVEUR_CONNEXION) {
-            LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) message.getMessage();
-            miseAJourListeJoueur((ArrayList<String>) map.get("listeJoueur"));
-        }
-        if(message.getTransmition() == Transmission.SERVEUR_OPTION) {
-            LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) message.getMessage();
-            boolean accent = (boolean) map.get("accent");
-            String langue = (String) map.get("langue");
-            attenteJoueurController.miseAJourOptions(accent, langue);
+    private void traitement(Message message) throws IOException {
+        switch(message.getTransmition()) {
+            case SERVEUR_DECONNEXION:
+                Thread.currentThread().interrupt();
+                break;
+            case SERVEUR_CONNEXION:
+                LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) message.getMessage();
+                miseAJourListeJoueur((ArrayList<String>) map.get("listeJoueur"));
+                break;
+            case SERVEUR_OPTION:
+                LinkedTreeMap<String, Object> map2 = (LinkedTreeMap<String, Object>) message.getMessage();
+                boolean accent = (boolean) map2.get("accent");
+                String langue = (String) map2.get("langue");
+                attenteJoueurController.miseAJourOptions(accent, langue);
+                break;
+            case SERVEUR_LANCER:
+                App.setRoot("jeu");
+                break;
+            default:
+                break;
         }
     }
 

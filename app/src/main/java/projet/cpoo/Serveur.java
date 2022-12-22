@@ -17,7 +17,7 @@ import com.google.gson.internal.LinkedTreeMap;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 public class Serveur {
-    private static ParametrePartie parametrePartie = new ParametrePartie(false, "Francais");
+    private static ParametrePartie parametrePartie = new ParametrePartie(false, "Français");
     public static void main (String[] args) {
         Map<Socket,String> sockets = new HashMap<Socket,String>();
         try {
@@ -72,6 +72,7 @@ class ClientThread implements Runnable {
             
         }
         catch (SocketException e) {
+            System.out.println("Client déconnecté");
             sockets.remove(client);
             try {
                 listeJoueurs();
@@ -86,6 +87,7 @@ class ClientThread implements Runnable {
         
     }
 
+    @SuppressWarnings("unchecked")
     private void traitement(Message message) throws IOException {
         if(message.getTransmition() == Transmission.CLIENT_CONNEXION) {
             LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) message.getMessage();
@@ -142,7 +144,10 @@ class ClientThread implements Runnable {
         out.println(json);
     }
 
-    private void lancementPartie() {
-        //TODO
+    private void lancementPartie() throws IOException {
+        for(Socket socket : sockets.keySet()) {
+            Message m = new Message(Transmission.SERVEUR_LANCER, null);
+            envoiMessage(socket, m);
+        }
     }
 }

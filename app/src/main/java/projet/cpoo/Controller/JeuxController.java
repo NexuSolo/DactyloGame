@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.swing.text.html.HTMLDocument.HTMLReader.CharacterAction;
+
 
 public class JeuxController {
     private static int CHAR_PER_LINE = 10;
@@ -81,7 +83,7 @@ public class JeuxController {
             // pos += addWordtoLine("ï", ligne_act);
             // ligne_act.getChildren().add(new Text(" "));
             for (int i = 0 ; i < 100 ; i++) {
-                String text = reader.readLine();
+                String text = new String(reader.readLine().getBytes(),"UTF-8");
                 list.add(text);
             }
             System.out.println("et é");
@@ -90,10 +92,13 @@ public class JeuxController {
                 // list = list.stream().filter((x -> x.length() < 9)).toList();
             stringIter = list.iterator();
             while(stringIter.hasNext()) {
-                String text = stringIter.next();
-                for (char c : text.toCharArray()) {
-                    System.out.print(" " + c);
-                }
+                //faire un string text qui est egal a stringIter.next() avec le codage utf-8
+                String text = new String(stringIter.next().getBytes(),"UTF-8");
+
+                // for (char c : text.toCharArray()) {
+                //     String s = new String(Character.toString(c).getBytes(), "UTF-8");
+                //     System.out.print(" " + s);
+                // }
                 System.out.println();
                 System.out.println(text);
                 if(pos + text.length() > CHAR_PER_LINE) {

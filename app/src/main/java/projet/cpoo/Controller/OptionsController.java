@@ -1,6 +1,7 @@
 package projet.cpoo.Controller;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.Socket;
 
@@ -121,9 +122,10 @@ public class OptionsController {
     }
 
     @FXML
-    private void langueFrancais() {
-        langueMenuButton.setText("Français");
-        App.setLangue("Français");
+    private void langueFrancais() throws UnsupportedEncodingException {
+        String s = new String("Français".getBytes(), "utf-8");
+        langueMenuButton.setText(s);
+        App.setLangue(s);
     }
 
     @FXML

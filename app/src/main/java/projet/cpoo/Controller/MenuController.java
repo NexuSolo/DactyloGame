@@ -1,11 +1,13 @@
 package projet.cpoo.Controller;
 
 import java.io.IOException;
+import java.net.Socket;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Polygon;
+import javafx.scene.text.Text;
 import projet.cpoo.App;
 
 public class MenuController {
@@ -29,6 +31,8 @@ public class MenuController {
     private Polygon optionsArrow;
     @FXML
     private Polygon quitterArrow;
+    @FXML
+    private Text erreurConnexionMenu;
 
     @FXML
     private void highlightButton(MouseEvent e) throws IOException {
@@ -82,7 +86,20 @@ public class MenuController {
 
     @FXML
     private void switchToMultijoueur() throws IOException {
-        App.setRoot("attenteJoueur");
+        try(Socket socket = new Socket(App.getIp(), App.getPort())) {
+            socket.close();
+            App.setRoot("attenteJoueur");
+        } catch (IOException e) {
+            new Thread(() -> {
+                try {
+                    erreurConnexionMenu.setOpacity(1);
+                    Thread.sleep(4000);
+                    erreurConnexionMenu.setOpacity(0);
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            }).start();
+        }
     }
 
     @FXML

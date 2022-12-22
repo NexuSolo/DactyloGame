@@ -140,7 +140,7 @@
             </GridPane>
          </center>
          <bottom>
-            <Text fill="RED" opacity="0.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Impossible de rejoindre le serveur. Vérifier vos options de connexion" underline="true" BorderPane.alignment="CENTER" />
+            <Text fx:id="erreurConnexionMenu" fill="RED" opacity="0.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Impossible de rejoindre le serveur. Vérifier vos options de connexion" underline="true" BorderPane.alignment="CENTER" />
          </bottom>
       </BorderPane>
    </children>
