@@ -30,15 +30,25 @@
     -fx-font-size: 1.5em;    
     -fx-tick-label-fill: #e2b714;
     -fx-font-family: Tahoma;
-    -fx-tick-length: 20;
-    -fx-minor-tick-length: 10;
+    -fx-tick-length: 10;
 }
 
+.default-color0.chart-area-symbol { -fx-background-color: #e2b714, #e2b714; }
+
+.default-color0.chart-series-area-line { -fx-stroke: #4472C4; }
+
+.default-color0.chart-series-area-fill { -fx-fill: #4473c410}
+
 .axis-label {
-    -fx-text-fill: #e2b714; 
+    -fx-text-fill: #e2b714;
  }
+
+ .chart-content {
+    -fx-padding: 30px;
+}
+
 .chart-plot-background {
-    -fx-background-color: #e2b714;
+    -fx-background-color: #41454c;
 }
 .chart-vertical-grid-lines {
     -fx-stroke: transparent;

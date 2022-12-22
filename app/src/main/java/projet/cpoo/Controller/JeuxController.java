@@ -6,6 +6,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import projet.cpoo.App;
 import projet.cpoo.GameData;
@@ -21,14 +22,13 @@ import java.util.TimerTask;
 
 
 public class JeuxController {
-    private static int CHAR_PER_LINE = 40;
+    private static int CHAR_PER_LINE = 10;
     private int pos = 0;
     private int posMin = 0;
     private int motComplete = 0;
     private double entreesClavier = 0;
     private double lettresCorrectes = 0;
     private int motMax = 3;
-    private int moyFluidite = 0;
     private int tmpTemps = 0;
     private int derCharUtile = 0;
     private boolean modeTemps;
@@ -36,7 +36,7 @@ public class JeuxController {
     private int temps = TEMPS_MAX;
     private Timer timer = new Timer();
     private boolean start = false;
-    private boolean circonflexe = false; 
+    private boolean circonflexe = false;
     private boolean trema = false;
 
 
@@ -78,16 +78,24 @@ public class JeuxController {
             ligne_act = ligne_1;
             BufferedReader reader = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResource("liste_mots/liste_francais.txt").openStream()));
             List<String> list = new ArrayList<String>();
+            // pos += addWordtoLine("ï", ligne_act);
+            // ligne_act.getChildren().add(new Text(" "));
             for (int i = 0 ; i < 100 ; i++) {
                 String text = reader.readLine();
                 list.add(text);
             }
-            Collections.shuffle(list);
+            System.out.println("et é");
+            // Collections.shuffle(list);
             //TODO Enlever les trucs qui facilitent les tests
-            list = list.stream().filter((x -> x.length() < 9)).toList();
+                // list = list.stream().filter((x -> x.length() < 9)).toList();
             stringIter = list.iterator();
             while(stringIter.hasNext()) {
                 String text = stringIter.next();
+                for (char c : text.toCharArray()) {
+                    System.out.print(" " + c);
+                }
+                System.out.println();
+                System.out.println(text);
                 if(pos + text.length() > CHAR_PER_LINE) {
                     pos = 0;
                     if (!updateActualLine()) {
@@ -137,6 +145,8 @@ public class JeuxController {
         int pos = 0;
         for(char c : s.toCharArray()) {
                 Text t = new Text(String.valueOf(c));
+                // System.out.println("char = " + String.valueOf(c));
+                t.setFont(new Font("Arial",12));
                 t.getStyleClass().add("text-to-do");
                 line.getChildren().add(t);
                 pos++;
@@ -277,7 +287,10 @@ public class JeuxController {
 
     private String formatString(String text) {
         switch (text) {
-            case "a" : if (circonflexe) return "â";
+            case "a" : if (circonflexe){
+                System.out.println("vyuijopk â é" +'\u00a9');
+                return "â";
+            }
             else if (trema) return "ä";
             break;
             case "e" : if (circonflexe) return "ê";
@@ -299,7 +312,7 @@ public class JeuxController {
 
     @FXML
     private void keyDetect(KeyEvent e) {
-        System.out.println(" char = " + e.getCode());
+        // System.out.println(" char = " + formatString(e.getText()));
         if(e.getCode().isLetterKey() || isAccentedChar(e.getCharacter())) {
             if (!start) timerStart();
             entreesClavier++;
@@ -317,6 +330,7 @@ public class JeuxController {
                 }
             }
             Text t = (Text) ligne_act.getChildren().get(pos);
+            System.out.println("T text = " + t.getText() + " char = " + formatString(e.getText()));
             if(t.getText().equals(formatString(e.getText()))) {
                 t.getStyleClass().remove("text-to-do");
                 t.getStyleClass().add("text-done");
@@ -337,7 +351,7 @@ public class JeuxController {
             else {
                 t.getStyleClass().remove("text-to-do");
                 t.getStyleClass().add("text-error");
-                pos++;  
+                pos++;
             }
             circonflexe = false;
             trema = false;

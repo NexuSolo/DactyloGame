@@ -36,7 +36,7 @@ public abstract class Settings {
         Settings.modeTemps = false;
     }
 
-    private static int TEMPS_MAX = 100;
+    private static int TEMPS_MAX = 10;
 
     public static int getTEMPS_MAX() {
         return TEMPS_MAX;
