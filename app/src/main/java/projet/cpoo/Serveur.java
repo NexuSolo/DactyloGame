@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,7 +61,7 @@ class ClientThread implements Runnable {
             BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
             String line;
             while ((line = reader.readLine()) != null) {
-                System.out.println(line);
+                System.out.println(LocalTime.now() + " : " + line);
                 Gson gson = new Gson();
                 Message message = gson.fromJson(line, Message.class);
                 traitement(message);
@@ -90,6 +91,7 @@ class ClientThread implements Runnable {
             LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) message.getMessage();
             sockets.put(client, (String) map.get("pseudo"));
             listeJoueurs();
+            miseAJourOptions();
         }
         if(message.getTransmition() == Transmission.CLIENT_DECONNEXION) {
             sockets.remove(client);
