@@ -14,6 +14,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import projet.cpoo.App;
+import projet.cpoo.GameData;
+import projet.cpoo.Settings;
 
 public class OptionsController {
     private Socket socket;
@@ -78,7 +80,7 @@ public class OptionsController {
         testConnect(App.getIp(), App.getPort());
         langueMenuButton.setText(App.getLangue());
         accentCheckBox.setSelected(App.isAccent());
-        if (App.getMode().equals("temps")) {
+        if (Settings.isModeTemps()) {
             tempsRadioButton.setSelected(true);
             nombreDeText.setText("Nombre de secondes :");
         }
@@ -87,8 +89,12 @@ public class OptionsController {
             nombreDeText.setText("Nombre de mots :");
         }
         spin.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 300, 60));
-        spin.getValueFactory().setValue(App.getModenbr());
-        spin.valueProperty().addListener((obs, oldValue, newValue) -> App.setModenbr(((Integer) newValue).intValue()));
+        if (Settings.isModeTemps()) spin.getValueFactory().setValue(Settings.getLIMITE_MAX()/10);
+        else spin.getValueFactory().setValue(Settings.getLIMITE_MAX());
+        spin.valueProperty().addListener((obs, oldValue, newValue) -> { int val = ((Integer) newValue).intValue();
+        if (Settings.isModeTemps()) val *= 10;
+        System.out.println("Set val : " + val);
+        Settings.setLIMITE_MAX(val);});
         
         pseudoField.textProperty().addListener((observable, oldValue, newValue) -> App.setPseudo(newValue));
 
@@ -147,7 +153,10 @@ public class OptionsController {
         tempsRadioButton.setSelected(true);
         MotsRadioButton.setSelected(false);
         nombreDeText.setText("Nombre de secondes :");
-        App.setMode("temps");
+        Settings.setModeTemps();
+        Settings.setLIMITE_MAX(300);
+        spin.getValueFactory().setValue(Settings.getLIMITE_MAX()/10);
+        // App.setMode("temps");
     }
 
     @FXML
@@ -155,7 +164,10 @@ public class OptionsController {
         tempsRadioButton.setSelected(false);
         MotsRadioButton.setSelected(true);
         nombreDeText.setText("Nombre de mots :");
-        App.setMode("mots");
+        Settings.setModeMots();
+        Settings.setLIMITE_MAX(30);
+        spin.getValueFactory().setValue(Settings.getLIMITE_MAX());
+        // App.setMode("mots");
     }
     
     @FXML

@@ -12,8 +12,9 @@
 }
 
 .congratText{
-    -fx-text-fill: #e2b714;
+    -fx-fill: #e2b714;
     -fx-font-size: 25;
+
 }
 
 .chart {

@@ -14,35 +14,35 @@ public abstract class Settings {
         return modeTemps;
     }
 
-    private static int nbMots = 60;
+    private static int nbMots = 300;
 
     public static int getNbMots() {
         return nbMots;
     }
 
-    public void setFrench() {
+    public static void setFrench() {
         Settings.langue = "fr";
     }
 
-    public void setEnglish() {
+    public static void setEnglish() {
         Settings.langue = "en";
     }
 
-    public void setModeTemps() {
+    public static void setModeTemps() {
         Settings.modeTemps = true;
     }
 
-    public void setModeMots() {
+    public static void setModeMots() {
         Settings.modeTemps = false;
     }
 
-    private static int TEMPS_MAX = 10;
+    private static int LIMITE_MAX = 50;
 
-    public static int getTEMPS_MAX() {
-        return TEMPS_MAX;
+    public static int getLIMITE_MAX() {
+        return LIMITE_MAX;
     }
 
-    public static void setTEMPS_MAX(int TEMPS_MAX) {
-        Settings.TEMPS_MAX = TEMPS_MAX;
+    public static void setLIMITE_MAX(int LIMITE_MAX) {
+        Settings.LIMITE_MAX = LIMITE_MAX;
     }
 }
