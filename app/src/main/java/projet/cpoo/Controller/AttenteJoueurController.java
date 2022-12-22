@@ -105,8 +105,10 @@ public class AttenteJoueurController {
     }
 
     void miseAJourOptions(boolean b, String langue) {
-        accentCheckBox.setSelected(b);
-        langueMenuButton.setText(langue);
+        Platform.runLater(() -> {
+            accentCheckBox.setSelected(b);
+            langueMenuButton.setText(langue);
+        });
     }
 }
 
