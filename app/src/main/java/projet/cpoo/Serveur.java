@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
@@ -49,6 +50,7 @@ public class Serveur {
 class ClientThread implements Runnable {
     private Socket client;
     private Map<Socket,String> sockets;
+    private List<String> listeMots = new ArrayList<String>();
 
     public ClientThread(Socket client, Map<Socket,String> sockets) {
         this.client = client;
@@ -69,7 +71,6 @@ class ClientThread implements Runnable {
                     break;
                 }
             }
-            
         }
         catch (SocketException e) {
             System.out.println("Client déconnecté");
@@ -149,5 +150,39 @@ class ClientThread implements Runnable {
             Message m = new Message(Transmission.SERVEUR_LANCER, null);
             envoiMessage(socket, m);
         }
+        creationPartie();
+    }
+
+    private void creationPartie() throws IOException {
+        BufferedReader r = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResource("liste_mots/liste_francais.txt").openStream()));
+        while (r.readLine() != null) {
+            listeMots.add(r.readLine());
+        }
+        for(Socket socket : sockets.keySet()) {
+            List<String> mots = new ArrayList<String>();
+            LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
+            for(int i = 0; i < 15; i++) {
+                //ajouter dans map avec la clé i la valeur true 1 fois sur 10
+                Random rand = new Random();
+                int nombreAleatoire = rand.nextInt(10 * sockets.size());
+                if(nombreAleatoire == 0) {
+                    map.put(String.valueOf(i), true);
+                }
+                else {
+                    map.put(String.valueOf(i), false);
+                }
+                mots.add(motAleatoire());
+            }
+            map.put("listeMot", mots);
+            Message m = new Message(Transmission.SERVEUR_LISTE_MOT, map);
+            envoiMessage(socket, m);
+        }
+        
+    }
+
+    private String motAleatoire() throws IOException {
+        Random rand = new Random();
+        int nombreAleatoire = rand.nextInt(listeMots.size());
+        return listeMots.get(nombreAleatoire);
     }
 }

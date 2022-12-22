@@ -127,6 +127,7 @@ class Reception implements Runnable {
     public Reception(AttenteJoueurController attenteJoueurController, Socket socket) {
         this.attenteJoueurController = attenteJoueurController;
         this.socket = socket;
+        App.setSocket(socket);
     }
 
     @Override
@@ -163,7 +164,7 @@ class Reception implements Runnable {
                 attenteJoueurController.miseAJourOptions(accent, langue);
                 break;
             case SERVEUR_LANCER:
-                App.setRoot("jeu");
+                App.setRoot("multijoueur");
                 break;
             default:
                 break;

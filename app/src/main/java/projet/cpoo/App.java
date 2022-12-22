@@ -6,6 +6,7 @@ package projet.cpoo;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.Socket;
 import java.util.Properties;
 
 import javafx.application.Application;
@@ -24,6 +25,7 @@ public class App extends Application {
     private static boolean accent = true;
     private static String mode = "Temps";
     private static int modenbr = 60;
+    private static Socket socket;
 
     public static void main(String[] args) {
         loadProperties();
@@ -177,6 +179,14 @@ public class App extends Application {
     public static void setModenbr(int modenbr) {
         App.modenbr = modenbr;
         createProperties();
+    }
+
+    public static Socket getSocket() {
+        return socket;
+    }
+
+    public static void setSocket(Socket socket) {
+        App.socket = socket;
     }
 
 }
