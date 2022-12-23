@@ -22,10 +22,17 @@ import java.io.PrintWriter;
 public class Serveur {
     private static ParametrePartie parametrePartie = new ParametrePartie(false, "Français");
     public static void main (String[] args) {
+
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            public void run() {
+                System.out.println("Fermeture du serveur...");
+            }
+        }));
+
         Map<Socket,String> sockets = new HashMap<Socket,String>();
         try {
-            try (ServerSocket server = new ServerSocket(5000)) {
-                System.out.println(server.getInetAddress());
+            try (ServerSocket server = new ServerSocket(Integer.valueOf(args[0]))) {
+                System.out.println(server.getLocalSocketAddress());
                 System.out.println("Serveur en écoute...");
                 while (true) {
                     Socket client = server.accept();
