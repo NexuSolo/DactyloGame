@@ -86,11 +86,21 @@ public class StatistiquesController {
 
         XYChart.Series serie1 = new Series<>();
         serie1.getData().add(new XYChart.Data<>(0, 0));
-        for (int i = 0; i < wordTab.size(); i++) {
-            double x = i * (GameData.getTempsFinal()*0.01);
-            System.out.println("Add x " + (x) + " y  " + wordTab.get(i));
-            if (Settings.isModeTemps()) serie1.getData().add(new XYChart.Data<>(x,wordTab.get(i)));
-            else serie1.getData().add(new XYChart.Data<>(wordTab.get(i),x));
+        if (Settings.isModeTemps()) {
+
+            for (int i = 0; i < wordTab.size(); i++) {
+                double x = i * (GameData.getTempsFinal()*0.01);
+                System.out.println("Add x " + (x) + " y  " + wordTab.get(i));
+                if (Settings.isModeTemps()) serie1.getData().add(new XYChart.Data<>(x,wordTab.get(i)));
+                else serie1.getData().add(new XYChart.Data<>(x,wordTab.get(i)));
+            }
+        }
+        else {
+            for (int i = 0; i < wordTab.size(); i++) {
+                double x = i * (GameData.getTempsFinal()*0.01);
+                System.out.println("2Add x " + (wordTab.get(i)) + " y  " + i);
+                serie1.getData().add(new XYChart.Data<>(wordTab.get(i),i));
+            } 
         }
         motChart.setTitle("Mot par minutes");
         motChart.setLegendVisible(false);
@@ -139,8 +149,14 @@ public class StatistiquesController {
 
         freqChart.setTitle("Fluidit\u00e9 lors de la partie");
         XYChart.Series serieFreq = new Series<>();
-        for (int i = 0; i < freqList.size(); i++) {
-            serieFreq.getData().add(new XYChart.Data<>(i, freqList.get(i)));
+        double pas = freqList.size() * 0.1;
+        for (int i = 0; i < freqList.size(); i+= pas ) {
+            double j = pas * 0.5;
+            int borneinf = (i > 0)?(int)(i-j):i;
+            int bornesup = (i < freqList.size()-1)?(int)(i+j):i;
+            List<Integer> sub = freqList.subList(borneinf,bornesup);
+            double moy = sub.stream().reduce(0,( x,y ) -> x + y)/sub.size();
+            serieFreq.getData().add(new XYChart.Data<>(i, moy));
         }
         serieFreq.setName("Fluidit\u00e9 en moyenne");
         freqChart.getData().addAll(serieFreq);

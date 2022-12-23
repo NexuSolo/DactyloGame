@@ -95,13 +95,16 @@ public class JeuxController {
             //     list.add(text);
             // }
             Collections.shuffle(list);
+            if (!modeTemps) list = list.subList(0,Settings.getLIMITE_MAX());
+            for (String string : list) {
+                System.out.print(" " + string+ " ");   
+            }
+            System.out.println("len = " + list.size());
             //TODO Enlever les trucs qui facilitent les tests
                 // list = list.stream().filter((x -> x.length() < 9)).toList();
             stringIter = list.iterator();
-            while(stringIter.hasNext()) {
+            while(stringIter.hasNext() ) {
                 text = stringIter.next();
-                for (char c : text.toCharArray()) {
-                }
                 if(pos + text.length() > CHAR_PER_LINE) {
                     pos = 0;
                     if (!updateActualLine()) {
@@ -113,6 +116,7 @@ public class JeuxController {
                 ligne_act.getChildren().add(new Text(" "));
                 pos++;
             }
+            pos = 0;
             reader.close();
             ligne_act = ligne_1;
             if(modeTemps) updateTempsRestant();
@@ -156,12 +160,10 @@ public class JeuxController {
         int pos = 0;
         for(char c : s.toCharArray()) {
                 Text t = new Text(String.valueOf(c));
-                // System.out.println("char = " + String.valueOf(c));
-                // t.setFont(new Font("Arial",12));
                 t.getStyleClass().add("text-to-do");
                 line.getChildren().add(t);
                 pos++;
-            }
+        }
         return pos;
     }
 
@@ -211,7 +213,7 @@ public class JeuxController {
 
     private void updatePrecision() {
         double ratio = lettresCorrectes/entreesClavier;
-        System.out.println("Prec : " + (ratio*100) + " LC " + (lettresCorrectes) + " EC "+(entreesClavier));
+        // System.out.println("Prec : " + (ratio*100) + " LC " + (lettresCorrectes) + " EC "+(entreesClavier));
         stat_prec.setText(String.valueOf((int)(ratio*100) + "%"));
     }
 
@@ -235,8 +237,8 @@ public class JeuxController {
             if (diviseur == 0) diviseur = 1;
             if(temps % diviseur == 0) {
                 double ratio = lettresCorrectes/entreesClavier;
-                System.out.println("case print : " + (temps/(TEMPS_MAX/10) -1) + "  nb mots = " + motComplete);
-                System.out.println("LC = " + lettresCorrectes);
+                // System.out.println("case print : " + (temps/(TEMPS_MAX/10) -1) + "  nb mots = " + motComplete);
+                // System.out.println("LC = " + lettresCorrectes);
                 // System.out.println("case print : " + (temps/(TEMPS_MAX/10) -1));
                 GameData.addPrecList((int)(ratio*100));
                 GameData.addWordList(motComplete);
@@ -273,7 +275,7 @@ public class JeuxController {
             if(modeTemps) {
                 GameData.addWordList(motComplete);
                 double a = temps - tmpTemps;
-                if (a > GameData.getFreqList().get(GameData.getFreqList().size() - 1)) GameData.addFreqList(temps-tmpTemps);
+                if (GameData.getFreqList().size() > 1 && a > GameData.getFreqList().get(GameData.getFreqList().size() - 1)) GameData.addFreqList(temps-tmpTemps);
             }
             GameData.setMotComplete(motComplete);
             GameData.setTempsFinal(temps);
@@ -307,6 +309,8 @@ public class JeuxController {
             case DIGIT7 : return "\u00e8";
             case DIGIT9 : return "\u00e7";
             case DIGIT0 : return "\u00e0";
+            case DIGIT6 : return  "-";
+            case SUBTRACT : return  "-";    
             case UNDEFINED : return "\u00f9";
             default : return e.getCharacter();
         }
@@ -341,7 +345,7 @@ public class JeuxController {
     
     private int posBack() {
         Text t = (Text) ligne_act.getChildren().get(pos);
-        System.out.println("texte = " + t.getText());
+        System.out.println("texte = " + t.getText() + "contains " + t.getStyleClass().contains("text-skipped"));
         if(t.getStyleClass().contains("text-skipped")) {
             System.out.println("skipped");
             int tmp = pos;
@@ -353,10 +357,11 @@ public class JeuxController {
         }
         else return 1;
     }
+
     @FXML
     private void keyDetect(KeyEvent e) {
         // System.out.println(" char = " + inputToChars(e)+  "\u00e9" );
-        if(e.getCode().isLetterKey() || isAccentedChar(inputToChars(e)) || e.getCode() == KeyCode.MINUS) {
+        if(e.getCode().isLetterKey() || isAccentedChar(inputToChars(e)) || inputToChars(e) == "-"){
             if (!start) timerStart();
             entreesClavier++;
             if(pos >= CHAR_PER_LINE || pos >= ligne_act.getChildren().size() ) {
@@ -437,6 +442,7 @@ public class JeuxController {
                 System.out.println("Pos = " + pos + "Pos min = " + posMin);
                 if(pos > 0 && pos > posMin) {
                     pos--;
+                    posBack();
                     Text t = (Text) ligne_act.getChildren().get(pos);
                     if(t.getStyleClass().contains("text-done")) lettresCorrectes--;
                     t.getStyleClass().remove("text-skipped");
