@@ -22,13 +22,6 @@ import java.io.PrintWriter;
 public class Serveur {
     private static ParametrePartie parametrePartie = new ParametrePartie(false, "Français");
     public static void main (String[] args) {
-
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            public void run() {
-                System.out.println("Fermeture du serveur...");
-            }
-        }));
-
         Map<Socket,String> sockets = new HashMap<Socket,String>();
         try {
             try (ServerSocket server = new ServerSocket(Integer.valueOf(args[0]))) {
@@ -60,6 +53,8 @@ class ClientThread implements Runnable {
     private Socket client;
     private Map<Socket,String> sockets;
     private List<String> listeMots = new ArrayList<String>();
+    int positionMot = 0;
+    int vie = 10;
 
     public ClientThread(Socket client, Map<Socket,String> sockets) {
         this.client = client;
@@ -117,6 +112,10 @@ class ClientThread implements Runnable {
         }
         if(message.getTransmition() == Transmission.CLIENT_LANCER) {
             lancementPartie();
+        }
+        if(message.getTransmition() == Transmission.CLIENT_LETTRE) {
+            LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) message.getMessage();
+            receptionLettre((String) map.get("lettre"));
         }
     }
 
@@ -224,4 +223,48 @@ class ClientThread implements Runnable {
         int nombreAleatoire = rand.nextInt(listeMots.size());
         return listeMots.get(nombreAleatoire);
     }
+
+    private void receptionLettre(String s) throws IOException {
+        String mot = listeMots.get(0);
+        if(s.equals(" ")) {
+            positionMot = 0;
+            listeMots.remove(0);
+            if(positionMot != mot.length()) {
+                vie -= mot.length() - positionMot;
+            }
+            Message m = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
+            envoiMessage(client, m);
+        }
+        else if(positionMot < mot.length()) {
+            positionMot++;
+            Message m;
+            if(s.equals(mot.substring(positionMot,positionMot+1))) {
+                m = new Message(Transmission.SERVEUR_LETTRE_VALIDE, null);
+            }
+            else {
+                m = new Message(Transmission.SERVEUR_LETTRE_INVALIDE, null);
+            }
+            envoiMessage(client, m);
+        }
+        else {
+            positionMot = 0;
+            listeMots.remove(0);
+            vie -= 1;
+            Message m = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
+            envoiMessage(client, m);
+        }
+    }
+
+    private void receptionBackspace() throws IOException {
+        String mot = listeMots.get(0);
+        if(positionMot > 0) {
+            positionMot--;
+            String s = mot.substring(positionMot,positionMot+1);
+            LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
+            map.put("lettre", s); 
+            Message m = new Message(Transmission.SERVEUR_BACKSPACE,map);
+            envoiMessage(client, m);
+        }
+    }
+
 }

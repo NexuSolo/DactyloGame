@@ -21,15 +21,19 @@ import java.io.UnsupportedEncodingException;
 
 public final class MultijoueurController {
     private Socket socket;
+    protected int positionMot = 0;
 
     @FXML
-    private HBox ligne_1;
+    HBox ligne_1;
+    int nombreMotLigne_1 = 0;
 
     @FXML
-    private HBox ligne_2;
+    HBox ligne_2;
+    int nombreMotLigne_2 = 0;
 
     @FXML
-    private HBox ligne_3;
+    HBox ligne_3;
+    int nombreMotLigne_3 = 0;
 
     @FXML
     private void initialize() {
@@ -44,36 +48,45 @@ public final class MultijoueurController {
 
     protected void ajoutMot(String s, TypeMot typeMot) throws UnsupportedEncodingException {
         s = new String(s.getBytes(), "UTF-8");
-        Text t = new Text(s);
-        switch (typeMot) {
-            case WORD_TO_DO :
-                t.getStyleClass().add("text-to-do");
-                break;
-            case WORD_CORRECT :
-                t.getStyleClass().add("text-done");
-                break;
-            case WORD_WRONG :
-                t.getStyleClass().add("text-error");
-                break;
-            case WORD_LIFE :
-                t.getStyleClass().add("text-life");
-                break;
-            case WORD_ATTACK :
-                t.getStyleClass().add("text-attack");
-                break;
-            default:
-                break;
+        for(int i = 0; i < s.length(); i++) {
+            Text t = new Text(s.substring(i, i+1));
+            switch (typeMot) {
+                case WORD_TO_DO :
+                    t.getStyleClass().add("text-to-do");
+                    break;
+                case WORD_CORRECT :
+                    t.getStyleClass().add("text-done");
+                    break;
+                case WORD_WRONG :
+                    t.getStyleClass().add("text-error");
+                    break;
+                case WORD_LIFE :
+                    t.getStyleClass().add("text-life");
+                    break;
+                case WORD_ATTACK :
+                    t.getStyleClass().add("text-attack");
+                    break;
+                default:
+                    break;
+            }
+            if (nombreMotLigne_1 < 5) {
+                ligne_1.getChildren().add(t);
+            } else if (nombreMotLigne_2 < 5) {
+                ligne_2.getChildren().add(t);
+            } else if (nombreMotLigne_3 < 5) {
+                ligne_3.getChildren().add(t);
+            }
         }
         Text espace = new Text(" ");
-        if (ligne_1.getChildren().size() < 10) {
-            ligne_1.getChildren().add(t);
+        if (nombreMotLigne_1 < 5) {
             ligne_1.getChildren().add(espace);
-        } else if (ligne_2.getChildren().size() < 10) {
-            ligne_2.getChildren().add(t);
+            nombreMotLigne_1++;
+        } else if (nombreMotLigne_2 < 5) {
             ligne_2.getChildren().add(espace);
-        } else if (ligne_3.getChildren().size() < 10) {
-            ligne_3.getChildren().add(t);
+            nombreMotLigne_2++;
+        } else if (nombreMotLigne_3 < 5) {
             ligne_3.getChildren().add(espace);
+            nombreMotLigne_3++;
         }
     }
     
@@ -128,6 +141,47 @@ class ReceptionJeux implements Runnable {
                         e.printStackTrace();
                     }
                 });
+                break;
+            case SERVEUR_MOT_SUIVANT :
+                for(int i  = 0; i < multijoueurController.positionMot; i++) {
+                    multijoueurController.ligne_1.getChildren().remove(0);
+                }
+                multijoueurController.positionMot = 0;
+                break;
+            case SERVEUR_LETTRE_VALIDE :
+                if(multijoueurController.nombreMotLigne_3 != 0) {
+                    multijoueurController.ligne_3.getChildren().get(multijoueurController.nombreMotLigne_3++).getStyleClass().add("text-done");
+                    multijoueurController.positionMot++;
+                }
+                else if(multijoueurController.nombreMotLigne_2 != 0) {
+                    multijoueurController.ligne_2.getChildren().get(multijoueurController.nombreMotLigne_2++).getStyleClass().add("text-done");
+                    multijoueurController.positionMot++;
+                }
+                else if(multijoueurController.nombreMotLigne_1 != 0) {
+                    multijoueurController.ligne_1.getChildren().get(multijoueurController.nombreMotLigne_1++).getStyleClass().add("text-done");
+                    multijoueurController.positionMot++;
+                }
+                break;
+            case SERVEUR_LETTRE_INVALIDE :
+                if(multijoueurController.nombreMotLigne_3 != 0) {
+                    multijoueurController.ligne_3.getChildren().get(multijoueurController.nombreMotLigne_3++).getStyleClass().add("text-error");
+                    multijoueurController.positionMot++;
+                }
+                else if(multijoueurController.nombreMotLigne_2 != 0) {
+                    multijoueurController.ligne_2.getChildren().get(multijoueurController.nombreMotLigne_2++).getStyleClass().add("text-error");
+                    multijoueurController.positionMot++;
+                }
+                else if(multijoueurController.nombreMotLigne_1 != 0) {
+                    multijoueurController.ligne_1.getChildren().get(multijoueurController.nombreMotLigne_1++).getStyleClass().add("text-error");
+                    multijoueurController.positionMot++;
+                }
+                break;
+            case SERVEUR_BACKSPACE :
+                
+                break;
+            case SERVEUR_PERDU :
+                break;
+            case SERVEUR_GAGNER :
                 break;
             default:
                 break;

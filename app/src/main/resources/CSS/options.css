@@ -17,5 +17,6 @@
 
 .TextModeDeJeu {
     -fx-underline: true;
-    -fx-test-size: 20;
+    -fx-test-size: 20; /* TODO :typo */
+    
 }
