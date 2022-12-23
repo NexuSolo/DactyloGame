@@ -6,7 +6,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import projet.cpoo.App;
 import projet.cpoo.GameData;
@@ -20,7 +19,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.swing.text.html.HTMLDocument.HTMLReader.CharacterAction;
 
 
 public class JeuxController {
@@ -358,26 +356,30 @@ public class JeuxController {
         else return 1;
     }
 
+    public void changeLine() {
+        if(pos >= CHAR_PER_LINE || pos >= ligne_act.getChildren().size() ) {
+            pos = 0;
+            posMin = 0;
+            derCharUtile = 0;
+            if (!updateActualLine()) {
+                if (!addLine()) {
+                    return;
+                }
+            }
+            else if (ligne_act == ligne_3) {
+                addLine();
+                ligne_act = ligne_2;
+            }
+        }
+    }
+
     @FXML
     private void keyDetect(KeyEvent e) {
         // System.out.println(" char = " + inputToChars(e)+  "\u00e9" );
         if(e.getCode().isLetterKey() || isAccentedChar(inputToChars(e)) || inputToChars(e) == "-"){
             if (!start) timerStart();
             entreesClavier++;
-            if(pos >= CHAR_PER_LINE || pos >= ligne_act.getChildren().size() ) {
-                pos = 0;
-                posMin = 0;
-                derCharUtile = 0;
-                if (!updateActualLine()) {
-                    if (!addLine()) {
-                        return;
-                    }
-                }
-                else if (ligne_act == ligne_3) {
-                    addLine();
-                    ligne_act = ligne_2;
-                }
-            }
+            changeLine();
             Text t = (Text) ligne_act.getChildren().get(pos);
             if(t.getText().equals(formatString(e.getText(),e.isShiftDown()))) {
                 t.getStyleClass().remove("text-to-do");
@@ -408,6 +410,7 @@ public class JeuxController {
         else if(e.getCode() == KeyCode.SPACE) {
             circonflexe = false;
             trema = false;
+            changeLine();
             Text t = (Text) ligne_act.getChildren().get(pos);
             if(!t.getText().equals(" ")) {
                 // t.getStyleClass().remove("text-to-do");

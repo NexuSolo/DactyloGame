@@ -39,6 +39,9 @@
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="stats" text="Vies : " />
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="stats" text="Niveau : " GridPane.columnIndex="1" />
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="stats" text="Mots avant le prochain niveau" GridPane.columnIndex="2" />
+                  <Text fx:id="nbVies" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="stats" text="Text" GridPane.rowIndex="1" />
+                  <Text fx:id="numNiveau" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="stats" text="Text" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Text fx:id="motProchainNiv" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="stats" text="Text" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                </children>
             </GridPane>
          </children>

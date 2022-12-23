@@ -32,14 +32,21 @@ public class SoloController {
     @FXML
     HBox ligne;
 
+    @FXML
+    Text nbVies;
+    
+    @FXML
+    Text numNiveau;
+
+    @FXML
+    Text motProchainNiveau;
+
 
     @FXML
     private void initialize() {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResource("liste_mots/liste_francais.txt").openStream()));
             List<String> list = new ArrayList<String>();
-            // pos += addWordtoLine("ï", ligne_act);
-            // ligne_act.getChildren().add(new Text(" "));
             String text = new String(reader.readLine().getBytes(),"UTF-8");
             while (text != null) {
                 text = new String(text.getBytes(),"UTF-8");
@@ -53,10 +60,13 @@ public class SoloController {
                 ligne.getChildren().add(new Text(" "));
                 pos++;
             }
+            // setStats();
             timerStart();
         } catch (Exception e) {
         }
     }
+
+    // public void 
     
 
     private void timerStart() {

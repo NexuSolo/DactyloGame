@@ -2,30 +2,22 @@ package projet.cpoo;
 
 public abstract class Settings {
 
-    private static String langue = "fr";
+    public static enum language { FR,EN };
 
-    public static String getLangue() {
+    private static language langue = language.FR;
+
+    public static language getLangue() {
         return langue;
+    }
+
+    public static void setLangue(language langue) {
+        Settings.langue = langue;
     }
 
     private static boolean modeTemps = true;
 
     public static boolean isModeTemps() {
         return modeTemps;
-    }
-
-    private static int nbMots = 300;
-
-    public static int getNbMots() {
-        return nbMots;
-    }
-
-    public static void setFrench() {
-        Settings.langue = "fr";
-    }
-
-    public static void setEnglish() {
-        Settings.langue = "en";
     }
 
     public static void setModeTemps() {
@@ -45,4 +37,15 @@ public abstract class Settings {
     public static void setLIMITE_MAX(int LIMITE_MAX) {
         Settings.LIMITE_MAX = LIMITE_MAX;
     }
+
+    private static int niveau = 1;
+
+    public static void setNiveau(int niveau) {
+        Settings.niveau = niveau;
+    }
+
+    public static int getNiveau() {
+        return Settings.niveau;
+    }
+    
 }
