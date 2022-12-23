@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
@@ -151,6 +153,34 @@ class ClientThread implements Runnable {
             envoiMessage(socket, m);
         }
         creationPartie();
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                for (Socket socket : sockets.keySet()) {
+                    try {
+                        String s = motAleatoire();
+                        System.out.println(s + " " + socket + " " + sockets.keySet().size());
+                        LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
+                        Random rand = new Random();
+                        int nombreAleatoire = rand.nextInt(10 * sockets.size());
+                        if(nombreAleatoire == 0) {
+                            map.put(s,TypeMot.WORD_ATTACK);
+                        }
+                        else if(nombreAleatoire == 1) {
+                            map.put(s,TypeMot.WORD_LIFE);
+                        }
+                        else {
+                            map.put(s,TypeMot.WORD_TO_DO);
+                        }
+                        Message m = new Message(Transmission.SERVEUR_MOT, map);
+                        envoiMessage(socket, m);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }, 3000,3000);
     }
 
     private void creationPartie() throws IOException {
@@ -161,15 +191,17 @@ class ClientThread implements Runnable {
         for(Socket socket : sockets.keySet()) {
             List<String> mots = new ArrayList<String>();
             LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
-            for(int i = 0; i < 15; i++) {
-                //ajouter dans map avec la clé i la valeur true 1 fois sur 10
+            for(int i = 0; i < 8; i++) {
                 Random rand = new Random();
                 int nombreAleatoire = rand.nextInt(10 * sockets.size());
                 if(nombreAleatoire == 0) {
-                    map.put(String.valueOf(i), true);
+                    map.put(String.valueOf(i), TypeMot.WORD_ATTACK);
+                }
+                else if(nombreAleatoire == 1) {
+                    map.put(String.valueOf(i), TypeMot.WORD_LIFE);
                 }
                 else {
-                    map.put(String.valueOf(i), false);
+                    map.put(String.valueOf(i), TypeMot.WORD_TO_DO);
                 }
                 mots.add(motAleatoire());
             }

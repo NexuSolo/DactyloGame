@@ -30,7 +30,18 @@
     -fx-font-size: 25px;
     -fx-font-family: "Arial";
     -fx-fill: #64666940;
-;
+}
+
+.text-life {
+    -fx-font-size: 25px;
+    -fx-font-family: "Arial";
+    -fx-fill: #3e7cc4;
+}
+
+.text-attack {
+    -fx-font-size: 25px;
+    -fx-font-family: "Arial";
+    -fx-fill: #9b3e00;
 }
 
 .stats {
@@ -44,4 +55,13 @@
     -fx-font-family: "Arial";
     -fx-fill: #ca4754;
     -fx-underline: true;
+}
+
+.separator {
+    -fx-background-color:  #6b6b6b;
+    -fx-pref-height: 1;
+}
+
+.textListeJoueur{
+    -fx-font-size: 25px;
 }

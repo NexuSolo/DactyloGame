@@ -135,8 +135,8 @@ class Reception implements Runnable {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println(line);
+            while (!Thread.interrupted() &&(line = reader.readLine()) != null) {
+                System.out.println(line + " " + Thread.currentThread().getName());
                 Gson gson = new Gson();
                 Message message = gson.fromJson(line, Message.class);
                 traitement(message);
@@ -165,6 +165,7 @@ class Reception implements Runnable {
                 break;
             case SERVEUR_LANCER:
                 App.setRoot("multijoueur");
+                Thread.currentThread().interrupt();
                 break;
             default:
                 break;
