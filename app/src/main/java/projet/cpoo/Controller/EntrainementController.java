@@ -21,7 +21,7 @@ import java.util.TimerTask;
 
 
 
-public class JeuxController {
+public class EntrainementController {
     private static int CHAR_PER_LINE = 30;
     private int pos = 0;
     private int posMin = 0;
@@ -80,26 +80,15 @@ public class JeuxController {
             ligne_act = ligne_1;
             BufferedReader reader = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResource("liste_mots/liste_francais.txt").openStream()));
             List<String> list = new ArrayList<String>();
-            // pos += addWordtoLine("ï", ligne_act);
-            // ligne_act.getChildren().add(new Text(" "));
-            String text = new String(reader.readLine().getBytes(),"UTF-8");
+            String text = reader.readLine();
             while (text != null) {
                 text = new String(text.getBytes(),"UTF-8");
                 list.add(text);
                 text = reader.readLine();
             }
-            // for (int i = 0 ; i < 5000 ; i++) {
-            //     String text = new String(reader.readLine().getBytes(),"UTF-8");
-            //     list.add(text);
-            // }
             Collections.shuffle(list);
             if (!modeTemps) list = list.subList(0,Settings.getLIMITE_MAX());
-            for (String string : list) {
-                System.out.print(" " + string+ " ");   
-            }
             System.out.println("len = " + list.size());
-            //TODO Enlever les trucs qui facilitent les tests
-                // list = list.stream().filter((x -> x.length() < 9)).toList();
             stringIter = list.iterator();
             while(stringIter.hasNext() ) {
                 text = stringIter.next();
@@ -293,15 +282,18 @@ public class JeuxController {
         }
     }
 
-    private void isAccent(KeyCode code) {
+    private void isAccent(KeyEvent e) {
+        KeyCode code = e.getCode();
         switch (code) {
-            case DEAD_CIRCUMFLEX : circonflexe = true; break;
+            case DEAD_CIRCUMFLEX : if (!e.isShiftDown()) circonflexe = true;
+            else trema = true; break;
             case DEAD_DIAERESIS : trema = true;
             default : break;
         }
     }
 
     private String inputToChars(KeyEvent e) {
+        System.out.println("code = " + e.getCode());
         switch(e.getCode()) {
             case DIGIT2 : return "\u00e9";
             case DIGIT7 : return "\u00e8";
@@ -375,7 +367,6 @@ public class JeuxController {
 
     @FXML
     private void keyDetect(KeyEvent e) {
-        // System.out.println(" char = " + inputToChars(e)+  "\u00e9" );
         if(e.getCode().isLetterKey() || isAccentedChar(inputToChars(e)) || inputToChars(e) == "-"){
             if (!start) timerStart();
             entreesClavier++;
@@ -455,7 +446,7 @@ public class JeuxController {
                     t.getStyleClass().add("text-to-do");
                 }
             }
-            else isAccent(e.getCode());
+            else isAccent(e);
         }
         updatePrecision();
     }

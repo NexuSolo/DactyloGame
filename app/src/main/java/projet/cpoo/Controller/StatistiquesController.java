@@ -155,6 +155,7 @@ public class StatistiquesController {
             int borneinf = (i > 0)?(int)(i-j):i;
             int bornesup = (i < freqList.size()-1)?(int)(i+j):i;
             List<Integer> sub = freqList.subList(borneinf,bornesup);
+            int len = (sub.size() > 0 )?sub.size():1;
             double moy = sub.stream().reduce(0,( x,y ) -> x + y)/sub.size();
             serieFreq.getData().add(new XYChart.Data<>(i, moy));
         }

@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="borderPaneBackground" stylesheets="@CSS/jeu.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="projet.cpoo.Controller.JeuxController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="borderPaneBackground" stylesheets="@CSS/jeu.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="projet.cpoo.Controller.EntrainementController">
    <children>
       <GridPane prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columnConstraints>
@@ -30,11 +30,6 @@
                   <HBox fx:id="ligne_3" alignment="CENTER" prefHeight="100.0" prefWidth="200.0" />
                </children>
             </VBox>
-            <TextArea mouseTransparent="true" onKeyPressed="#keyDetect" opacity="0.0" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="3">
-               <cursor>
-                  <Cursor fx:constant="DEFAULT" />
-               </cursor>
-            </TextArea>
             <GridPane styleClass="stats">
               <columnConstraints>
                 <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -56,5 +51,10 @@
             </GridPane>
          </children>
       </GridPane>
+      <TextArea mouseTransparent="true" onKeyPressed="#keyDetect" opacity="0.0" prefHeight="200.0" prefWidth="200.0">
+         <cursor>
+            <Cursor fx:constant="DEFAULT" />
+         </cursor>
+      </TextArea>
    </children>
 </AnchorPane>
