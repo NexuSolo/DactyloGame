@@ -1,10 +1,6 @@
 package projet.cpoo.Controller;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Timer;
@@ -12,69 +8,37 @@ import java.util.TimerTask;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import projet.cpoo.Settings;
 
-public class SoloController {
-    
-    private int pos = 0;
-    private int motComplete = 0;
-    private int temps = 0;
-    private Iterator<String> stringIter;
-    private Timer timer = new Timer();
+public class SoloController extends ControllerJeu{    
     private int vies = 50;
     private int nombreMots = 0;
     private int motRestant = 1;
     private int niveau = Settings.getNiveau();
-    private boolean start = false;
-    private boolean circonflexe = false;
-    private boolean trema = false;
-    private boolean soin = false;
-    private boolean firstTry = true;
-
-
-    @FXML
-    HBox ligne;
-
-    @FXML
-    Text nbVies;
     
-    @FXML
-    Text numNiveau;
+    private int nombreMotLigne_1 = 0;
+
+    private int nombreMotLigne_2 = 0;
+
+    private int nombreMotLigne_3 = 0;
+
+    
 
     @FXML
-    Text motProchainNiv;
+    protected void initialize() {
+        ligne_act = ligne_1;
+        super.initialize();
+        // setStats();
+        ligne_act = ligne_1;
+        pos = 0;
+        temps = System.currentTimeMillis();
+        // soin = ligne_act.getChildren().get(0).getStyleClass().contains("text-life");
 
-
-    @FXML
-    private void initialize() {
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResource("liste_mots/liste_francais.txt").openStream()));
-            List<String> list = new ArrayList<String>();
-            String text = reader.readLine();
-            while (text != null) {
-                text = new String(text.getBytes(),"UTF-8");
-                list.add(text);
-                text = reader.readLine();
-            }
-            stringIter = list.iterator();
-            Collections.shuffle(list);
-            int r = new Random().nextInt(10);
-            for (int i = 0; i < 3 ; i++) {
-                text = stringIter.next();
-                pos += addWordtoLine(text, ligne,r==0);
-                ligne.getChildren().add(new Text(" "));
-                pos++;
-            }
-            setStats();
-            pos = 0;
-            soin = ligne.getChildren().get(0).getStyleClass().contains("text-life");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     private void upNiveau() {
@@ -94,21 +58,20 @@ public class SoloController {
     } 
 
     private void updateNiveau() {
-        numNiveau.setText(String.valueOf(niveau));
+        textBM.setText(String.valueOf(niveau));
     }
 
     private void updateVies() {
-        nbVies.setText(String.valueOf(vies));
+        textBG.setText(String.valueOf(vies));
     }
 
     private void updateMotNiveau() {
-        motProchainNiv.setText(String.valueOf(motRestant));
+        textBD.setText(String.valueOf(motRestant));
     }
-    
 
     private void timerStart() {
         start = true;
-        double coeff = 1/(double)niveau;
+        double coeff = 3000 *  Math.pow(0.9,niveau);
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -116,49 +79,62 @@ public class SoloController {
                 if (stringIter.hasNext()) {
                     String s = stringIter.next();
                     int r = new Random().nextInt(10);
+                    HBox ligne = selectLine();
                     addWordtoLine(s, ligne,r == 0);
                     ligne.getChildren().add(new Text(" "));
                 }
                 });
             }
-        },0,(int)(5000*coeff));
+        },0,(int)coeff);
+    }
+
+    private HBox selectLine() {
+        if (nombreMotLigne_1 < 5 ) return ligne_1;
+        if (nombreMotLigne_2 < 5) return ligne_2;
+        return ligne_3;
+    }
+
+    private boolean jeuVide() {
+        return ligne_1.getChildren().size() == 0;
     }
     
-    private void validationMot() {
+    protected void validationMot() {
+        if(jeuVide()) return;
         int i = 0;
         nombreMots--;
         updateMotNiveau();
-        Text t = (Text) ligne.getChildren().get(i);
+        Text t = (Text) ligne_1.getChildren().get(i);
         int tmpVie = vies;
         while (!t.getText().equals(" ")) {
-            if (firstTry && soin) vies++;
+            if (firstTry && soin && t.getStyleClass().contains("text-done")) vies++;
             if (!t.getStyleClass().contains("text-done")) vies--;
             i++;
-            t = (Text) ligne.getChildren().get(i);
+            t = (Text) ligne_1.getChildren().get(i);
         }
-        ligne.getChildren().remove(0, i+1);
+        ligne_1.getChildren().remove(0, i+1);
         updateVies();
-        if (nombreMots < 3) {
+        if (nombreMots < 8) {
             int r = new Random().nextInt(10);
+            HBox ligne = selectLine();
             addWordtoLine(stringIter.next(), ligne,r==0);
             ligne.getChildren().add(new Text(" "));
         }
+        rearrangeCol();
         if (tmpVie == vies) {
             motRestant--;
         }
-        updateMotNiveau();
         if(motRestant <= 0) {
             motRestant = 5;
             upNiveau();
         }
+        updateMotNiveau();
         pos = 0;
         firstTry = true;
-        soin = ligne.getChildren().get(0).getStyleClass().contains("text-life");
-        // mots bleus qui régen
+        if(ligne_1.getChildren().size() != 0) soin = ligne_1.getChildren().get(0).getStyleClass().contains("text-life");
     }
 
-    private int addWordtoLine(String s,HBox line,boolean soin) {
-        if (nombreMots >= 5) validationMot();
+    protected int addWordtoLine(String s,HBox line,boolean soin) {
+        if (nombreMots >= 15) validationMot();
         nombreMots++;
         int pos = 0;
         for(char c : s.toCharArray()) {
@@ -168,64 +144,20 @@ public class SoloController {
                 line.getChildren().add(t);
                 pos++;
         }
+        if (line == ligne_1) nombreMotLigne_1++;
+        else if (line == ligne_2) nombreMotLigne_2++;
+        else nombreMotLigne_3++;
+        try {if (!jeuVide()) soin = ligne_1.getChildren().get(0).getStyleClass().contains("text-life");
+        } catch (Exception e) { e.printStackTrace();
+            System.out.println( "size = " +ligne_1.getChildren().size());}
         return pos;
     }
 
-    private String formatString(String text,boolean shift) {
-        if (shift) return toAccent(text).toUpperCase();
-        else return toAccent(text); 
-    }
-
-    private String toAccent(String text) {
-        switch (text) {
-            case "a" : if (circonflexe) return "\u00e2";
-            else if (trema) return "\u00e4";
-            break;
-            case "e" : if (circonflexe) return "\u00ea";
-            else if (trema) return "\u00eb";
-            break;
-            case "u" : if (circonflexe) return "\u00fb";
-            else if (trema) return "\u00fc";
-            break;
-            case "i" : if (circonflexe) return "\u00ee";
-            else if (trema) return "\u00ef";
-            break;
-            case "o" : if (circonflexe) return "u00f4";
-            else if (trema) return "u00f6";
-            break;
-            default : break;
-        }
-        return text;
-    }
-
-    private String inputToChars(KeyEvent e) {
-        switch(e.getCode()) {
-            case DIGIT2 : return "\u00e9";
-            case DIGIT7 : return "\u00e8";
-            case DIGIT9 : return "\u00e7";
-            case DIGIT0 : return "\u00e0";
-            case DIGIT6 : return  "-";
-            case SUBTRACT : return  "-";    
-            case UNDEFINED : return "\u00f9";
-            default : return e.getCharacter();
-        }
-    }
-
-    private boolean isAccentedChar(String s) {
-        switch (s) {
-            case "\u00f9" : return true;
-            case "\u00e0" : return true;
-            case "\u00e9" : return true;
-            case "\u00e8" : return true;
-            case "\u00e7" : return true;
-            default : return false;
-        }
-    }
 
     public void keyDetect(KeyEvent e) {
         if(e.getCode().isLetterKey() || isAccentedChar(inputToChars(e)) || inputToChars(e) == "-"){
             if(!start) timerStart();
-            Text t = (Text) ligne.getChildren().get(pos);
+            Text t = (Text) ligne_1.getChildren().get(pos);
             if(t.getText().equals(formatString(e.getText(),e.isShiftDown()))) {
                 t.getStyleClass().remove("text-to-do");
                 t.getStyleClass().remove("text-life");
@@ -243,17 +175,23 @@ public class SoloController {
                 t.getStyleClass().add("text-error");
                 pos++;
             }
+            circonflexe = false;
+            trema = false;
         }
         else if(e.getCode() == KeyCode.SPACE){
+            circonflexe = false;
+            trema = false;
             validationMot();
             pos = 0;
         }
         else {
+            circonflexe = false;
+            trema = false;
             if (e.getCode().equals(KeyCode.BACK_SPACE)) {
                 if(pos > 0) {
                     firstTry = false;
                     pos--;
-                    Text t = (Text) ligne.getChildren().get(pos);
+                    Text t = (Text) ligne_1.getChildren().get(pos);
                     t.getStyleClass().remove("text-skipped");
                     t.getStyleClass().remove("text-done");
                     t.getStyleClass().remove("text-error");
@@ -262,6 +200,76 @@ public class SoloController {
                     if (soin) t.getStyleClass().add("text-life");
                 }
             }
+            else isAccent(e);
         }
+    }
+
+    private boolean ligneFull(HBox ligne) {
+        if (ligne == ligne_1) return nombreMotLigne_1 > 5;
+        if (ligne == ligne_2) return nombreMotLigne_2 > 5;
+        return nombreMotLigne_3 > 5;
+    }
+
+    
+
+    @Override
+    protected void initializeGame(List<String> list) {
+        String text;
+        stringIter = list.iterator();
+        int r = new Random().nextInt(10);
+        for (int i = 0; i < 5 ; i++) {
+            System.out.println("i = " + i);
+            text = stringIter.next();
+            if(ligneFull(ligne_act)) {
+                pos = 0;
+                if (!updateActualLine()) {
+                    tmpIter = text;
+                    break;
+                }
+            }
+            pos += addWordtoLine(text, ligne_act,r==0);
+            ligne_act.getChildren().add(new Text(" "));
+            pos++;
+        }
+    }
+
+    @Override
+    protected void initializeText() {
+        textHG.setText(" Vies restantes");
+        textHM.setText(" Niveau ");
+        setStats();
+    }
+
+    private void decrementeNombreLigne(HBox ligne) {
+        if (ligne == ligne_1) nombreMotLigne_1--;
+        else if (ligne == ligne_2) nombreMotLigne_2--;
+        else nombreMotLigne_3--;
+    }
+
+    private void incrementeNombreLigne(HBox ligne) {
+        if (ligne == ligne_1) nombreMotLigne_1++;
+        else if (ligne == ligne_2) nombreMotLigne_2++;
+        else nombreMotLigne_3++;
+    }
+
+    private void popMot(HBox ligne_bas,HBox ligne_haut) {
+        int i = 0;
+        Text t = (Text) ligne_bas.getChildren().get(i);
+        List <Node> list = new LinkedList<>();
+        while (!t.getText().equals(" ") || i >= ligne_bas.getChildren().size()) {
+            list.add(t);
+            ligne_bas.getChildren().remove(t);
+            t = (Text) ligne_bas.getChildren().get(i);
+        }
+        ligne_bas.getChildren().remove(t); if (t.getText().equals(" ")) 
+        ligne_haut.getChildren().addAll(list);
+        ligne_haut.getChildren().add(new Text(" "));
+        decrementeNombreLigne(ligne_bas);
+        incrementeNombreLigne(ligne_haut);
+    }   
+
+    private void rearrangeCol() {
+        if(nombreMotLigne_2 > 0) popMot(ligne_2, ligne_1);
+        if(nombreMotLigne_3 > 0) popMot(ligne_3, ligne_2);
     }
 }

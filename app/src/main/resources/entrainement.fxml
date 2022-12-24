@@ -41,12 +41,12 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="stats" text="Mots completes : " />
-                  <Text fx:id="stat_mot" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="stats" GridPane.rowIndex="1" />
-                  <Text fx:id="stat_prec" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="stats" text="100%" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="stats" text="Precision" GridPane.columnIndex="1" />
-                  <Text fx:id="texte_restant" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="stats" text="Mots restants" GridPane.columnIndex="2" />
-                  <Text fx:id="stat_restant" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="stats" text="10" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                  <Text fx:id="textHG" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="stats" text="Mots completes : " />
+                  <Text fx:id="textBG" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="stats" GridPane.rowIndex="1" />
+                  <Text fx:id="textBM" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="stats" text="100%" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Text fx:id="textHM" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="stats" text="Precision" GridPane.columnIndex="1" />
+                  <Text fx:id="textHD" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="stats" text="Mots restants" GridPane.columnIndex="2" />
+                  <Text fx:id="textBD" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="stats" text="10" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                </children>
             </GridPane>
          </children>
