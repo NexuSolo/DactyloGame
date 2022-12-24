@@ -1,5 +1,6 @@
 package projet.cpoo.Controller;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -13,12 +14,14 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
+import projet.cpoo.App;
+import projet.cpoo.GameData;
 import projet.cpoo.Settings;
 
 public class SoloController extends ControllerJeu{    
     private int vies = 50;
     private int nombreMots = 0;
-    private int motRestant = 1;
+    private int motRestant = 10;
     private int niveau = Settings.getNiveau();
     
     private int nombreMotLigne_1 = 0;
@@ -26,19 +29,15 @@ public class SoloController extends ControllerJeu{
     private int nombreMotLigne_2 = 0;
 
     private int nombreMotLigne_3 = 0;
-
-    
+    @FXML
+    private Text textMotComplete;
 
     @FXML
     protected void initialize() {
         ligne_act = ligne_1;
         super.initialize();
-        // setStats();
         ligne_act = ligne_1;
         pos = 0;
-        temps = System.currentTimeMillis();
-        // soin = ligne_act.getChildren().get(0).getStyleClass().contains("text-life");
-
     }
 
     private void upNiveau() {
@@ -54,6 +53,7 @@ public class SoloController extends ControllerJeu{
     private void setStats() {
         updateVies();
         updateMotNiveau();
+        updateMotComplete();
         updateNiveau();
     } 
 
@@ -67,6 +67,10 @@ public class SoloController extends ControllerJeu{
 
     private void updateMotNiveau() {
         textBD.setText(String.valueOf(motRestant));
+    }
+
+    private void updateMotComplete() {
+        textMotComplete.setText("Mot compl\u00e9t\u00e9s " + String.valueOf(motComplete));
     }
 
     private void timerStart() {
@@ -85,7 +89,7 @@ public class SoloController extends ControllerJeu{
                 }
                 });
             }
-        },0,(int)coeff);
+        },(int) coeff,(int)coeff);
     }
 
     private HBox selectLine() {
@@ -122,15 +126,32 @@ public class SoloController extends ControllerJeu{
         rearrangeCol();
         if (tmpVie == vies) {
             motRestant--;
+            motComplete++;
+            updateMotComplete();
         }
         if(motRestant <= 0) {
-            motRestant = 5;
+            motRestant = 10;
             upNiveau();
         }
         updateMotNiveau();
         pos = 0;
         firstTry = true;
         if(ligne_1.getChildren().size() != 0) soin = ligne_1.getChildren().get(0).getStyleClass().contains("text-life");
+        if (vies <= 0) {
+            try {
+                finDuJeu();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void finDuJeu() throws IOException {
+            timer.cancel();
+            GameData.setMotComplete(motComplete);
+            GameData.setTempsFinal((System.currentTimeMillis()-temps)*0.01);
+            GameData.setNiveauFinal(niveau);
+            App.setRoot("statsSolo");
     }
 
     protected int addWordtoLine(String s,HBox line,boolean soin) {
@@ -148,15 +169,17 @@ public class SoloController extends ControllerJeu{
         else if (line == ligne_2) nombreMotLigne_2++;
         else nombreMotLigne_3++;
         try {if (!jeuVide()) soin = ligne_1.getChildren().get(0).getStyleClass().contains("text-life");
-        } catch (Exception e) { e.printStackTrace();
-            System.out.println( "size = " +ligne_1.getChildren().size());}
+        } catch (Exception e) { e.printStackTrace();}
         return pos;
     }
 
 
     public void keyDetect(KeyEvent e) {
+        if(!start) {
+            timerStart();
+            temps = System.currentTimeMillis();
+        }
         if(e.getCode().isLetterKey() || isAccentedChar(inputToChars(e)) || inputToChars(e) == "-"){
-            if(!start) timerStart();
             Text t = (Text) ligne_1.getChildren().get(pos);
             if(t.getText().equals(formatString(e.getText(),e.isShiftDown()))) {
                 t.getStyleClass().remove("text-to-do");
@@ -216,9 +239,7 @@ public class SoloController extends ControllerJeu{
     protected void initializeGame(List<String> list) {
         String text;
         stringIter = list.iterator();
-        int r = new Random().nextInt(10);
         for (int i = 0; i < 5 ; i++) {
-            System.out.println("i = " + i);
             text = stringIter.next();
             if(ligneFull(ligne_act)) {
                 pos = 0;
@@ -227,6 +248,7 @@ public class SoloController extends ControllerJeu{
                     break;
                 }
             }
+            int r = new Random().nextInt(10);
             pos += addWordtoLine(text, ligne_act,r==0);
             ligne_act.getChildren().add(new Text(" "));
             pos++;

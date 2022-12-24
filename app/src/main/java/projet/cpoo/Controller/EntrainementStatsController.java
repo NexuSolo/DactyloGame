@@ -2,13 +2,11 @@ package projet.cpoo.Controller;
 
 import java.io.IOException;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
 import javafx.fxml.FXML;
 import javafx.scene.chart.AreaChart;
-import javafx.scene.chart.Chart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Series;
@@ -22,7 +20,7 @@ import projet.cpoo.App;
 import projet.cpoo.GameData;
 import projet.cpoo.Settings;
 
-public class StatistiquesController {
+public class EntrainementStatsController extends StatsController {
 
     @FXML
     AnchorPane anchor;
@@ -37,7 +35,7 @@ public class StatistiquesController {
     Text congrats;
 
     @FXML
-    public void initialize() throws Exception {
+    public void initialize() {
         button.setFocusTraversable(false);
         anchor.setFocusTraversable(true);
         anchor.requestFocus();
@@ -45,20 +43,11 @@ public class StatistiquesController {
         setText();
     }
 
-    private void setGraph() {
+    protected void setGraph() {
         //TODO : faire en fonction du temps
         setMotGraph();
         setPrecGraph();
         setFreqGraph();
-    }
-
-    private void setText(){
-        int mots = GameData.getMotComplete();
-        int temps = GameData.getTempsFinal()/10;
-        int mpm = (60*mots)/temps;
-        String s = "Bravo vous avez tape " + mots + " mots en " + temps + " secondes";
-        s += "\nCela fait donc " + mpm + " mots par minute"; 
-        congrats.setText(s);
     }
 
     private void setMotGraph() {
@@ -87,10 +76,8 @@ public class StatistiquesController {
         XYChart.Series serie1 = new Series<>();
         serie1.getData().add(new XYChart.Data<>(0, 0));
         if (Settings.isModeTemps()) {
-
             for (int i = 0; i < wordTab.size(); i++) {
                 double x = i * (GameData.getTempsFinal()*0.01);
-                System.out.println("Add x " + (x) + " y  " + wordTab.get(i));
                 if (Settings.isModeTemps()) serie1.getData().add(new XYChart.Data<>(x,wordTab.get(i)));
                 else serie1.getData().add(new XYChart.Data<>(x,wordTab.get(i)));
             }
@@ -98,7 +85,6 @@ public class StatistiquesController {
         else {
             for (int i = 0; i < wordTab.size(); i++) {
                 double x = i * (GameData.getTempsFinal()*0.01);
-                System.out.println("2Add x " + (wordTab.get(i)) + " y  " + i);
                 serie1.getData().add(new XYChart.Data<>(wordTab.get(i),i));
             } 
         }
@@ -149,16 +135,7 @@ public class StatistiquesController {
 
         freqChart.setTitle("Fluidit\u00e9 lors de la partie");
         XYChart.Series serieFreq = new Series<>();
-        double pas = freqList.size() * 0.1;
-        for (int i = 0; i < freqList.size(); i+= pas ) {
-            double j = pas * 0.5;
-            int borneinf = (i > 0)?(int)(i-j):i;
-            int bornesup = (i < freqList.size()-1)?(int)(i+j):i;
-            List<Integer> sub = freqList.subList(borneinf,bornesup);
-            int len = (sub.size() > 0 )?sub.size():1;
-            double moy = sub.stream().reduce(0,( x,y ) -> x + y)/sub.size();
-            serieFreq.getData().add(new XYChart.Data<>(i, moy));
-        }
+        createGraph(freqList, serieFreq);
         serieFreq.setName("Fluidit\u00e9 en moyenne");
         freqChart.getData().addAll(serieFreq);
         freqChart.setLegendVisible(false);
@@ -168,16 +145,25 @@ public class StatistiquesController {
         gridPane.add(freqChart, 1,2);
     }
 
-    @FXML
-    public void retour() throws IOException {
-        GameData.resetAll();
-        App.setRoot("menu");
+    private void createGraph(List<Integer> freqList,XYChart.Series serieFreq) {
+        if (freqList.size() <= 10) {
+            for (int i = 0; i < freqList.size(); i++) {
+            serieFreq.getData().add(new XYChart.Data<>(i,freqList.get(i)));
+            }
+        }
+        else {
+            double pas = freqList.size() * 0.1;
+            for (int i = 0; i < freqList.size(); i+= pas ) {
+            double j = pas * 0.5;
+            int borneinf = (i > 0)?(int)(i-j):i;
+            int bornesup = (i < freqList.size()-1)?(int)(i+j):i;
+            List<Integer> sub = freqList.subList(borneinf,bornesup);
+            int len = (sub.size() > 0 )?sub.size():1;
+            double moy = sub.stream().reduce(0,( x,y ) -> x + y)/sub.size();
+            serieFreq.getData().add(new XYChart.Data<>(i, moy));
+            }
+        }
     }
-    @FXML
-    public void keyPressed(KeyEvent e) throws IOException {
-        System.out.println("appui");
-        if (e.getCode().equals(KeyCode.ESCAPE)) {
-            App.setRoot("menu");
-        }    
-    }
+
+   
 }

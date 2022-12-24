@@ -201,7 +201,7 @@ public class EntrainementController extends ControllerJeu {
             }
             GameData.setMotComplete(motComplete);
             GameData.setTempsFinal(temps);
-            App.setRoot("statistiques");
+            App.setRoot("statsEntrainement");
         }
     }
 

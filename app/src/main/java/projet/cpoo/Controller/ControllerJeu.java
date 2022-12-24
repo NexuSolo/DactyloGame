@@ -34,10 +34,11 @@ public abstract class ControllerJeu {
     protected Iterator<String> stringIter;
     protected String tmpIter =  null;
 
-
-
     @FXML
     protected HBox ligne_1;
+
+    @FXML
+    protected HBox ligne_act = ligne_1;
 
     @FXML
     protected HBox ligne_2;
@@ -65,8 +66,7 @@ public abstract class ControllerJeu {
 
     
 
-    @FXML
-    protected HBox ligne_act = ligne_1;
+    
 
     @FXML
     protected void initialize() {
@@ -100,8 +100,7 @@ public abstract class ControllerJeu {
 
     protected boolean updateActualLine(){
         pos = 0;
-        if (ligne_act == ligne_1) {ligne_act = ligne_2;
-        System.out.println("ex L1");}
+        if (ligne_act == ligne_1) ligne_act = ligne_2;
         else if (ligne_act == ligne_2) ligne_act = ligne_3;
         else return false;
         return true;
@@ -110,7 +109,6 @@ public abstract class ControllerJeu {
     protected abstract void validationMot();
 
     protected String inputToChars(KeyEvent e) {
-        System.out.println("code = " + e.getCode());
         switch(e.getCode()) {
             case DIGIT2 : return "\u00e9";
             case DIGIT7 : return "\u00e8";
@@ -126,8 +124,7 @@ public abstract class ControllerJeu {
     protected void isAccent(KeyEvent e) {
         KeyCode code = e.getCode();
         switch (code) {
-            case DEAD_CIRCUMFLEX : if (!e.isShiftDown()) { System.out.println("Circ true");
-                circonflexe = true;}
+            case DEAD_CIRCUMFLEX : if (!e.isShiftDown()) circonflexe = true;
             else trema = true; break;
             case DEAD_DIAERESIS : trema = true;
             default : break;

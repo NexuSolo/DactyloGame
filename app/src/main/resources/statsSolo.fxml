@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -8,11 +9,10 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="anchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="720.0" minWidth="1280.0" onKeyPressed="#keyPressed" styleClass="borderPaneBackground" stylesheets="@CSS/statistiques.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="projet.cpoo.Controller.StatistiquesController">
+<AnchorPane fx:id="anchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="720.0" minWidth="1280.0" onKeyPressed="#keyPressed" styleClass="borderPaneBackground" stylesheets="@CSS/statistiques.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="projet.cpoo.Controller.SoloStatController">
    <children>
       <GridPane fx:id="gridPane" alignment="CENTER" layoutX="47.0" layoutY="601.0" prefHeight="720.0" prefWidth="1280.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columnConstraints>
-          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
           <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
         </columnConstraints>
         <rowConstraints>
@@ -21,7 +21,9 @@
           <RowConstraints minHeight="10.0" percentHeight="45.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Text fx:id="congrats" fill="#e2b714" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="congratText" text="AAAA" GridPane.rowIndex="1" />
+            <Text fx:id="congrats" fill="#e2b714" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="congratText" GridPane.rowIndex="1" />
+            <Text fx:id="statsText" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="congratText" text="Text" GridPane.rowIndex="2" />
+            <TextArea onKeyPressed="#keyPressed" opacity="0.0" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1" />
          </children>
       </GridPane>
       <Button fx:id="button" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#retour" styleClass="buttonRetour" text="&lt;- Retour">

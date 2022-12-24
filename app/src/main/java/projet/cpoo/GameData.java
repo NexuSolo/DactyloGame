@@ -34,11 +34,7 @@ public abstract class GameData {
         GameData.freqList = new LinkedList<Integer>();
     }
     
-    public static void resetAll() {
-        resetFreqList();
-        resetPrecList();
-        resetWordList();
-    }
+  
 
     private static List<Integer> wordList = new LinkedList<Integer>();
 
@@ -64,15 +60,45 @@ public abstract class GameData {
         GameData.motComplete = motComplete;
     }
 
-    private static int tempsFinal = 0;
+    public static void resetMotComplete() {
+        GameData.motComplete = 0;
+    }
 
-    public static int getTempsFinal() {
+    private static double tempsFinal = 0;
+
+    public static double getTempsFinal() {
         return tempsFinal;
     }
 
-    public static void setTempsFinal(int tempsFinal) {
+    public static void setTempsFinal(double tempsFinal) {
         GameData.tempsFinal = tempsFinal;
     }
 
+    public static void resetTempsFinal() {
+        GameData.tempsFinal = 0;
+    }
+
+    private static int niveauFinal = 0;
+
+    public static int getNiveauFinal() {
+        return niveauFinal;
+    }
+
+    public static void setNiveauFinal(int niveauFinal) {
+        GameData.niveauFinal = niveauFinal;
+    }
+    
+    public static void resetNiveauFinal() {
+        GameData.niveauFinal = Settings.getNiveau();
+    }
+
+    public static void resetAll() {
+        resetFreqList();
+        resetPrecList();
+        resetWordList();
+        resetMotComplete();
+        resetNiveauFinal();
+        resetTempsFinal();
+    }
     
 }
