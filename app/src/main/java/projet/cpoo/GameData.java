@@ -4,11 +4,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 public abstract class GameData {
-    
 
     private static List<Integer> precList = new LinkedList<Integer>();
 
-    public static  List<Integer> getPrecList() {
+    public static List<Integer> getPrecList() {
         return new LinkedList<Integer>(precList);
     }
 
@@ -22,7 +21,7 @@ public abstract class GameData {
 
     private static List<Integer> freqList = new LinkedList<Integer>();
 
-    public static  List<Integer> getFreqList() {
+    public static List<Integer> getFreqList() {
         return new LinkedList<Integer>(freqList);
     }
 
@@ -33,12 +32,10 @@ public abstract class GameData {
     public static void resetFreqList() {
         GameData.freqList = new LinkedList<Integer>();
     }
-    
-  
 
     private static List<Integer> wordList = new LinkedList<Integer>();
 
-    public static  List<Integer> getWordList() {
+    public static List<Integer> getWordList() {
         return new LinkedList<Integer>(wordList);
     }
 
@@ -87,7 +84,7 @@ public abstract class GameData {
     public static void setNiveauFinal(int niveauFinal) {
         GameData.niveauFinal = niveauFinal;
     }
-    
+
     public static void resetNiveauFinal() {
         GameData.niveauFinal = Settings.getNiveau();
     }
@@ -100,5 +97,5 @@ public abstract class GameData {
         resetNiveauFinal();
         resetTempsFinal();
     }
-    
+
 }

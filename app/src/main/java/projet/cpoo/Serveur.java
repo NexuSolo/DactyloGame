@@ -53,7 +53,7 @@ class ClientThread implements Runnable {
     private Socket client;
     private Map<Socket,String> sockets;
     private List<String> listeMots = new ArrayList<String>();
-    int positionMot = 0;
+    private String motAct = "";
     int vie = 10;
 
     public ClientThread(Socket client, Map<Socket,String> sockets) {
@@ -225,44 +225,52 @@ class ClientThread implements Runnable {
     }
 
     private void receptionLettre(String s) throws IOException {
-        String mot = listeMots.get(0);
         if(s.equals(" ")) {
-            positionMot = 0;
+            vie -= viePerdu(s);
             listeMots.remove(0);
-            if(positionMot != mot.length()) {
-                vie -= mot.length() - positionMot;
-            }
             Message m = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
             envoiMessage(client, m);
         }
-        else if(positionMot < mot.length()) {
-            positionMot++;
-            Message m;
-            if(s.equals(mot.substring(positionMot,positionMot+1))) {
-                m = new Message(Transmission.SERVEUR_LETTRE_VALIDE, null);
-            }
-            else {
-                m = new Message(Transmission.SERVEUR_LETTRE_INVALIDE, null);
-            }
-            envoiMessage(client, m);
+        else if(s.equals("backspace")) {
+            receptionBackspace();
         }
         else {
-            positionMot = 0;
-            listeMots.remove(0);
-            vie -= 1;
-            Message m = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
-            envoiMessage(client, m);
+            if(motAct.length() == listeMots.get(0).length()) {
+                vie -= 1;
+                motAct = "";
+                listeMots.remove(0);
+                Message m = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
+                envoiMessage(client, m);
+            }
+            else {
+                if(listeMots.get(0).substring(motAct.length(), motAct.length() + 1).equals(s)) {
+                    motAct += s;
+                    Message m = new Message(Transmission.SERVEUR_LETTRE_VALIDE, null);
+                    envoiMessage(client, m);
+                }
+                else {
+                    motAct += s;
+                    Message m = new Message(Transmission.SERVEUR_LETTRE_INVALIDE, null);
+                    envoiMessage(client, m);
+                }
+            }
         }
     }
 
+    private int viePerdu(String s) {
+        int res = 0;
+        for(int i = 0; i < listeMots.get(0).length(); i++) {
+            if(!listeMots.get(0).substring(i, i + 1).equals(s.substring(i, i + 1))) {
+                res++;
+            }
+        }
+        return res;
+    }
+
     private void receptionBackspace() throws IOException {
-        String mot = listeMots.get(0);
-        if(positionMot > 0) {
-            positionMot--;
-            String s = mot.substring(positionMot,positionMot+1);
-            LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
-            map.put("lettre", s); 
-            Message m = new Message(Transmission.SERVEUR_BACKSPACE,map);
+        if(motAct.length() > 0) {
+            motAct = motAct.substring(0, motAct.length() - 1);
+            Message m = new Message(Transmission.SERVEUR_BACKSPACE, null);
             envoiMessage(client, m);
         }
     }

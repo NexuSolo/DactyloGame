@@ -143,41 +143,20 @@ class ReceptionJeux implements Runnable {
                 });
                 break;
             case SERVEUR_MOT_SUIVANT :
-                for(int i  = 0; i < multijoueurController.positionMot; i++) {
+                while(!((Text) multijoueurController.ligne_1.getChildren().get(0)).getText().equals(" ")) {
                     multijoueurController.ligne_1.getChildren().remove(0);
                 }
+                multijoueurController.ligne_1.getChildren().remove(0);
                 multijoueurController.positionMot = 0;
                 break;
             case SERVEUR_LETTRE_VALIDE :
-                if(multijoueurController.nombreMotLigne_3 != 0) {
-                    multijoueurController.ligne_3.getChildren().get(multijoueurController.nombreMotLigne_3++).getStyleClass().add("text-done");
-                    multijoueurController.positionMot++;
-                }
-                else if(multijoueurController.nombreMotLigne_2 != 0) {
-                    multijoueurController.ligne_2.getChildren().get(multijoueurController.nombreMotLigne_2++).getStyleClass().add("text-done");
-                    multijoueurController.positionMot++;
-                }
-                else if(multijoueurController.nombreMotLigne_1 != 0) {
-                    multijoueurController.ligne_1.getChildren().get(multijoueurController.nombreMotLigne_1++).getStyleClass().add("text-done");
-                    multijoueurController.positionMot++;
-                }
+                multijoueurController.ligne_1.getChildren().get(multijoueurController.positionMot++).getStyleClass().add("text-done");
                 break;
             case SERVEUR_LETTRE_INVALIDE :
-                if(multijoueurController.nombreMotLigne_3 != 0) {
-                    multijoueurController.ligne_3.getChildren().get(multijoueurController.nombreMotLigne_3++).getStyleClass().add("text-error");
-                    multijoueurController.positionMot++;
-                }
-                else if(multijoueurController.nombreMotLigne_2 != 0) {
-                    multijoueurController.ligne_2.getChildren().get(multijoueurController.nombreMotLigne_2++).getStyleClass().add("text-error");
-                    multijoueurController.positionMot++;
-                }
-                else if(multijoueurController.nombreMotLigne_1 != 0) {
-                    multijoueurController.ligne_1.getChildren().get(multijoueurController.nombreMotLigne_1++).getStyleClass().add("text-error");
-                    multijoueurController.positionMot++;
-                }
+                multijoueurController.ligne_1.getChildren().get(multijoueurController.positionMot++).getStyleClass().add("text-error");
                 break;
             case SERVEUR_BACKSPACE :
-                
+                multijoueurController.ligne_1.getChildren().get(--multijoueurController.positionMot).getStyleClass().add("text-to-do");
                 break;
             case SERVEUR_PERDU :
                 break;
