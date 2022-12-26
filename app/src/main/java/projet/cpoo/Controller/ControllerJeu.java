@@ -106,7 +106,7 @@ public abstract class ControllerJeu {
         return true;
     }
 
-    protected abstract void validationMot();
+    protected abstract void validationMot(boolean solo);
 
     protected String inputToChars(KeyEvent e) {
         switch(e.getCode()) {

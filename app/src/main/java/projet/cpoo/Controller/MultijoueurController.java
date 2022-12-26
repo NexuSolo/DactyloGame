@@ -27,17 +27,6 @@ public final class MultijoueurController extends SoloController{
     private Socket socket;
     protected int positionMot = 0;
 
-    @FXML
-    HBox ligne_1;
-    int nombreMotLigne_1 = 0;
-
-    @FXML
-    HBox ligne_2;
-    int nombreMotLigne_2 = 0;
-
-    @FXML
-    HBox ligne_3;
-    int nombreMotLigne_3 = 0;
 
     @FXML
     protected final void initialize() {
@@ -52,8 +41,8 @@ public final class MultijoueurController extends SoloController{
 
     protected void ajoutMot(String s, TypeMot typeMot) throws UnsupportedEncodingException {
         s = new String(s.getBytes(), "UTF-8");
-        for(int i = 0; i < s.length(); i++) {
-            Text t = new Text(s.substring(i, i+1));
+        for (char c : s.toCharArray()) {
+            Text t = new Text(String.valueOf(c));
             switch (typeMot) {
                 case WORD_TO_DO :
                     t.getStyleClass().add("text-to-do");
@@ -105,20 +94,23 @@ public final class MultijoueurController extends SoloController{
         System.out.println("Key = " + e.getCode());
 
         Message m;
+        LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
         if(e.getCode().isLetterKey() || isAccentedChar(inputToChars(e)) || inputToChars(e) == "-"){
-            LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
             System.out.println("Text = " + formatString(e.getText(),e.isShiftDown()));
             map.put("lettre",formatString(e.getText(),e.isShiftDown()));
-            m = new Message(Transmission.CLIENT_LETTRE,map);
         
         }
         else if (e.getCode() == KeyCode.BACK_SPACE) {
-            m = new Message(Transmission.CLIENT_BACKSPACE,null);
+            map.put("lettre","backspace");
         }
-        else {
-            System.out.println(" m null");
-            m = null;
+        else if(e.getCode() == KeyCode.SPACE){
+            map.put("lettre"," ");
         }
+        else return;
+        Text t = (Text) ligne_1.getChildren().get(positionMot);
+        map.put("lettre2",t.getText());
+        System.out.println("Envoy : " + (formatString(e.getText(),e.isShiftDown())) + " attendu " + t.getText());
+        m = new Message(Transmission.CLIENT_LETTRE,map);
         try {
             if (m == null) System.out.println("NULL");
             envoiMessage(socket, m);
@@ -180,11 +172,14 @@ class ReceptionJeux implements Runnable {
                 });
                 break;
             case SERVEUR_MOT_SUIVANT :
-                while(!((Text) multijoueurController.ligne_1.getChildren().get(0)).getText().equals(" ")) {
-                    multijoueurController.ligne_1.getChildren().remove(0);
-                }
-                multijoueurController.ligne_1.getChildren().remove(0);
-                multijoueurController.positionMot = 0;
+                Platform.runLater( () -> {
+                    // while(!((Text) multijoueurController.ligne_1.getChildren().get(0)).getText().equals(" ")) {
+                    //     multijoueurController.ligne_1.getChildren().remove(0);
+                    // }
+                    // multijoueurController.ligne_1.getChildren().remove(0);
+                    multijoueurController.validationMot(false);
+                    multijoueurController.positionMot = 0;
+                });
                 break;
             case SERVEUR_LETTRE_VALIDE :
                 multijoueurController.ligne_1.getChildren().get(multijoueurController.positionMot++).getStyleClass().add("text-done");
@@ -193,7 +188,9 @@ class ReceptionJeux implements Runnable {
                 multijoueurController.ligne_1.getChildren().get(multijoueurController.positionMot++).getStyleClass().add("text-error");
                 break;
             case SERVEUR_BACKSPACE :
-                multijoueurController.ligne_1.getChildren().get(--multijoueurController.positionMot).getStyleClass().add("text-to-do");
+                Text t = (Text)multijoueurController.ligne_1.getChildren().get(--multijoueurController.positionMot);
+                t.getStyleClass().remove("text-done");
+                t.getStyleClass().remove("text-error");
                 break;
             case SERVEUR_PERDU :
                 break;

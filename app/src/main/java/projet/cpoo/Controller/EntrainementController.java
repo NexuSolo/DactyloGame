@@ -324,7 +324,7 @@ public class EntrainementController extends ControllerJeu {
     }
 
     @Override
-    protected void validationMot() {
+    protected void validationMot(boolean solo) {
         return;
     }
 

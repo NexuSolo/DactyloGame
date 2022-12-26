@@ -24,11 +24,11 @@ public class SoloController extends ControllerJeu{
     private int motRestant = 10;
     private int niveau = Settings.getNiveau();
     
-    private int nombreMotLigne_1 = 0;
+    protected int nombreMotLigne_1 = 0;
 
-    private int nombreMotLigne_2 = 0;
+    protected int nombreMotLigne_2 = 0;
 
-    private int nombreMotLigne_3 = 0;
+    protected int nombreMotLigne_3 = 0;
     @FXML
     private Text textMotComplete;
 
@@ -102,11 +102,11 @@ public class SoloController extends ControllerJeu{
         return ligne_1.getChildren().size() == 0;
     }
     
-    protected void validationMot() {
+    protected void validationMot(boolean solo) {
         if(jeuVide()) return;
         int i = 0;
         nombreMots--;
-        updateMotNiveau();
+        // updateMotNiveau();
         Text t = (Text) ligne_1.getChildren().get(i);
         int tmpVie = vies;
         while (!t.getText().equals(" ")) {
@@ -116,8 +116,8 @@ public class SoloController extends ControllerJeu{
             t = (Text) ligne_1.getChildren().get(i);
         }
         ligne_1.getChildren().remove(0, i+1);
-        updateVies();
-        if (nombreMots < 8) {
+        // updateVies();
+        if (solo && nombreMots < 8) {
             int r = new Random().nextInt(10);
             HBox ligne = selectLine();
             addWordtoLine(stringIter.next(), ligne,r==0);
@@ -127,17 +127,17 @@ public class SoloController extends ControllerJeu{
         if (tmpVie == vies) {
             motRestant--;
             motComplete++;
-            updateMotComplete();
+            // updateMotComplete();
         }
         if(motRestant <= 0) {
             motRestant = 10;
-            upNiveau();
+            // upNiveau();
         }
-        updateMotNiveau();
+        // updateMotNiveau();
         pos = 0;
         firstTry = true;
         if(ligne_1.getChildren().size() != 0) soin = ligne_1.getChildren().get(0).getStyleClass().contains("text-life");
-        if (vies <= 0) {
+        if (solo && vies <= 0) {
             try {
                 finDuJeu();
             } catch (Exception e) {
@@ -155,7 +155,7 @@ public class SoloController extends ControllerJeu{
     }
 
     protected int addWordtoLine(String s,HBox line,boolean soin) {
-        if (nombreMots >= 15) validationMot();
+        if (nombreMots >= 15) validationMot(true);
         nombreMots++;
         int pos = 0;
         for(char c : s.toCharArray()) {
@@ -188,7 +188,7 @@ public class SoloController extends ControllerJeu{
                 pos++;
             }
             else if (t.getText().equals(" ")) {
-                validationMot();
+                validationMot(true);
                 pos = 0;
             }
             else {
@@ -204,7 +204,7 @@ public class SoloController extends ControllerJeu{
         else if(e.getCode() == KeyCode.SPACE){
             circonflexe = false;
             trema = false;
-            validationMot();
+            validationMot(true);
             pos = 0;
         }
         else {
@@ -290,7 +290,8 @@ public class SoloController extends ControllerJeu{
         incrementeNombreLigne(ligne_haut);
     }   
 
-    private void rearrangeCol() {
+    protected void rearrangeCol() {
+        System.out.println("NBR l2" + nombreMotLigne_2);
         if(nombreMotLigne_2 > 0) popMot(ligne_2, ligne_1);
         if(nombreMotLigne_3 > 0) popMot(ligne_3, ligne_2);
     }
