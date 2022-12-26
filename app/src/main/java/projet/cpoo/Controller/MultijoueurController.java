@@ -10,16 +10,20 @@ import com.google.gson.internal.LinkedTreeMap;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import projet.cpoo.App;
 import projet.cpoo.Message;
+import projet.cpoo.Transmission;
 import projet.cpoo.TypeMot;
 
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
-public final class MultijoueurController {
+public final class MultijoueurController extends SoloController{
     private Socket socket;
     protected int positionMot = 0;
 
@@ -36,7 +40,7 @@ public final class MultijoueurController {
     int nombreMotLigne_3 = 0;
 
     @FXML
-    private void initialize() {
+    protected final void initialize() {
         socket = App.getSocket();
         Thread reception = new Thread(new ReceptionJeux(this));
         reception.start();
@@ -87,6 +91,39 @@ public final class MultijoueurController {
         } else if (nombreMotLigne_3 < 5) {
             ligne_3.getChildren().add(espace);
             nombreMotLigne_3++;
+        }
+    }
+
+    private void envoiMessage(Socket socket, Message message) throws IOException {
+        Gson gson = new Gson();
+        String json = gson.toJson(message);
+        PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
+        out.println(json);
+    }
+
+    public void keyDetect(KeyEvent e) {
+        System.out.println("Key = " + e.getCode());
+
+        Message m;
+        if(e.getCode().isLetterKey() || isAccentedChar(inputToChars(e)) || inputToChars(e) == "-"){
+            LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
+            System.out.println("Text = " + formatString(e.getText(),e.isShiftDown()));
+            map.put("lettre",formatString(e.getText(),e.isShiftDown()));
+            m = new Message(Transmission.CLIENT_LETTRE,map);
+        
+        }
+        else if (e.getCode() == KeyCode.BACK_SPACE) {
+            m = new Message(Transmission.CLIENT_BACKSPACE,null);
+        }
+        else {
+            System.out.println(" m null");
+            m = null;
+        }
+        try {
+            if (m == null) System.out.println("NULL");
+            envoiMessage(socket, m);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
     

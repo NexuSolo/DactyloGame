@@ -39,7 +39,7 @@
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="textListeJoueur" text="Text" />
                </children>
             </VBox>
-            <TextArea mouseTransparent="true" opacity="0.0" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <TextArea mouseTransparent="true" onKeyPressed="#keyDetect" opacity="0.0" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                <cursor>
                   <Cursor fx:constant="DEFAULT" />
                </cursor>

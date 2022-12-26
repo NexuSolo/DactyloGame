@@ -20,6 +20,7 @@ import projet.cpoo.App;
 import projet.cpoo.GameData;
 import projet.cpoo.Settings;
 
+@SuppressWarnings ("unchecked")
 public class EntrainementStatsController extends StatsController {
 
     @FXML
@@ -51,7 +52,6 @@ public class EntrainementStatsController extends StatsController {
     }
 
     private void setMotGraph() {
-        System.out.println("GD TF = " + GameData.getTempsFinal()*0.01);
         List<Integer> wordTab = GameData.getWordList();
         final NumberAxis yAxis;
         final NumberAxis xAxis;
@@ -158,7 +158,6 @@ public class EntrainementStatsController extends StatsController {
             int borneinf = (i > 0)?(int)(i-j):i;
             int bornesup = (i < freqList.size()-1)?(int)(i+j):i;
             List<Integer> sub = freqList.subList(borneinf,bornesup);
-            int len = (sub.size() > 0 )?sub.size():1;
             double moy = sub.stream().reduce(0,( x,y ) -> x + y)/sub.size();
             serieFreq.getData().add(new XYChart.Data<>(i, moy));
             }

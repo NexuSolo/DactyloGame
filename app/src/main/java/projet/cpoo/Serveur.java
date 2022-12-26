@@ -22,7 +22,7 @@ import java.io.PrintWriter;
 public class Serveur {
     private static ParametrePartie parametrePartie = new ParametrePartie(false, "Français");
     public static void main (String[] args) {
-        Map<Socket,String> sockets = new HashMap<Socket,String>();
+        Map<Socket,ClientThread> sockets = new HashMap<Socket,ClientThread>();
         try {
             try (ServerSocket server = new ServerSocket(Integer.valueOf(args[0]))) {
                 System.out.println(server.getLocalSocketAddress());
@@ -51,12 +51,13 @@ public class Serveur {
 
 class ClientThread implements Runnable {
     private Socket client;
-    private Map<Socket,String> sockets;
+    private Map<Socket,ClientThread> sockets;
+    private String pseudo;
     private List<String> listeMots = new ArrayList<String>();
     private String motAct = "";
     int vie = 10;
 
-    public ClientThread(Socket client, Map<Socket,String> sockets) {
+    public ClientThread(Socket client, Map<Socket,ClientThread> sockets) {
         this.client = client;
         this.sockets = sockets;
     }
@@ -96,7 +97,7 @@ class ClientThread implements Runnable {
     private void traitement(Message message) throws IOException {
         if(message.getTransmition() == Transmission.CLIENT_CONNEXION) {
             LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) message.getMessage();
-            sockets.put(client, (String) map.get("pseudo"));
+            sockets.get(client).pseudo = map.get("pseudo");
             listeJoueurs();
             miseAJourOptions();
         }
@@ -225,6 +226,8 @@ class ClientThread implements Runnable {
     }
 
     private void receptionLettre(String s) throws IOException {
+        System.out.println("Liste mots");
+        listeMots.stream().forEach(System.out::println);
         if(s.equals(" ")) {
             vie -= viePerdu(s);
             listeMots.remove(0);
@@ -243,6 +246,7 @@ class ClientThread implements Runnable {
                 envoiMessage(client, m);
             }
             else {
+                System.out.println("char test = " + s + " char a comp :" + listeMots.get(0).substring(motAct.length(), motAct.length() + 1));
                 if(listeMots.get(0).substring(motAct.length(), motAct.length() + 1).equals(s)) {
                     motAct += s;
                     Message m = new Message(Transmission.SERVEUR_LETTRE_VALIDE, null);
