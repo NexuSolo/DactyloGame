@@ -53,7 +53,8 @@ class ClientThread implements Runnable {
     private Socket client;
     private Map<Socket,ClientThread> sockets;
     private String pseudo;
-    private List<String> listeMots = new ArrayList<String>();
+    private List<String> dictionnaire = new ArrayList<String>(); //static
+    private List<String> liseMots = new ArrayList<String>();
     private String motAct = "";
     int vie = 10;
 
@@ -97,7 +98,9 @@ class ClientThread implements Runnable {
     private void traitement(Message message) throws IOException {
         if(message.getTransmition() == Transmission.CLIENT_CONNEXION) {
             LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) message.getMessage();
-            sockets.get(client).pseudo = map.get("pseudo");
+            System.out.println("map : " + map);
+            pseudo = (String) map.get("pseudo");
+            sockets.put(client, this);
             listeJoueurs();
             miseAJourOptions();
         }
@@ -137,7 +140,7 @@ class ClientThread implements Runnable {
     private void listeJoueurs() throws IOException {
         List<String> joueurs = new ArrayList<String>();
         for(Socket socket : sockets.keySet()) {
-            joueurs.add(sockets.get(socket));
+            joueurs.add(sockets.get(socket).pseudo);
         }
         for(Socket socket : sockets.keySet()) {
             LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
@@ -193,7 +196,7 @@ class ClientThread implements Runnable {
     private void creationPartie() throws IOException {
         BufferedReader r = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResource("liste_mots/liste_francais.txt").openStream()));
         while (r.readLine() != null) {
-            listeMots.add(r.readLine());
+            dictionnaire.add(r.readLine());
         }
         for(Socket socket : sockets.keySet()) {
             List<String> mots = new ArrayList<String>();
@@ -212,6 +215,7 @@ class ClientThread implements Runnable {
                 }
                 mots.add(motAleatoire());
             }
+            sockets.get(socket).liseMots = mots;
             map.put("listeMot", mots);
             Message m = new Message(Transmission.SERVEUR_LISTE_MOT, map);
             envoiMessage(socket, m);
@@ -221,16 +225,16 @@ class ClientThread implements Runnable {
 
     private String motAleatoire() throws IOException {
         Random rand = new Random();
-        int nombreAleatoire = rand.nextInt(listeMots.size());
-        return listeMots.get(nombreAleatoire);
+        int nombreAleatoire = rand.nextInt(dictionnaire.size());
+        return dictionnaire.get(nombreAleatoire);
     }
 
     private void receptionLettre(String s) throws IOException {
         System.out.println("Liste mots");
-        listeMots.stream().forEach(System.out::println);
+        liseMots.stream().forEach(System.out::println);
         if(s.equals(" ")) {
             vie -= viePerdu(s);
-            listeMots.remove(0);
+            liseMots.remove(0);
             Message m = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
             envoiMessage(client, m);
         }
@@ -238,16 +242,16 @@ class ClientThread implements Runnable {
             receptionBackspace();
         }
         else {
-            if(motAct.length() == listeMots.get(0).length()) {
+            if(motAct.length() == liseMots.get(0).length()) {
                 vie -= 1;
                 motAct = "";
-                listeMots.remove(0);
+                liseMots.remove(0);
                 Message m = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
                 envoiMessage(client, m);
             }
             else {
-                System.out.println("char test = " + s + " char a comp :" + listeMots.get(0).substring(motAct.length(), motAct.length() + 1));
-                if(listeMots.get(0).substring(motAct.length(), motAct.length() + 1).equals(s)) {
+                System.out.println("char test = " + s + " char a comp :" + liseMots.get(0).substring(motAct.length(), motAct.length() + 1));
+                if(liseMots.get(0).substring(motAct.length(), motAct.length() + 1).equals(s)) {
                     motAct += s;
                     Message m = new Message(Transmission.SERVEUR_LETTRE_VALIDE, null);
                     envoiMessage(client, m);
@@ -263,8 +267,8 @@ class ClientThread implements Runnable {
 
     private int viePerdu(String s) {
         int res = 0;
-        for(int i = 0; i < listeMots.get(0).length(); i++) {
-            if(!listeMots.get(0).substring(i, i + 1).equals(s.substring(i, i + 1))) {
+        for(int i = 0; i < liseMots.get(0).length(); i++) {
+            if(!liseMots.get(0).substring(i, i + 1).equals(s.substring(i, i + 1))) {
                 res++;
             }
         }
