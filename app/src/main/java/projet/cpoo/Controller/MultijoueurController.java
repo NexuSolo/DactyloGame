@@ -86,6 +86,13 @@ public final class MultijoueurController extends SoloController{
         }
     }
 
+    protected final boolean motDegats(){
+        Message m;
+        m = new Message(Transmission.CLIENT_VALIDATION,null);
+        // envoiMessage(socket, m);
+        return false;
+    }
+
     private void envoiMessage(Socket socket, Message message) throws IOException {
         Gson gson = new Gson();
         String json = gson.toJson(message);
@@ -93,9 +100,12 @@ public final class MultijoueurController extends SoloController{
         out.println(json);
     }
 
+    protected final void remplirMots() {
+        
+    }
     public void keyDetect(KeyEvent e) {
         System.out.println("Key = " + e.getCode());
-
+        System.out.println("pos mot = " + positionMot);
         Message m;
         LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
         if(e.getCode().isLetterKey() || isAccentedChar(inputToChars(e)) || inputToChars(e) == "-"){
@@ -181,6 +191,8 @@ class ReceptionJeux implements Runnable {
                     // multijoueurController.ligne_1.getChildren().remove(0);
                     multijoueurController.validationMot(false);
                     multijoueurController.positionMot = 0;
+                    multijoueurController.pos = 0;
+
                 });
                 break;
             case SERVEUR_LETTRE_VALIDE :

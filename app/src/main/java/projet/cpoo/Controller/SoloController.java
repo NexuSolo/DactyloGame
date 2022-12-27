@@ -101,12 +101,9 @@ public class SoloController extends ControllerJeu{
     private boolean jeuVide() {
         return ligne_1.getChildren().size() == 0;
     }
-    
-    protected void validationMot(boolean solo) {
-        if(jeuVide()) return;
+
+    protected boolean motDegats(){
         int i = 0;
-        nombreMots--;
-        // updateMotNiveau();
         Text t = (Text) ligne_1.getChildren().get(i);
         int tmpVie = vies;
         while (!t.getText().equals(" ")) {
@@ -115,35 +112,74 @@ public class SoloController extends ControllerJeu{
             i++;
             t = (Text) ligne_1.getChildren().get(i);
         }
+        return tmpVie <= vies;
+    }
+
+    
+    protected void removeMot(){
+        int i = 0;
+        Text t = (Text) ligne_1.getChildren().get(i);
+        while (!t.getText().equals(" ")) {
+            i++;
+            t = (Text) ligne_1.getChildren().get(i);
+        }
         ligne_1.getChildren().remove(0, i+1);
-        // updateVies();
-        if (solo && nombreMots < 8) {
+    }
+
+    protected void remplirMots() {
+        if (nombreMots < 8) {
             int r = new Random().nextInt(10);
             HBox ligne = selectLine();
             addWordtoLine(stringIter.next(), ligne,r==0);
             ligne.getChildren().add(new Text(" "));
         }
-        rearrangeCol();
-        if (tmpVie == vies) {
+    }
+
+    protected void incrementeMotComplete(boolean b) {
+        if (b) {
             motRestant--;
             motComplete++;
-            // updateMotComplete();
+            updateMotComplete();
         }
+    }
+
+    protected void monteeNiveau() {
         if(motRestant <= 0) {
             motRestant = 10;
-            // upNiveau();
+            upNiveau();
         }
-        // updateMotNiveau();
+    }
+
+    protected void resetPos(){
         pos = 0;
         firstTry = true;
         if(ligne_1.getChildren().size() != 0) soin = ligne_1.getChildren().get(0).getStyleClass().contains("text-life");
-        if (solo && vies <= 0) {
+    }
+
+    protected void end() {
+        if (vies <= 0) {
             try {
                 finDuJeu();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+    }
+    
+    protected void validationMot(boolean solo) {
+        if(jeuVide()) return;
+        nombreMots--;
+        updateMotNiveau();
+        boolean b = motDegats();
+        removeMot();
+        updateVies();
+        remplirMots();
+        incrementeMotComplete(b);
+        rearrangeCol();
+        monteeNiveau();
+        updateMotNiveau();
+        resetPos();
+        end();
     }
 
     private void finDuJeu() throws IOException {
@@ -258,6 +294,7 @@ public class SoloController extends ControllerJeu{
     @Override
     protected void initializeText() {
         textHG.setText(" Vies restantes");
+        textHD.setText(" Mots avant prochain niveau ");
         textHM.setText(" Niveau ");
         setStats();
     }
@@ -291,7 +328,6 @@ public class SoloController extends ControllerJeu{
     }   
 
     protected void rearrangeCol() {
-        System.out.println("NBR l2" + nombreMotLigne_2);
         if(nombreMotLigne_2 > 0) popMot(ligne_2, ligne_1);
         if(nombreMotLigne_3 > 0) popMot(ligne_3, ligne_2);
     }

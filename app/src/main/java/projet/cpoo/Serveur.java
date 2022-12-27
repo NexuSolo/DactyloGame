@@ -58,6 +58,7 @@ class ClientThread implements Runnable {
     private List<String> dictionnaire = new ArrayList<String>(); //static
     private List<String> listeMots = new ArrayList<String>();
     private String motAct = "";
+    int accents = 0;
 
     public ClientThread(Socket client, Map<Socket,ClientThread> sockets) {
         this.client = client;
@@ -121,6 +122,9 @@ class ClientThread implements Runnable {
         if(message.getTransmition() == Transmission.CLIENT_LETTRE) {
             LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) message.getMessage();
             receptionLettre((String) map.get("lettre"),(String) map.get("lettre2"));
+        }
+        if(message.getTransmition() == Transmission.CLIENT_VALIDATION) {
+            ClientThread ct = sockets.get(client);
         }
     }
 
@@ -222,6 +226,7 @@ class ClientThread implements Runnable {
                 mots.add(motAleatoire());
             }
             sockets.get(socket).listeMots = mots;
+            // mots.add(dictionnaire.get(0));
             map.put("listeMot", mots);
             Message m = new Message(Transmission.SERVEUR_LISTE_MOT, map);
             envoiMessage(socket, m);
@@ -246,6 +251,7 @@ class ClientThread implements Runnable {
             listeMots.remove(0);
             Message m = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
             motAct = "";
+            accents = 0;
             envoiMessage(client, m);
         }
         else if(s.equals("backspace")) {
@@ -255,15 +261,26 @@ class ClientThread implements Runnable {
             if(motAct.length() == listeMots.get(0).length()) {
                 changementVie(-1);
                 motAct = "";
+                accents = 0;
                 listeMots.remove(0);
                 Message m = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
                 envoiMessage(client, m);
             }
             else {
-
-                // System.out.println("char test = " + s + " char a comp :" + listeMots.get(0).substring(0, motAct.length() + 1));
-                if(s.equals(s2)) {
-                    motAct += s;
+                System.out.println("MotAct: " + motAct +" nb accents = " + accents);
+                String mot = listeMots.get(0);
+                String nextChar = mot.substring(motAct.length() + accents,motAct.length() + 1 +accents);
+                if (mot.length() >= motAct.length() + 2 + accents) {
+                    String tmp = new String(mot.substring(motAct.length()+accents,motAct.length() + 2 + accents).getBytes(),"UTF-8");
+                    System.out.println("is accent =" + isAccentedChar(tmp));
+                    if (isAccentedChar(tmp)) {
+                        accents++;
+                        nextChar = tmp;
+                    }
+                }
+                System.out.println("char test = " + s + " char a comp :" + nextChar);
+                if(s.equals(nextChar)) {
+                    motAct += nextChar;
                     Message m = new Message(Transmission.SERVEUR_LETTRE_VALIDE, null);
                     envoiMessage(client, m);
                 }
@@ -273,6 +290,17 @@ class ClientThread implements Runnable {
                     envoiMessage(client, m);
                 }
             }
+        }
+    }
+
+    protected boolean isAccentedChar(String s) {
+        switch (s) {
+            case "\u00f9" : return true;
+            case "\u00e0" : return true;
+            case "\u00e9" : return true;
+            case "\u00e8" : return true;
+            case "\u00e7" : return true;
+            default : return false;
         }
     }
 
@@ -288,7 +316,16 @@ class ClientThread implements Runnable {
 
     private void receptionBackspace() throws IOException {
         if(motAct.length() > 0) {
-            motAct = motAct.substring(0, motAct.length() - 1);
+            System.out.println("Mot act avant " + motAct);
+            int len = 1;
+            if (motAct.length() > 1) {
+                String tmp = new String(motAct.substring(motAct.length() - 1,motAct.length()).getBytes());
+                if (isAccentedChar(tmp)) {
+                    accents--;
+                }
+            }
+            motAct = motAct.substring(0, motAct.length() - len);
+            System.out.println("Mot act apres " + motAct);
             Message m = new Message(Transmission.SERVEUR_BACKSPACE, null);
             envoiMessage(client, m);
         }
