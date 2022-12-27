@@ -124,7 +124,16 @@ class ClientThread implements Runnable {
             receptionLettre((String) map.get("lettre"),(String) map.get("lettre2"));
         }
         if(message.getTransmition() == Transmission.CLIENT_VALIDATION) {
-            ClientThread ct = sockets.get(client);
+            updateVie();
+            LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
+            map.put("vie",vie);
+            Message m = new Message(Transmission.CHANGEMENT_VIE,map);
+            envoiMessage(client, m);
+            listeMots.remove(0);
+            motAct = "";
+            accents = 0;
+            Message m2 = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
+            envoiMessage(client, m2);
         }
     }
 
@@ -205,6 +214,7 @@ class ClientThread implements Runnable {
         BufferedReader r = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResource("liste_mots/liste_francais.txt").openStream()));
         String text = r.readLine();
         while (text != null) {
+            text = new String(text.getBytes(),"UTF-8");
             dictionnaire.add(text);
             text = r.readLine();
         }
@@ -226,7 +236,6 @@ class ClientThread implements Runnable {
                 mots.add(motAleatoire());
             }
             sockets.get(socket).listeMots = mots;
-            // mots.add(dictionnaire.get(0));
             map.put("listeMot", mots);
             Message m = new Message(Transmission.SERVEUR_LISTE_MOT, map);
             envoiMessage(socket, m);
@@ -247,7 +256,7 @@ class ClientThread implements Runnable {
 
     private void receptionLettre(String s,String s2) throws IOException {
         if(s.equals(" ")) {
-            updateVie(s);
+            updateVie();
             listeMots.remove(0);
             Message m = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
             motAct = "";
@@ -267,18 +276,15 @@ class ClientThread implements Runnable {
                 envoiMessage(client, m);
             }
             else {
-                System.out.println("MotAct: " + motAct +" nb accents = " + accents);
                 String mot = listeMots.get(0);
                 String nextChar = mot.substring(motAct.length() + accents,motAct.length() + 1 +accents);
                 if (mot.length() >= motAct.length() + 2 + accents) {
                     String tmp = new String(mot.substring(motAct.length()+accents,motAct.length() + 2 + accents).getBytes(),"UTF-8");
-                    System.out.println("is accent =" + isAccentedChar(tmp));
                     if (isAccentedChar(tmp)) {
                         accents++;
                         nextChar = tmp;
                     }
                 }
-                System.out.println("char test = " + s + " char a comp :" + nextChar);
                 if(s.equals(nextChar)) {
                     motAct += nextChar;
                     Message m = new Message(Transmission.SERVEUR_LETTRE_VALIDE, null);
@@ -304,28 +310,35 @@ class ClientThread implements Runnable {
         }
     }
 
-    private void updateVie(String s) throws IOException {
+    private void updateVie() throws IOException {
+        String s = motAct;
         int res = 0;
-        for(int i = 0; i < s.length() -  1 ; i++) {
-            if(!s.substring(i, i + 1).equals(s.substring(i, i + 1))) {
+        String mot = listeMots.get(0);
+        System.out.println("lens " + motAct.length() +" "+ mot.length());
+        int j = 0;
+        for(int i = 0; i < s.length() ; i++) {
+            String s1 = s.substring(i, i + 1);
+            String s2 = mot.substring(j, j + 1);
+            System.out.println("s1 = " + s1 + " s2 = " + s2); 
+            if(!s1.equals(s2)) {
+                System.out.println("res --");
                 res--;
             }
+            j++;
+            if (j >= mot.length()) {
+                System.out.println("break");
+                break;
+            }
         }
+        res -= Math.abs(mot.length() - s.length());
+        System.out.println("res = " + res);
         if(res != 0) changementVie(res);
     }
 
     private void receptionBackspace() throws IOException {
         if(motAct.length() > 0) {
-            System.out.println("Mot act avant " + motAct);
             int len = 1;
-            if (motAct.length() > 1) {
-                String tmp = new String(motAct.substring(motAct.length() - 1,motAct.length()).getBytes());
-                if (isAccentedChar(tmp)) {
-                    accents--;
-                }
-            }
             motAct = motAct.substring(0, motAct.length() - len);
-            System.out.println("Mot act apres " + motAct);
             Message m = new Message(Transmission.SERVEUR_BACKSPACE, null);
             envoiMessage(client, m);
         }
@@ -360,6 +373,7 @@ class ClientThread implements Runnable {
             for(Socket socket : sockets.keySet()) {
                 envoiMessage(socket, m);
             }
+            
         }
     }
 

@@ -35,6 +35,7 @@ public final class MultijoueurController extends SoloController{
     protected final void initialize() {
         socket = App.getSocket();
         Thread reception = new Thread(new ReceptionJeux(this));
+        initializeText();
         reception.start();
     }
 
@@ -43,7 +44,6 @@ public final class MultijoueurController extends SoloController{
     }
 
     protected void ajoutMot(String s, TypeMot typeMot) throws UnsupportedEncodingException {
-        s = new String(s.getBytes(), "UTF-8");
         for (char c : s.toCharArray()) {
             Text t = new Text(String.valueOf(c));
             switch (typeMot) {
@@ -89,7 +89,11 @@ public final class MultijoueurController extends SoloController{
     protected final boolean motDegats(){
         Message m;
         m = new Message(Transmission.CLIENT_VALIDATION,null);
-        // envoiMessage(socket, m);
+        try {
+            envoiMessage(socket, m);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
@@ -101,7 +105,7 @@ public final class MultijoueurController extends SoloController{
     }
 
     protected final void remplirMots() {
-        
+
     }
     public void keyDetect(KeyEvent e) {
         System.out.println("Key = " + e.getCode());
@@ -117,7 +121,10 @@ public final class MultijoueurController extends SoloController{
             map.put("lettre","backspace");
         }
         else if(e.getCode() == KeyCode.SPACE){
-            map.put("lettre"," ");
+            validationMot(false);
+            updateVies();
+            return;
+            // map.put("lettre"," ");
         }
         else return;
         Text t = (Text) ligne_1.getChildren().get(positionMot);
@@ -189,7 +196,7 @@ class ReceptionJeux implements Runnable {
                     //     multijoueurController.ligne_1.getChildren().remove(0);
                     // }
                     // multijoueurController.ligne_1.getChildren().remove(0);
-                    multijoueurController.validationMot(false);
+                    // multijoueurController.validationMot(false);
                     multijoueurController.positionMot = 0;
                     multijoueurController.pos = 0;
 
@@ -209,6 +216,13 @@ class ReceptionJeux implements Runnable {
             case SERVEUR_CLASSEMENT :
                     miseAJourClassement((LinkedTreeMap<String, Object>) message.getMessage());
                 break;
+            case CHANGEMENT_VIE :
+            System.out.println("Changement vie : ");
+                LinkedTreeMap<String, Object> mapMess = (LinkedTreeMap<String, Object>) message.getMessage();
+                System.out.println(mapMess);
+                multijoueurController.vies = ((Double)mapMess.get("vie")).intValue();
+                multijoueurController.updateVies();
+             System.out.println("Nouvelles vies " + multijoueurController.vies );
             case SERVEUR_PERDU :
                 finDePartie(false,(LinkedTreeMap<String, Object>) message.getMessage());
                 break;
@@ -243,6 +257,7 @@ class ReceptionJeux implements Runnable {
     private void affichageListMot(LinkedTreeMap<String, Object> t) throws UnsupportedEncodingException {
         List<String> listeMot = (List<String>) t.get("listeMot");
         for(int i = 0; i < listeMot.size(); i++) {
+
             TypeMot typeMot = TypeMot.valueOf((String) t.get("" + i));
             System.out.println(listeMot.get(i) + " " + typeMot);
             multijoueurController.ajoutMot(listeMot.get(i), typeMot);
@@ -251,19 +266,19 @@ class ReceptionJeux implements Runnable {
 
     @SuppressWarnings("unchecked")
     private void finDePartie(boolean gagner, LinkedTreeMap<String, Object> t) {
-        List<String> listeJoueurs = (List<String>) t.get("listeJoueurs");
-        List<Integer> listeScore = (List<Integer>) t.get("listeScore");
-        try {
-            if(gagner) {
-                ClassementController c = new ClassementController(listeJoueurs,listeScore,true);
-                App.setRoot("classement",c);
-            } else {
-                ClassementController c = new ClassementController(listeJoueurs,listeScore,false);
-                App.setRoot("classement",c);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // List<String> listeJoueurs = (List<String>) t.get("listeJoueurs");
+        // List<Integer> listeScore = (List<Integer>) t.get("listeScore");
+        // try {
+        //     if(gagner) {
+        //         ClassementController c = new ClassementController(listeJoueurs,listeScore,true);
+        //         App.setRoot("classement",c);
+        //     } else {
+        //         ClassementController c = new ClassementController(listeJoueurs,listeScore,false);
+        //         App.setRoot("classement",c);
+        //     }
+        // } catch (IOException e) {
+        //     e.printStackTrace();
+        // }
     }
 
 }

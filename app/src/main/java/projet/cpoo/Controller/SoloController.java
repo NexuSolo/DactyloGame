@@ -19,7 +19,7 @@ import projet.cpoo.GameData;
 import projet.cpoo.Settings;
 
 public class SoloController extends ControllerJeu{    
-    private int vies = 50;
+    protected int vies = 50;
     private int nombreMots = 0;
     private int motRestant = 10;
     private int niveau = Settings.getNiveau();
@@ -61,7 +61,7 @@ public class SoloController extends ControllerJeu{
         textBM.setText(String.valueOf(niveau));
     }
 
-    private void updateVies() {
+    protected final void updateVies() {
         textBG.setText(String.valueOf(vies));
     }
 
@@ -167,18 +167,19 @@ public class SoloController extends ControllerJeu{
     }
     
     protected void validationMot(boolean solo) {
+        System.out.println("appel");
         if(jeuVide()) return;
         nombreMots--;
-        updateMotNiveau();
         boolean b = motDegats();
         removeMot();
-        updateVies();
         remplirMots();
         incrementeMotComplete(b);
         rearrangeCol();
         monteeNiveau();
-        updateMotNiveau();
         resetPos();
+        updateMotNiveau();
+        updateMotNiveau();
+        updateVies();
         end();
     }
 
