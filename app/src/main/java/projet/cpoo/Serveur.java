@@ -53,10 +53,11 @@ class ClientThread implements Runnable {
     private Socket client;
     private Map<Socket,ClientThread> sockets;
     private String pseudo;
+    private int vie = 50;
+    private boolean enJeu = true;
     private List<String> dictionnaire = new ArrayList<String>(); //static
     private List<String> listeMots = new ArrayList<String>();
     private String motAct = "";
-    int vie = 10;
 
     public ClientThread(Socket client, Map<Socket,ClientThread> sockets) {
         this.client = client;
@@ -189,6 +190,9 @@ class ClientThread implements Runnable {
                         e.printStackTrace();
                     }
                 }
+                if(sockets.size() == 0) {
+                    this.cancel();
+                }
             }
         }, 3000,3000);
     }
@@ -221,6 +225,11 @@ class ClientThread implements Runnable {
             map.put("listeMot", mots);
             Message m = new Message(Transmission.SERVEUR_LISTE_MOT, map);
             envoiMessage(socket, m);
+            LinkedTreeMap<String, Object> map2 = new LinkedTreeMap<String, Object>();
+            List<String> classement = sockets.keySet().stream().sorted((x,y) -> sockets.get(x).vie - sockets.get(y).vie).filter(x -> sockets.get(x).enJeu).map(x -> sockets.get(x).pseudo + " : " + sockets.get(x).vie).toList();
+            map2.put("liste", classement);
+            Message m2 = new Message(Transmission.SERVEUR_CLASSEMENT, map2);
+            envoiMessage(socket, m2);
         }
         
     }
@@ -233,7 +242,7 @@ class ClientThread implements Runnable {
 
     private void receptionLettre(String s,String s2) throws IOException {
         if(s.equals(" ")) {
-            vie -= viePerdu(s);
+            updateVie(s);
             listeMots.remove(0);
             Message m = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
             motAct = "";
@@ -244,7 +253,7 @@ class ClientThread implements Runnable {
         }
         else {
             if(motAct.length() == listeMots.get(0).length()) {
-                vie -= 1;
+                changementVie(-1);
                 motAct = "";
                 listeMots.remove(0);
                 Message m = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
@@ -267,22 +276,53 @@ class ClientThread implements Runnable {
         }
     }
 
-    private int viePerdu(String s) {
+    private void updateVie(String s) throws IOException {
         int res = 0;
         for(int i = 0; i < s.length() -  1 ; i++) {
             if(!s.substring(i, i + 1).equals(s.substring(i, i + 1))) {
-                res++;
+                res--;
             }
         }
-        return res;
+        if(res != 0) changementVie(res);
     }
 
     private void receptionBackspace() throws IOException {
         if(motAct.length() > 0) {
             motAct = motAct.substring(0, motAct.length() - 1);
-            System.out.println("new motAct len: " + motAct.length());
             Message m = new Message(Transmission.SERVEUR_BACKSPACE, null);
             envoiMessage(client, m);
+        }
+    }
+
+    private void changementVie(int i) throws IOException {
+        vie += i;
+        if(vie <= 0) {
+            enJeu = false;
+            LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
+            List<String> listeJoueurs = sockets.keySet().stream().map(x -> sockets.get(x).pseudo).toList();
+            map.put("listeJoueurs", listeJoueurs);
+            List<Integer> listeScore = sockets.keySet().stream().map(x -> sockets.get(x).vie).toList();
+            map.put("listeScore", listeScore);
+            Message m = new Message(Transmission.SERVEUR_PERDU, map);
+            envoiMessage(client, m);
+            LinkedTreeMap<String, Object> map2 = new LinkedTreeMap<String, Object>();
+            List<String> liste = sockets.keySet().stream().sorted((x,y) -> sockets.get(x).vie - sockets.get(y).vie).filter(x -> sockets.get(x).enJeu).map(x -> sockets.get(x).pseudo + " : " + sockets.get(x).vie).toList();
+            map2.put("liste", liste);
+            Message m2 = new Message(Transmission.SERVEUR_CLASSEMENT, map2);
+            for(Socket socket : sockets.keySet()) {
+               if(socket != client) {
+                   envoiMessage(socket, m2);
+               }
+            }
+        }
+        else {
+            LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
+            List<String> liste = sockets.keySet().stream().sorted((x,y) -> sockets.get(x).vie - sockets.get(y).vie).filter(x -> sockets.get(x).enJeu).map(x -> sockets.get(x).pseudo + " : " + sockets.get(x).vie).toList();
+            map.put("liste", liste);
+            Message m = new Message(Transmission.SERVEUR_CLASSEMENT, map);
+            for(Socket socket : sockets.keySet()) {
+                envoiMessage(socket, m);
+            }
         }
     }
 

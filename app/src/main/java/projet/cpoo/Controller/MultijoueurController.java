@@ -12,7 +12,8 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import projet.cpoo.App;
 import projet.cpoo.Message;
@@ -26,6 +27,8 @@ import java.io.UnsupportedEncodingException;
 public final class MultijoueurController extends SoloController{
     private Socket socket;
     protected int positionMot = 0;
+    @FXML
+    protected VBox classementVBox;
 
 
     @FXML
@@ -112,7 +115,6 @@ public final class MultijoueurController extends SoloController{
         System.out.println("Envoy : " + (formatString(e.getText(),e.isShiftDown())) + " attendu " + t.getText());
         m = new Message(Transmission.CLIENT_LETTRE,map);
         try {
-            if (m == null) System.out.println("NULL");
             envoiMessage(socket, m);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -145,7 +147,7 @@ class ReceptionJeux implements Runnable {
     }
 
     @SuppressWarnings("unchecked")
-    private void traitement(Message message) throws UnsupportedEncodingException {
+    private void traitement(Message message) throws IOException {
         switch (message.getTransmition()) {
             case SERVEUR_DECONNEXION:
                 Thread.currentThread().interrupt();
@@ -192,13 +194,37 @@ class ReceptionJeux implements Runnable {
                 t.getStyleClass().remove("text-done");
                 t.getStyleClass().remove("text-error");
                 break;
+            case SERVEUR_CLASSEMENT :
+                    miseAJourClassement((LinkedTreeMap<String, Object>) message.getMessage());
+                break;
             case SERVEUR_PERDU :
+                finDePartie(false,(LinkedTreeMap<String, Object>) message.getMessage());
                 break;
             case SERVEUR_GAGNER :
+                finDePartie(true,(LinkedTreeMap<String, Object>) message.getMessage());
                 break;
             default:
                 break;
         }
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void miseAJourClassement(LinkedTreeMap<String, Object> message) {
+        Platform.runLater(() -> {
+            multijoueurController.classementVBox.getChildren().clear();
+            Text t = new Text("Classement");
+            t.getStyleClass().add("textListeJoueur");
+            multijoueurController.classementVBox.getChildren().add(t);
+            Pane pane = new Pane();
+            pane.getStyleClass().add("separator");
+            multijoueurController.classementVBox.getChildren().add(pane);
+            List<String> joueurs = (List<String>) message.get("liste");
+            for (String joueur : joueurs) {
+                Text text = new Text(joueur);
+                text.getStyleClass().add("textListeJoueur");
+                multijoueurController.classementVBox.getChildren().add(text);
+            }
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -208,6 +234,23 @@ class ReceptionJeux implements Runnable {
             TypeMot typeMot = TypeMot.valueOf((String) t.get("" + i));
             System.out.println(listeMot.get(i) + " " + typeMot);
             multijoueurController.ajoutMot(listeMot.get(i), typeMot);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void finDePartie(boolean gagner, LinkedTreeMap<String, Object> t) {
+        List<String> listeJoueurs = (List<String>) t.get("listeJoueurs");
+        List<Integer> listeScore = (List<Integer>) t.get("listeScore");
+        try {
+            if(gagner) {
+                ClassementController c = new ClassementController(listeJoueurs,listeScore,true);
+                App.setRoot("classement",c);
+            } else {
+                ClassementController c = new ClassementController(listeJoueurs,listeScore,false);
+                App.setRoot("classement",c);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

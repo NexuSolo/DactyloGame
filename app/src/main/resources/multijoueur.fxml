@@ -26,17 +26,14 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="15.0" styleClass="borderPaneBackground" GridPane.rowIndex="1">
+            <VBox fx:id="classementVBox" alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="15.0" styleClass="borderPaneBackground" GridPane.rowIndex="1">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Top joueurs">
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Classement">
                      <font>
                         <Font size="25.0" />
                      </font>
                   </Text>
                   <Pane prefHeight="200.0" prefWidth="200.0" styleClass="separator" />
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="textListeJoueur" text="Text" />
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="textListeJoueur" text="Text" />
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="textListeJoueur" text="Text" />
                </children>
             </VBox>
             <TextArea mouseTransparent="true" onKeyPressed="#keyDetect" opacity="0.0" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
