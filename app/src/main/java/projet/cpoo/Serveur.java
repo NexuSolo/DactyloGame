@@ -57,6 +57,8 @@ class ClientThread implements Runnable {
     private boolean enJeu = true;
     private List<String> dictionnaire = new ArrayList<String>(); //static
     private List<String> listeMots = new ArrayList<String>();
+    private List<TypeMot> listeTypeMots = new ArrayList<TypeMot>();
+    private boolean premierCoup = true;
     private String motAct = "";
     int accents = 0;
 
@@ -130,6 +132,7 @@ class ClientThread implements Runnable {
             Message m = new Message(Transmission.CHANGEMENT_VIE,map);
             envoiMessage(client, m);
             listeMots.remove(0);
+            listeTypeMots.remove(0);
             motAct = "";
             accents = 0;
             Message m2 = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
@@ -197,6 +200,8 @@ class ClientThread implements Runnable {
                         else {
                             map.put(s,TypeMot.WORD_TO_DO);
                         }
+                        sockets.get(socket).listeMots.add(s);
+                        sockets.get(socket).listeTypeMots.add((TypeMot) map.get(s));
                         Message m = new Message(Transmission.SERVEUR_MOT, map);
                         envoiMessage(socket, m);
                     } catch (IOException e) {
@@ -207,7 +212,7 @@ class ClientThread implements Runnable {
                     this.cancel();
                 }
             }
-        }, 3000,3000);
+        }, 5000,5000);
     }
 
     private void creationPartie() throws IOException {
@@ -220,22 +225,27 @@ class ClientThread implements Runnable {
         }
         for(Socket socket : sockets.keySet()) {
             List<String> mots = new ArrayList<String>();
+            List<TypeMot> typeMots = new ArrayList<TypeMot>();
             LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
             for(int i = 0; i < 8; i++) {
                 Random rand = new Random();
                 int nombreAleatoire = rand.nextInt(10 * sockets.size());
                 if(nombreAleatoire == 0) {
                     map.put(String.valueOf(i), TypeMot.WORD_ATTACK);
+                    typeMots.add(TypeMot.WORD_ATTACK);
                 }
                 else if(nombreAleatoire == 1) {
                     map.put(String.valueOf(i), TypeMot.WORD_LIFE);
+                    typeMots.add(TypeMot.WORD_LIFE);
                 }
                 else {
                     map.put(String.valueOf(i), TypeMot.WORD_TO_DO);
+                    typeMots.add(TypeMot.WORD_TO_DO);
                 }
                 mots.add(motAleatoire());
             }
             sockets.get(socket).listeMots = mots;
+            sockets.get(socket).listeTypeMots = typeMots;
             map.put("listeMot", mots);
             Message m = new Message(Transmission.SERVEUR_LISTE_MOT, map);
             envoiMessage(socket, m);
@@ -258,6 +268,7 @@ class ClientThread implements Runnable {
         if(s.equals(" ")) {
             updateVie();
             listeMots.remove(0);
+            listeTypeMots.remove(0);
             Message m = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
             motAct = "";
             accents = 0;
@@ -272,6 +283,7 @@ class ClientThread implements Runnable {
                 motAct = "";
                 accents = 0;
                 listeMots.remove(0);
+                listeTypeMots.remove(0);
                 Message m = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
                 envoiMessage(client, m);
             }
