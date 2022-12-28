@@ -104,6 +104,20 @@ class ClientThread implements Runnable {
 
     @SuppressWarnings("unchecked")
     private void traitement(Message message) throws IOException {
+        if(message.getTransmition() == Transmission.CLIENT_CONNEXION_SERVER_RUN) {
+            Message m;
+            if(Serveur.partieEnCours) {
+                LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
+                map.put("bool",true);
+                m = new Message(Transmission.SERVER_CONNEXION_SERVER_RUN, map);
+            }
+            else {
+                LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
+                map.put("bool",false);
+                m = new Message(Transmission.SERVER_CONNEXION_SERVER_RUN, map);
+            }
+            envoiMessage(client, m);
+        }
         if(message.getTransmition() == Transmission.CLIENT_CONNEXION) {
             LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) message.getMessage();
             System.out.println("map : " + map);
