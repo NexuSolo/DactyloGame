@@ -169,10 +169,12 @@ class ClientThread implements Runnable {
             joueurs.add(sockets.get(socket).pseudo);
         }
         for(Socket socket : sockets.keySet()) {
-            LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
-            map.put("listeJoueur", joueurs);
-            Message m = new Message(Transmission.SERVEUR_CONNEXION, map);
-            envoiMessage(socket, m);
+            if(sockets.get(socket).enJeu) {
+                LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
+                map.put("listeJoueur", joueurs);
+                Message m = new Message(Transmission.SERVEUR_CONNEXION, map);
+                envoiMessage(socket, m);
+            }
         }
     }
 
@@ -382,7 +384,6 @@ class ClientThread implements Runnable {
             map.put("listeScore", listeScore);
             Message m = new Message(Transmission.SERVEUR_PERDU, map);
             envoiMessage(client, m);
-
             int enVie = sockets.keySet().stream().map(x -> sockets.get(x).enJeu).filter(x -> x).toList().size();
             if(enVie == 1 ) {
                 LinkedTreeMap<String, Object> map2 = new LinkedTreeMap<String, Object>();
@@ -395,7 +396,9 @@ class ClientThread implements Runnable {
                     if(sockets.get(socket).enJeu) {
                         sockets.get(socket).enJeu = false;
                         envoiMessage(socket, m3);
-                        break;
+                    }
+                    if(!socket.isClosed()) {
+                        socket.close();
                     }
                 }
                 resetServeur();
@@ -429,7 +432,6 @@ class ClientThread implements Runnable {
         Serveur.setParametrePartie(new ParametrePartie(false, "Français"));
         Serveur.partieEnCours = false;
         sockets.clear();
-        client.close();
     }
 
 }
