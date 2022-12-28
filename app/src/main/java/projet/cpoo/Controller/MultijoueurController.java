@@ -159,6 +159,12 @@ class ReceptionJeux implements Runnable {
                 traitement(message);
             }
         } catch (IOException e) {
+            try {
+                App.getSocket().close();
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
             e.printStackTrace();
         }
     }
@@ -222,7 +228,8 @@ class ReceptionJeux implements Runnable {
                 System.out.println(mapMess);
                 multijoueurController.vies = ((Double)mapMess.get("vie")).intValue();
                 multijoueurController.updateVies();
-             System.out.println("Nouvelles vies " + multijoueurController.vies );
+                System.out.println("Nouvelles vies " + multijoueurController.vies );
+                break;
             case SERVEUR_PERDU :
                 finDePartie(false,(LinkedTreeMap<String, Object>) message.getMessage());
                 break;
@@ -266,19 +273,19 @@ class ReceptionJeux implements Runnable {
 
     @SuppressWarnings("unchecked")
     private void finDePartie(boolean gagner, LinkedTreeMap<String, Object> t) {
-        // List<String> listeJoueurs = (List<String>) t.get("listeJoueurs");
-        // List<Integer> listeScore = (List<Integer>) t.get("listeScore");
-        // try {
-        //     if(gagner) {
-        //         ClassementController c = new ClassementController(listeJoueurs,listeScore,true);
-        //         App.setRoot("classement",c);
-        //     } else {
-        //         ClassementController c = new ClassementController(listeJoueurs,listeScore,false);
-        //         App.setRoot("classement",c);
-        //     }
-        // } catch (IOException e) {
-        //     e.printStackTrace();
-        // }
+        List<String> listeJoueurs = (List<String>) t.get("listeJoueurs");
+        List<Integer> listeScore = (List<Integer>) t.get("listeScore");
+        try {
+            if(gagner) {
+                ClassementController c = new ClassementController(listeJoueurs,listeScore,true);
+                App.setRoot("classement",c);
+            } else {
+                ClassementController c = new ClassementController(listeJoueurs,listeScore,false);
+                App.setRoot("classement",c);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

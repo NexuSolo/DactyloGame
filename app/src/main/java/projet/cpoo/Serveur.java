@@ -87,6 +87,7 @@ class ClientThread implements Runnable {
             sockets.remove(client);
             try {
                 listeJoueurs();
+                Thread.interrupted();
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
@@ -185,27 +186,29 @@ class ClientThread implements Runnable {
             @Override
             public void run() {
                 for (Socket socket : sockets.keySet()) {
-                    try {
-                        String s = motAleatoire();
-                        System.out.println(s + " " + socket + " " + sockets.keySet().size());
-                        LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
-                        Random rand = new Random();
-                        int nombreAleatoire = rand.nextInt(10 * sockets.size());
-                        if(nombreAleatoire == 0) {
-                            map.put(s,TypeMot.WORD_ATTACK);
+                    if(sockets.get(socket).enJeu) {
+                        try {
+                            String s = motAleatoire();
+                            System.out.println(s + " " + socket + " " + sockets.keySet().size());
+                            LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
+                            Random rand = new Random();
+                            int nombreAleatoire = rand.nextInt(10 * sockets.size());
+                            if(nombreAleatoire == 0) {
+                                map.put(s,TypeMot.WORD_ATTACK);
+                            }
+                            else if(nombreAleatoire == 1) {
+                                map.put(s,TypeMot.WORD_LIFE);
+                            }
+                            else {
+                                map.put(s,TypeMot.WORD_TO_DO);
+                            }
+                            sockets.get(socket).listeMots.add(s);
+                            sockets.get(socket).listeTypeMots.add((TypeMot) map.get(s));
+                            Message m = new Message(Transmission.SERVEUR_MOT, map);
+                            envoiMessage(socket, m);
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                        else if(nombreAleatoire == 1) {
-                            map.put(s,TypeMot.WORD_LIFE);
-                        }
-                        else {
-                            map.put(s,TypeMot.WORD_TO_DO);
-                        }
-                        sockets.get(socket).listeMots.add(s);
-                        sockets.get(socket).listeTypeMots.add((TypeMot) map.get(s));
-                        Message m = new Message(Transmission.SERVEUR_MOT, map);
-                        envoiMessage(socket, m);
-                    } catch (IOException e) {
-                        e.printStackTrace();
                     }
                 }
                 if(sockets.size() == 0) {
@@ -269,6 +272,7 @@ class ClientThread implements Runnable {
             updateVie();
             listeMots.remove(0);
             listeTypeMots.remove(0);
+            premierCoup = true;
             Message m = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
             motAct = "";
             accents = 0;
@@ -284,6 +288,7 @@ class ClientThread implements Runnable {
                 accents = 0;
                 listeMots.remove(0);
                 listeTypeMots.remove(0);
+                premierCoup = true;
                 Message m = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
                 envoiMessage(client, m);
             }
@@ -349,6 +354,7 @@ class ClientThread implements Runnable {
 
     private void receptionBackspace() throws IOException {
         if(motAct.length() > 0) {
+            premierCoup = false;
             int len = 1;
             motAct = motAct.substring(0, motAct.length() - len);
             Message m = new Message(Transmission.SERVEUR_BACKSPACE, null);
@@ -367,15 +373,35 @@ class ClientThread implements Runnable {
             map.put("listeScore", listeScore);
             Message m = new Message(Transmission.SERVEUR_PERDU, map);
             envoiMessage(client, m);
-            LinkedTreeMap<String, Object> map2 = new LinkedTreeMap<String, Object>();
-            List<String> liste = sockets.keySet().stream().sorted((x,y) -> sockets.get(x).vie - sockets.get(y).vie).filter(x -> sockets.get(x).enJeu).map(x -> sockets.get(x).pseudo + " : " + sockets.get(x).vie).toList();
-            map2.put("liste", liste);
-            Message m2 = new Message(Transmission.SERVEUR_CLASSEMENT, map2);
-            for(Socket socket : sockets.keySet()) {
-               if(socket != client) {
-                   envoiMessage(socket, m2);
-               }
+
+            int enVie = sockets.keySet().stream().map(x -> sockets.get(x).enJeu).filter(x -> x).toList().size();
+            if(enVie == 1 ) {
+                LinkedTreeMap<String, Object> map2 = new LinkedTreeMap<String, Object>();
+                List<String> listeJoueurs2 = sockets.keySet().stream().map(x -> sockets.get(x).pseudo).toList();
+                map2.put("listeJoueurs", listeJoueurs2);
+                List<Integer> listeScore2 = sockets.keySet().stream().map(x -> sockets.get(x).vie).toList();
+                map2.put("listeScore", listeScore2);
+                Message m3 = new Message(Transmission.SERVEUR_GAGNER, map2);
+                for(Socket socket : sockets.keySet()) {
+                    if(sockets.get(socket).enJeu) {
+                        sockets.get(socket).enJeu = false;
+                        envoiMessage(socket, m3);
+                        break;
+                    }
+                }
             }
+            else {
+                LinkedTreeMap<String, Object> map2 = new LinkedTreeMap<String, Object>();
+                List<String> liste = sockets.keySet().stream().sorted((x,y) -> sockets.get(x).vie - sockets.get(y).vie).filter(x -> sockets.get(x).enJeu).map(x -> sockets.get(x).pseudo + " : " + sockets.get(x).vie).toList();
+                map2.put("liste", liste);
+                Message m2 = new Message(Transmission.SERVEUR_CLASSEMENT, map2);
+                for(Socket socket : sockets.keySet()) {
+                   if(sockets.get(socket).enJeu) {
+                       envoiMessage(socket, m2);
+                   }
+                }
+            }
+
         }
         else {
             LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
