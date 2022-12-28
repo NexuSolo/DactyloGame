@@ -223,12 +223,9 @@ class ReceptionJeux implements Runnable {
                     miseAJourClassement((LinkedTreeMap<String, Object>) message.getMessage());
                 break;
             case CHANGEMENT_VIE :
-            System.out.println("Changement vie : ");
                 LinkedTreeMap<String, Object> mapMess = (LinkedTreeMap<String, Object>) message.getMessage();
-                System.out.println(mapMess);
                 multijoueurController.vies = ((Double)mapMess.get("vie")).intValue();
                 multijoueurController.updateVies();
-                System.out.println("Nouvelles vies " + multijoueurController.vies );
                 break;
             case SERVEUR_PERDU :
                 finDePartie(false,(LinkedTreeMap<String, Object>) message.getMessage());

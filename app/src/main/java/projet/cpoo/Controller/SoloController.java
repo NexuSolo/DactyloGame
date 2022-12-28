@@ -38,6 +38,7 @@ public class SoloController extends ControllerJeu{
         super.initialize();
         ligne_act = ligne_1;
         pos = 0;
+
     }
 
     private void upNiveau() {
@@ -80,13 +81,14 @@ public class SoloController extends ControllerJeu{
             @Override
             public void run() {
                 Platform.runLater( () -> {
+                    
                 if (stringIter.hasNext()) {
                     String s = stringIter.next();
                     int r = new Random().nextInt(10);
                     HBox ligne = selectLine();
                     addWordtoLine(s, ligne,r == 0);
                     ligne.getChildren().add(new Text(" "));
-                }
+                }  
                 });
             }
         },(int) coeff,(int)coeff);
@@ -124,6 +126,7 @@ public class SoloController extends ControllerJeu{
             t = (Text) ligne_1.getChildren().get(i);
         }
         ligne_1.getChildren().remove(0, i+1);
+        nombreMotLigne_1--;
     }
 
     protected void remplirMots() {
@@ -168,6 +171,7 @@ public class SoloController extends ControllerJeu{
     
     protected void validationMot(boolean solo) {
         System.out.println("appel");
+        
         if(jeuVide()) return;
         nombreMots--;
         boolean b = motDegats();
@@ -202,7 +206,9 @@ public class SoloController extends ControllerJeu{
                 line.getChildren().add(t);
                 pos++;
         }
-        if (line == ligne_1) nombreMotLigne_1++;
+        if (line == ligne_1){ nombreMotLigne_1++;
+            System.out.println("Add l1 addWord : " + nombreMotLigne_1 );
+        }
         else if (line == ligne_2) nombreMotLigne_2++;
         else nombreMotLigne_3++;
         try {if (!jeuVide()) soin = ligne_1.getChildren().get(0).getStyleClass().contains("text-life");
@@ -307,12 +313,18 @@ public class SoloController extends ControllerJeu{
     }
 
     private void incrementeNombreLigne(HBox ligne) {
-        if (ligne == ligne_1) nombreMotLigne_1++;
+        if (ligne == ligne_1) {nombreMotLigne_1++;
+            System.out.println("Add l1  incrNbr : " + nombreMotLigne_1 );
+        }
         else if (ligne == ligne_2) nombreMotLigne_2++;
         else nombreMotLigne_3++;
     }
 
     private void popMot(HBox ligne_bas,HBox ligne_haut) {
+        System.out.println("PopMot " + ligne_bas + " " + ligne_haut);
+        System.out.println("Nb mot ligne 1 " + nombreMotLigne_1);
+        System.out.println("Nb mot ligne 2 " + nombreMotLigne_2);
+        System.out.println("Nb mot ligne 3 " + nombreMotLigne_3);
         int i = 0;
         Text t = (Text) ligne_bas.getChildren().get(i);
         List <Node> list = new LinkedList<>();
