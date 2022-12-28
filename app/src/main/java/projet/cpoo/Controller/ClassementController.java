@@ -36,7 +36,6 @@ public class ClassementController implements Initializable {
         this.gagner = gagner;
     }
 
-    
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         if(gagner) {
@@ -57,7 +56,6 @@ public class ClassementController implements Initializable {
                 e1.printStackTrace();
             }
         });
-        
     }
     
     @FXML

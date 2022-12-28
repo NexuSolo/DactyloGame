@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -21,6 +22,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 public class Serveur {
     private static ParametrePartie parametrePartie = new ParametrePartie(false, "Français");
+    protected static boolean partieEnCours = false;
+    protected static Stack<String> classementStack = new Stack<String>();
     public static void main (String[] args) {
         Map<Socket,ClientThread> sockets = new HashMap<Socket,ClientThread>();
         try {
@@ -120,7 +123,12 @@ class ClientThread implements Runnable {
             miseAJourOptions();
         }
         if(message.getTransmition() == Transmission.CLIENT_LANCER) {
-            lancementPartie();
+            if(sockets.keySet().size() > 1) {
+                lancementPartie();
+            }
+            else {
+                //envoyer un message d'erreur
+            }
         }
         if(message.getTransmition() == Transmission.CLIENT_LETTRE) {
             LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) message.getMessage();
@@ -176,6 +184,7 @@ class ClientThread implements Runnable {
     }
 
     private void lancementPartie() throws IOException {
+        Serveur.partieEnCours = true;
         for(Socket socket : sockets.keySet()) {
             Message m = new Message(Transmission.SERVEUR_LANCER, null);
             envoiMessage(socket, m);
@@ -389,6 +398,7 @@ class ClientThread implements Runnable {
                         break;
                     }
                 }
+                resetServeur();
             }
             else {
                 LinkedTreeMap<String, Object> map2 = new LinkedTreeMap<String, Object>();
@@ -413,6 +423,13 @@ class ClientThread implements Runnable {
             }
             
         }
+    }
+
+    private void resetServeur() throws IOException {
+        Serveur.setParametrePartie(new ParametrePartie(false, "Français"));
+        Serveur.partieEnCours = false;
+        sockets.clear();
+        client.close();
     }
 
 }

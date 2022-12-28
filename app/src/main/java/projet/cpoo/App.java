@@ -10,6 +10,7 @@ import java.net.Socket;
 import java.util.Properties;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -110,13 +111,25 @@ public class App extends Application {
     }
 
     public static void setRoot(String fxml) throws IOException {
-        scene.setRoot(loadFXML(fxml));
+        Platform.runLater(() -> {
+            try {
+                scene.setRoot(loadFXML(fxml));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public static void setRoot(String fxml, Object controller) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(ClassLoader.getSystemResource(fxml + ".fxml"));
-        fxmlLoader.setController(controller);
-        scene.setRoot(fxmlLoader.load());
+        Platform.runLater(() -> {
+            FXMLLoader fxmlLoader = new FXMLLoader(ClassLoader.getSystemResource(fxml + ".fxml"));
+            fxmlLoader.setController(controller);
+            try {
+                scene.setRoot(fxmlLoader.load());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private static Parent loadFXML(String fxml) throws IOException {

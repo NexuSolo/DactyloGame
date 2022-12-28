@@ -3,6 +3,7 @@ package projet.cpoo.Controller;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -161,11 +162,10 @@ class ReceptionJeux implements Runnable {
         } catch (IOException e) {
             try {
                 App.getSocket().close();
-            } catch (IOException e1) {
-                // TODO Auto-generated catch block
+            }
+            catch (IOException e1) {
                 e1.printStackTrace();
             }
-            e.printStackTrace();
         }
     }
 
