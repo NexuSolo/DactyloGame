@@ -109,7 +109,6 @@ public final class MultijoueurController extends SoloController{
 
     }
     public void keyDetect(KeyEvent e) {
-        if (jeuVide()) return;
         Message m;
         LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
         if(e.getCode().isLetterKey() || isAccentedChar(inputToChars(e)) || inputToChars(e) == "-"){
@@ -121,15 +120,13 @@ public final class MultijoueurController extends SoloController{
             map.put("lettre","backspace");
         }
         else if(e.getCode() == KeyCode.SPACE){
-            validationMot(false);
-            updateVies();
-            return;
-            // map.put("lettre"," ");
+            // validationMot(false);
+            // updateVies();
+            // return;
+            map.put("lettre"," ");
         }
         else return;
         Text t = (Text) ligne_1.getChildren().get(positionMot);
-        map.put("lettre2",t.getText());
-        System.out.println("Envoy : " + (formatString(e.getText(),e.isShiftDown())) + " attendu " + t.getText());
         m = new Message(Transmission.CLIENT_LETTRE,map);
         try {
             envoiMessage(socket, m);
@@ -153,20 +150,17 @@ class ReceptionJeux implements Runnable {
             BufferedReader in = new BufferedReader(new InputStreamReader(multijoueurController.getSocket().getInputStream()));
             String line;
             while ((line = in.readLine()) != null) {
-                System.out.println(line);
+                // System.out.println(line);
                 Gson gson = new Gson();
                 Message message = gson.fromJson(line, Message.class);
                 traitement(message);
             }
         } catch (IOException e) {
-            // try {
-            //     System.out.println("Crash IO");                
-            //     App.getSocket().close();
-            // } catch (IOException e1) {
-            //     // TODO Auto-generated catch block
-            //     e1.printStackTrace();
-            // }
-            e.printStackTrace();
+            try {
+                App.getSocket().close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
     }
 
