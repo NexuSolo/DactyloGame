@@ -51,7 +51,6 @@ public class EntrainementController extends ControllerJeu {
 
     protected void initializeGame(List<String> list) {
         String text;
-        if (!modeTemps) list = list.subList(0,Settings.getLIMITE_MAX());
         stringIter = list.iterator();
         while(stringIter.hasNext()) {
             text = stringIter.next();
@@ -84,7 +83,9 @@ public class EntrainementController extends ControllerJeu {
 
     private void timerStart() {
         start = true;
+        
         timer.schedule(new TimerTask() {
+            
             @Override
             public void run() {
                 Platform.runLater( () -> {

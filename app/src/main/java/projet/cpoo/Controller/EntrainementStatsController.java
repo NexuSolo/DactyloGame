@@ -146,7 +146,7 @@ public class EntrainementStatsController extends StatsController {
     }
 
     private void createGraph(List<Integer> freqList,XYChart.Series serieFreq) {
-        if (freqList.size() <= 10) {
+        if (freqList.size() <= 15) {
             for (int i = 0; i < freqList.size(); i++) {
             serieFreq.getData().add(new XYChart.Data<>(i,freqList.get(i)));
             }

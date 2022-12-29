@@ -3,9 +3,9 @@ package projet.cpoo.Controller;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.List;
 
+import com.google.common.graph.ElementOrder.Type;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 
@@ -30,12 +30,12 @@ public final class MultijoueurController extends SoloController{
     protected int positionMot = 0;
     @FXML
     protected VBox classementVBox;
-
+    protected Thread reception;
 
     @FXML
     protected final void initialize() {
         socket = App.getSocket();
-        Thread reception = new Thread(new ReceptionJeux(this));
+        reception = new Thread(new ReceptionJeux(this));
         initializeText();
         reception.start();
     }
@@ -109,8 +109,7 @@ public final class MultijoueurController extends SoloController{
 
     }
     public void keyDetect(KeyEvent e) {
-        System.out.println("Key = " + e.getCode());
-        System.out.println("pos mot = " + positionMot);
+        if (jeuVide()) return;
         Message m;
         LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
         if(e.getCode().isLetterKey() || isAccentedChar(inputToChars(e)) || inputToChars(e) == "-"){
@@ -160,12 +159,14 @@ class ReceptionJeux implements Runnable {
                 traitement(message);
             }
         } catch (IOException e) {
-            try {
-                App.getSocket().close();
-            }
-            catch (IOException e1) {
-                e1.printStackTrace();
-            }
+            // try {
+            //     System.out.println("Crash IO");                
+            //     App.getSocket().close();
+            // } catch (IOException e1) {
+            //     // TODO Auto-generated catch block
+            //     e1.printStackTrace();
+            // }
+            e.printStackTrace();
         }
     }
 
@@ -198,26 +199,40 @@ class ReceptionJeux implements Runnable {
                 break;
             case SERVEUR_MOT_SUIVANT :
                 Platform.runLater( () -> {
-                    // while(!((Text) multijoueurController.ligne_1.getChildren().get(0)).getText().equals(" ")) {
-                    //     multijoueurController.ligne_1.getChildren().remove(0);
-                    // }
-                    // multijoueurController.ligne_1.getChildren().remove(0);
-                    // multijoueurController.validationMot(false);
                     multijoueurController.positionMot = 0;
                     multijoueurController.pos = 0;
 
                 });
                 break;
+            case SERVEUR_VALIDATION : 
+                Platform.runLater( () -> {
+                    multijoueurController.validationMot(false);
+                    multijoueurController.updateVies();
+                    multijoueurController.positionMot = 0;
+                    multijoueurController.pos = 0;
+                });
+                break;
             case SERVEUR_LETTRE_VALIDE :
-                multijoueurController.ligne_1.getChildren().get(multijoueurController.positionMot++).getStyleClass().add("text-done");
+                Text tV = (Text)multijoueurController.ligne_1.getChildren().get(multijoueurController.positionMot++);
+                tV.getStyleClass().remove("text-attack");
+                tV.getStyleClass().remove("text-life");
+                tV.getStyleClass().add("text-done");
                 break;
             case SERVEUR_LETTRE_INVALIDE :
-                multijoueurController.ligne_1.getChildren().get(multijoueurController.positionMot++).getStyleClass().add("text-error");
+                Text tI = (Text)multijoueurController.ligne_1.getChildren().get(multijoueurController.positionMot++);
+                tI.getStyleClass().remove("text-attack");
+                tI.getStyleClass().remove("text-life");
+                tI.getStyleClass().add("text-error");
                 break;
             case SERVEUR_BACKSPACE :
                 Text t = (Text)multijoueurController.ligne_1.getChildren().get(--multijoueurController.positionMot);
+                LinkedTreeMap<String, Object> mapType = (LinkedTreeMap<String, Object>) message.getMessage();
+                TypeMot type = TypeMot.valueOf((String) mapType.get("type"));
                 t.getStyleClass().remove("text-done");
                 t.getStyleClass().remove("text-error");
+                if (type == TypeMot.WORD_ATTACK) t.getStyleClass().add("text-attack");
+                if (type == TypeMot.WORD_LIFE) t.getStyleClass().add("text-life");
+                
                 break;
             case SERVEUR_CLASSEMENT :
                     miseAJourClassement((LinkedTreeMap<String, Object>) message.getMessage());

@@ -62,6 +62,10 @@ class ClientThread implements Runnable {
     private List<String> listeMots = new ArrayList<String>();
     private List<TypeMot> listeTypeMots = new ArrayList<TypeMot>();
     private boolean premierCoup = true;
+    private boolean soin = false;
+    private boolean attaque = false;
+    private boolean trema = false;
+    private boolean circonlexe = false;
     private String motAct = "";
     int accents = 0;
 
@@ -137,7 +141,7 @@ class ClientThread implements Runnable {
             miseAJourOptions();
         }
         if(message.getTransmition() == Transmission.CLIENT_LANCER) {
-            if(sockets.keySet().size() > 1) {
+            if(true || sockets.keySet().size() > 1) {
                 lancementPartie();
             }
             else {
@@ -149,17 +153,31 @@ class ClientThread implements Runnable {
             receptionLettre((String) map.get("lettre"),(String) map.get("lettre2"));
         }
         if(message.getTransmition() == Transmission.CLIENT_VALIDATION) {
+            System.out.println("CVVVVCVVCVCVCVCVCVCV");
             updateVie();
             LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
             map.put("vie",vie);
             Message m = new Message(Transmission.CHANGEMENT_VIE,map);
             envoiMessage(client, m);
-            listeMots.remove(0);
-            listeTypeMots.remove(0);
-            motAct = "";
-            accents = 0;
+            resetMot();
+            
             Message m2 = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
             envoiMessage(client, m2);
+        }
+    }
+
+    protected final void resetMot() {
+        listeMots.remove(0);
+        listeTypeMots.remove(0);
+        motAct = "";
+        accents = 0;
+        premierCoup = true;
+        if (listeMots.size() > 0) {
+            TypeMot type = listeTypeMots.get(0);
+            soin = type == TypeMot.WORD_LIFE;
+            attaque = type == TypeMot.WORD_ATTACK;
+            System.out.println("Soin = " + soin + " Attaque = " + attaque);
+            System.out.println("Prochain mot =" + listeMots.get(0));
         }
     }
 
@@ -229,6 +247,10 @@ class ClientThread implements Runnable {
                             }
                             sockets.get(socket).listeMots.add(s);
                             sockets.get(socket).listeTypeMots.add((TypeMot) map.get(s));
+                            if(listeMots.size() == 1) {
+                                soin = nombreAleatoire == 1;
+                                attaque = nombreAleatoire == 0;
+                            }
                             Message m = new Message(Transmission.SERVEUR_MOT, map);
                             envoiMessage(socket, m);
                         } catch (IOException e) {
@@ -241,6 +263,9 @@ class ClientThread implements Runnable {
                 }
             }
         }, 5000,5000);
+        TypeMot type = listeTypeMots.get(0);
+        soin = type == TypeMot.WORD_LIFE;
+        attaque = type == TypeMot.WORD_ATTACK;
     }
 
     private void creationPartie() throws IOException {
@@ -293,28 +318,13 @@ class ClientThread implements Runnable {
     }
 
     private void receptionLettre(String s,String s2) throws IOException {
-        if(s.equals(" ")) {
-            updateVie();
-            listeMots.remove(0);
-            listeTypeMots.remove(0);
-            premierCoup = true;
-            Message m = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
-            motAct = "";
-            accents = 0;
-            envoiMessage(client, m);
-        }
-        else if(s.equals("backspace")) {
+         if(s.equals("backspace")) {
             receptionBackspace();
         }
         else {
             if(motAct.length() == listeMots.get(0).length()) {
-                changementVie(-1);
-                motAct = "";
-                accents = 0;
-                listeMots.remove(0);
-                listeTypeMots.remove(0);
-                premierCoup = true;
-                Message m = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
+                motAct += s;
+                Message m = new Message(Transmission.SERVEUR_VALIDATION, null);
                 envoiMessage(client, m);
             }
             else {
@@ -334,6 +344,7 @@ class ClientThread implements Runnable {
                 }
                 else {
                     motAct += s;
+                    premierCoup = false;
                     Message m = new Message(Transmission.SERVEUR_LETTRE_INVALIDE, null);
                     envoiMessage(client, m);
                 }
@@ -365,6 +376,12 @@ class ClientThread implements Runnable {
             if(!s1.equals(s2)) {
                 System.out.println("res --");
                 res--;
+                if(attaque) attaque = false;
+            }
+            else if (this.premierCoup) {
+                if (soin) {
+                    res++;
+                }
             }
             j++;
             if (j >= mot.length()) {
@@ -382,7 +399,12 @@ class ClientThread implements Runnable {
             premierCoup = false;
             int len = 1;
             motAct = motAct.substring(0, motAct.length() - len);
-            Message m = new Message(Transmission.SERVEUR_BACKSPACE, null);
+            LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
+            if (soin) map.put("type",TypeMot.WORD_LIFE);
+            else if (attaque) map.put("type",TypeMot.WORD_ATTACK);
+            else map.put("type",TypeMot.WORD_TO_DO);
+            System.out.println("Map = " + map);
+            Message m = new Message(Transmission.SERVEUR_BACKSPACE, map);
             envoiMessage(client, m);
         }
     }

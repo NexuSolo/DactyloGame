@@ -100,7 +100,7 @@ public class SoloController extends ControllerJeu{
         return ligne_3;
     }
 
-    private boolean jeuVide() {
+    protected boolean jeuVide() {
         return ligne_1.getChildren().size() == 0;
     }
 
@@ -170,8 +170,6 @@ public class SoloController extends ControllerJeu{
     }
     
     protected void validationMot(boolean solo) {
-        System.out.println("appel");
-        
         if(jeuVide()) return;
         nombreMots--;
         boolean b = motDegats();
@@ -206,9 +204,7 @@ public class SoloController extends ControllerJeu{
                 line.getChildren().add(t);
                 pos++;
         }
-        if (line == ligne_1){ nombreMotLigne_1++;
-            System.out.println("Add l1 addWord : " + nombreMotLigne_1 );
-        }
+        if (line == ligne_1) nombreMotLigne_1++;
         else if (line == ligne_2) nombreMotLigne_2++;
         else nombreMotLigne_3++;
         try {if (!jeuVide()) soin = ligne_1.getChildren().get(0).getStyleClass().contains("text-life");
@@ -321,10 +317,6 @@ public class SoloController extends ControllerJeu{
     }
 
     private void popMot(HBox ligne_bas,HBox ligne_haut) {
-        System.out.println("PopMot " + ligne_bas + " " + ligne_haut);
-        System.out.println("Nb mot ligne 1 " + nombreMotLigne_1);
-        System.out.println("Nb mot ligne 2 " + nombreMotLigne_2);
-        System.out.println("Nb mot ligne 3 " + nombreMotLigne_3);
         int i = 0;
         Text t = (Text) ligne_bas.getChildren().get(i);
         List <Node> list = new LinkedList<>();
