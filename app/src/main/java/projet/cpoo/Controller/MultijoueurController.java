@@ -104,7 +104,7 @@ public final class MultijoueurController extends SoloController{
         System.out.println("Message envoye " + socket);
         Gson gson = new Gson();
         String json = gson.toJson(message);
-        PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"),true);
+        PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
         out.println(json);
         System.out.println("Fin Message envoye ");
 
@@ -113,6 +113,16 @@ public final class MultijoueurController extends SoloController{
     protected final void remplirMots() {
 
     }
+    protected void mapAccent(KeyEvent e,LinkedTreeMap<String, Object> map) {
+        KeyCode code = e.getCode();
+        switch (code) {
+            case DEAD_CIRCUMFLEX : if (!e.isShiftDown()) map.put("lettre","circonflexe");
+            else map.put("lettre","trema"); break;
+            case DEAD_DIAERESIS : map.put("lettre","trema");
+            default : break;
+        }
+    }
+
     public void keyDetect(KeyEvent e) {
         Message m;
         LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
@@ -130,7 +140,8 @@ public final class MultijoueurController extends SoloController{
             // return;
             map.put("lettre"," ");
         }
-        else return;
+        else mapAccent(e, map);
+        if (map.keySet().size() == 0) return;
         Text t = (Text) ligne_1.getChildren().get(positionMot);
         m = new Message(Transmission.CLIENT_LETTRE,map);
         try {
