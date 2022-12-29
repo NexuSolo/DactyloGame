@@ -99,10 +99,13 @@ public final class MultijoueurController extends SoloController{
     }
 
     private void envoiMessage(Socket socket, Message message) throws IOException {
+        System.out.println("Message envoye " + socket);
         Gson gson = new Gson();
         String json = gson.toJson(message);
         PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
         out.println(json);
+        System.out.println("Fin Message envoye ");
+
     }
 
     protected final void remplirMots() {

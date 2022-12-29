@@ -58,7 +58,7 @@ class ClientThread implements Runnable {
     private String pseudo;
     private int vie = 50;
     private boolean enJeu = true;
-    private List<String> dictionnaire = new ArrayList<String>(); //static
+    private static List<String> dictionnaire = new ArrayList<String>(); //static
     private List<String> listeMots = new ArrayList<String>();
     private List<TypeMot> listeTypeMots = new ArrayList<TypeMot>();
     private boolean premierCoup = true;
@@ -80,7 +80,7 @@ class ClientThread implements Runnable {
             BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
             String line;
             while ((line = reader.readLine()) != null) {
-                System.out.println(LocalTime.now() + " : " + line);
+                System.out.println(LocalTime.now() + " : " + line + " from " + client);
                 Gson gson = new Gson();
                 Message message = gson.fromJson(line, Message.class);
                 traitement(message);
@@ -108,7 +108,6 @@ class ClientThread implements Runnable {
 
     @SuppressWarnings("unchecked")
     private void traitement(Message message) throws IOException {
-        System.out.println("Serv + " + message.getTransmition());
         if(message.getTransmition() == Transmission.CLIENT_CONNEXION_SERVER_RUN) {
             Message m;
             if(Serveur.partieEnCours) {
@@ -125,7 +124,6 @@ class ClientThread implements Runnable {
         }
         if(message.getTransmition() == Transmission.CLIENT_CONNEXION) {
             LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) message.getMessage();
-            System.out.println("map : " + map);
             pseudo = (String) map.get("pseudo");
             sockets.put(client, this);
             listeJoueurs();
@@ -178,8 +176,6 @@ class ClientThread implements Runnable {
         TypeMot type = listeTypeMots.get(0);
         soin = type == TypeMot.WORD_LIFE;
         attaque = type == TypeMot.WORD_ATTACK;
-        System.out.println("Soin = " + soin + " Attaque = " + attaque);
-        System.out.println("Prochain mot =" + listeMots.get(0));
     }
 
     private void miseAJourOptions() {
@@ -220,8 +216,8 @@ class ClientThread implements Runnable {
 
     private void nouveauMot(Socket socket,String s) throws IOException {
         if (s == null) s = motAleatoire();
-        if (listeMots.size() > 15) validationMot();
-        System.out.println(s + " " + socket + " " + sockets.keySet().size());
+        if (listeMots.size() > 15) validationMot(socket);
+        System.out.println(s + " " + socket);
         LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
         Random rand = new Random();
         int nombreAleatoire = rand.nextInt(10 * sockets.size());
@@ -259,33 +255,12 @@ class ClientThread implements Runnable {
                     if(sockets.get(socket).enJeu) {
                         try {
                             nouveauMot(socket,null);
-                            // String s = motAleatoire();
-                            // System.out.println(s + " " + socket + " " + sockets.keySet().size());
-                            // LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
-                            // Random rand = new Random();
-                            // int nombreAleatoire = rand.nextInt(10 * sockets.size());
-                            // if(nombreAleatoire == 0) {
-                            //     map.put(s,TypeMot.WORD_ATTACK);
-                            // }
-                            // else if(nombreAleatoire == 1) {
-                            //     map.put(s,TypeMot.WORD_LIFE);
-                            // }
-                            // else {
-                            //     map.put(s,TypeMot.WORD_TO_DO);
-                            // }
-                            // sockets.get(socket).listeMots.add(s);
-                            // sockets.get(socket).listeTypeMots.add((TypeMot) map.get(s));
-                            // if(listeMots.size() == 1) {
-                            //     soin = nombreAleatoire == 1;
-                            //     attaque = nombreAleatoire == 0;
-                            // }
-                            // Message m = new Message(Transmission.SERVEUR_MOT, map);
-                            // envoiMessage(socket, m);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
                 }
+                System.out.println();
                 if(sockets.size() == 0) {
                     this.cancel();
                 }
@@ -301,7 +276,7 @@ class ClientThread implements Runnable {
         String text = r.readLine();
         while (text != null) {
             text = new String(text.getBytes(),"UTF-8");
-            dictionnaire.add(text);
+            if (text.length() < 7) dictionnaire.add(text);
             text = r.readLine();
         }
         for(Socket socket : sockets.keySet()) {
@@ -341,20 +316,21 @@ class ClientThread implements Runnable {
 
     private String motAleatoire() throws IOException {
         Random rand = new Random();
+        System.out.println("Taille dictio = " + dictionnaire.size() + " ip : " + client);
         int nombreAleatoire = rand.nextInt(dictionnaire.size());
         return dictionnaire.get(nombreAleatoire);
     }
 
-    private void validationMot() throws IOException {
+    private void validationMot(Socket s) throws IOException {
         trema = false;
-        circonlexe = false;    
+        circonlexe = false;
         Message m = new Message(Transmission.SERVEUR_VALIDATION, null);
-        envoiMessage(client, m);
+        envoiMessage(s, m);
     }
 
     private void receptionLettre(String s) throws IOException {
         if (s.equals(" ")) {
-            validationMot();
+            validationMot(client);
         }
         else if(s.equals("backspace")) {
             trema = false;
@@ -364,7 +340,7 @@ class ClientThread implements Runnable {
         else {
             if(motAct.length() == listeMots.get(0).length()) {
                 motAct += s;
-                validationMot();
+                validationMot(client);
             }
             else {
                 String mot = listeMots.get(0);
@@ -406,14 +382,11 @@ class ClientThread implements Runnable {
         String s = motAct;
         int res = 0;
         String mot = listeMots.get(0);
-        System.out.println("lens " + motAct.length() +" "+ mot.length());
         int j = 0;
         for(int i = 0; i < s.length() ; i++) {
             String s1 = s.substring(i, i + 1);
             String s2 = mot.substring(j, j + 1);
-            System.out.println("s1 = " + s1 + " s2 = " + s2); 
             if(!s1.equals(s2)) {
-                System.out.println("res --");
                 res--;
                 if(attaque) attaque = false;
             }
@@ -424,7 +397,6 @@ class ClientThread implements Runnable {
             }
             j++;
             if (j >= mot.length()) {
-                System.out.println("break");
                 break;
             }
         }
@@ -438,7 +410,6 @@ class ClientThread implements Runnable {
         for (Socket s : sockets.keySet()) {
             ClientThread ct = sockets.get(s);
             if (s != client && ct.enJeu) {
-                System.out.println("Mot Attaque envoyé : "+ mot + " a " + s);
                 ct.nouveauMot(ct.client, mot);
             }
         }
@@ -453,7 +424,6 @@ class ClientThread implements Runnable {
             if (soin) map.put("type",TypeMot.WORD_LIFE);
             else if (attaque) map.put("type",TypeMot.WORD_ATTACK);
             else map.put("type",TypeMot.WORD_TO_DO);
-            System.out.println("Map = " + map);
             Message m = new Message(Transmission.SERVEUR_BACKSPACE, map);
             envoiMessage(client, m);
         }
