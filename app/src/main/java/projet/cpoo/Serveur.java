@@ -14,6 +14,8 @@ import java.util.Random;
 import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
@@ -271,13 +273,15 @@ class ClientThread implements Runnable {
     }
 
     private void creationPartie() throws IOException {
-        BufferedReader r = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResource("liste_mots/liste_francais.txt").openStream()));
+        String fic = (Serveur.getParametrePartie().getLangue().equals("Français"))?"liste_mots/liste_francais.txt":"liste_mots/liste_anglais.txt";
+        BufferedReader r = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResource(fic).openStream()));
         String text = r.readLine();
         while (text != null) {
             text = new String(text.getBytes(),"UTF-8");
             if (text.length() < 7) dictionnaire.add(text);
             text = r.readLine();
         }
+        if (!Serveur.getParametrePartie().isAccent()) dictionnaire = dictionnaire.stream().filter((x) -> Pattern.matches("^*[a-zA-Z-]*",x)).collect(Collectors.toList());
         for(Socket socket : sockets.keySet()) {
             List<String> mots = new ArrayList<String>();
             List<TypeMot> typeMots = new ArrayList<TypeMot>();

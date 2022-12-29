@@ -130,6 +130,7 @@ public class OptionsController {
     @FXML
     private void langueFrancais() throws UnsupportedEncodingException {
         String s = new String("Français".getBytes(), "utf-8");
+        Settings.setLangue(Settings.language.FR);
         langueMenuButton.setText(s);
         App.setLangue(s);
     }
@@ -137,16 +138,16 @@ public class OptionsController {
     @FXML
     private void langueEnglish() {
         langueMenuButton.setText("English");
-        App.setLangue("English");
+        Settings.setLangue(Settings.language.EN);
     }
 
     @FXML
     private void accent() {
         if(accentCheckBox.isSelected()) {
-            App.setAccent(true);
+            Settings.setAccents(true);
         }
         else {
-            App.setAccent(false);
+            Settings.setAccents(false);
         }
     }
 

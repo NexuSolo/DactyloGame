@@ -7,6 +7,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
@@ -30,10 +34,11 @@ public abstract class ControllerJeu {
     protected boolean trema = false;
     protected boolean soin = false;
     protected boolean firstTry = true;
-    
+
     protected Iterator<String> stringIter;
     protected String tmpIter =  null;
-
+    private String regAcc ="^*[a-zA-Z-]*";
+    // private String regAcc ="^*[^âàéèêëêïîôöùû]*";
     @FXML
     protected HBox ligne_1;
 
@@ -64,14 +69,15 @@ public abstract class ControllerJeu {
     @FXML
     protected Text textBD;
 
-    
 
-    
+
+
 
     @FXML
     protected void initialize() {
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResource("liste_mots/liste_francais.txt").openStream()));
+            String fic = (Settings.getLangue() == Settings.language.FR)?"liste_mots/liste_francais.txt":"liste_mots/liste_anglais.txt";
+            BufferedReader reader = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResource(fic).openStream()));
             List<String> list = new ArrayList<String>();
             String text = reader.readLine();
             while (text != null) {
@@ -79,7 +85,9 @@ public abstract class ControllerJeu {
                 list.add(text);
                 text = reader.readLine();
             }
+            if (!Settings.isAccents()) list = list.stream().filter((x) -> Pattern.matches(regAcc,x)).collect(Collectors.toList());
             Collections.shuffle(list);
+            // list.stream().forEach(System.out::println);
             initializeGame(list);
             pos = 0;
             reader.close();
@@ -88,14 +96,14 @@ public abstract class ControllerJeu {
             e.printStackTrace();
         }
     }
-    
+
     protected abstract void initializeGame(List<String> list);
 
     protected abstract void initializeText();
 
     protected String formatString(String text,boolean shift) {
         if (shift) return toAccent(text).toUpperCase();
-        else return toAccent(text); 
+        else return toAccent(text);
     }
 
     protected boolean updateActualLine(){
@@ -115,7 +123,7 @@ public abstract class ControllerJeu {
             case DIGIT9 : return "\u00e7";
             case DIGIT0 : return "\u00e0";
             case DIGIT6 : return  "-";
-            case SUBTRACT : return  "-";    
+            case SUBTRACT : return  "-";
             case UNDEFINED : return "\u00f9";
             default : return e.getCharacter();
         }
@@ -180,7 +188,7 @@ public abstract class ControllerJeu {
         return false;
     }
 
-    
+
     protected boolean isAccentedChar(String s) {
         switch (s) {
             case "\u00f9" : return true;

@@ -12,6 +12,7 @@ public abstract class Settings {
 
     public static void setLangue(language langue) {
         Settings.langue = langue;
+        System.out.println("langue set to " + langue);
     }
 
     private static boolean modeTemps = true;
@@ -48,4 +49,14 @@ public abstract class Settings {
         return Settings.niveau;
     }
     
+    private static boolean accents = true;
+
+    public static boolean isAccents() {
+        return accents;
+    }
+
+    public static void setAccents(boolean accents) {
+        Settings.accents = accents;
+    }
+
 }
