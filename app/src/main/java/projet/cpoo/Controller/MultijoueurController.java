@@ -113,17 +113,6 @@ public final class MultijoueurController extends SoloController{
     protected final void remplirMots() {
 
     }
-
-    protected void mapAccent(KeyEvent e,LinkedTreeMap<String, Object> map) {
-        KeyCode code = e.getCode();
-        switch (code) {
-            case DEAD_CIRCUMFLEX : if (!e.isShiftDown()) map.put("lettre","circonflexe");
-            else map.put("lettre","trema"); break;
-            case DEAD_DIAERESIS : map.put("lettre","trema");
-            default : break;
-        }
-    }
-
     public void keyDetect(KeyEvent e) {
         Message m;
         LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
@@ -141,8 +130,8 @@ public final class MultijoueurController extends SoloController{
             // return;
             map.put("lettre"," ");
         }
-        else mapAccent(e, map);
-        if (map.keySet().size() == 0) return;
+        else return;
+        Text t = (Text) ligne_1.getChildren().get(positionMot);
         m = new Message(Transmission.CLIENT_LETTRE,map);
         try {
             envoiMessage(socket, m);
