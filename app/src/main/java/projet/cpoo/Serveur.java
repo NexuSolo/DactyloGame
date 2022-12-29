@@ -65,7 +65,7 @@ class ClientThread implements Runnable {
     private boolean soin = false;
     private boolean attaque = false;
     private boolean trema = false;
-    private boolean circonlexe = false;
+    private boolean circonflexe = false;
     private String motAct = "";
     int accents = 0;
 
@@ -259,28 +259,6 @@ class ClientThread implements Runnable {
                     if(sockets.get(socket).enJeu) {
                         try {
                             nouveauMot(socket,null);
-                            // String s = motAleatoire();
-                            // System.out.println(s + " " + socket + " " + sockets.keySet().size());
-                            // LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
-                            // Random rand = new Random();
-                            // int nombreAleatoire = rand.nextInt(10 * sockets.size());
-                            // if(nombreAleatoire == 0) {
-                            //     map.put(s,TypeMot.WORD_ATTACK);
-                            // }
-                            // else if(nombreAleatoire == 1) {
-                            //     map.put(s,TypeMot.WORD_LIFE);
-                            // }
-                            // else {
-                            //     map.put(s,TypeMot.WORD_TO_DO);
-                            // }
-                            // sockets.get(socket).listeMots.add(s);
-                            // sockets.get(socket).listeTypeMots.add((TypeMot) map.get(s));
-                            // if(listeMots.size() == 1) {
-                            //     soin = nombreAleatoire == 1;
-                            //     attaque = nombreAleatoire == 0;
-                            // }
-                            // Message m = new Message(Transmission.SERVEUR_MOT, map);
-                            // envoiMessage(socket, m);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -347,19 +325,50 @@ class ClientThread implements Runnable {
 
     private void validationMot() throws IOException {
         trema = false;
-        circonlexe = false;    
+        circonflexe = false;    
         Message m = new Message(Transmission.SERVEUR_VALIDATION, null);
         envoiMessage(client, m);
     }
 
+    protected String toAccent(String text) {
+        switch (text) {
+            case "a" : if (circonflexe) return "\u00e2";
+            else if (trema) return "\u00e4";
+            break;
+            case "e" : if (circonflexe) return "\u00ea";
+            else if (trema) return "\u00eb";
+            break;
+            case "u" : if (circonflexe) return "\u00fb";
+            else if (trema) return "\u00fc";
+            break;
+            case "i" : if (circonflexe) return "\u00ee";
+            else if (trema) return "\u00ef";
+            break;
+            case "o" : if (circonflexe) return "u00f4";
+            else if (trema) return "u00f6";
+            break;
+            default : break;
+        }
+        return text;
+    }
+    
     private void receptionLettre(String s) throws IOException {
+        s = toAccent(s);
         if (s.equals(" ")) {
             validationMot();
         }
         else if(s.equals("backspace")) {
             trema = false;
-            circonlexe = false;
+            circonflexe = false;
             receptionBackspace();
+        }
+        else if (s.equals("circonflexe")) {
+            circonflexe = true;
+            trema = false;
+        }
+        else if (s.equals("trema")) {
+            circonflexe = false;
+            trema = true;
         }
         else {
             if(motAct.length() == listeMots.get(0).length()) {
@@ -368,11 +377,11 @@ class ClientThread implements Runnable {
             }
             else {
                 String mot = listeMots.get(0);
-                String nextChar = mot.substring(motAct.length() + accents,motAct.length() + 1 +accents);
-                if (mot.length() >= motAct.length() + 2 + accents) {
-                    String tmp = new String(mot.substring(motAct.length()+accents,motAct.length() + 2 + accents).getBytes(),"UTF-8");
+                String nextChar = mot.substring(motAct.length() + 0,motAct.length() + 1 +0);
+                if (mot.length() >= motAct.length() + 2 + 0) {
+                    String tmp = new String(mot.substring(motAct.length()+0,motAct.length() + 2 + 0).getBytes(),"UTF-8");
                     if (isAccentedChar(tmp)) {
-                        accents++;
+                        // 0++;
                         nextChar = tmp;
                     }
                 }
@@ -387,6 +396,8 @@ class ClientThread implements Runnable {
                     Message m = new Message(Transmission.SERVEUR_LETTRE_INVALIDE, null);
                     envoiMessage(client, m);
                 }
+                circonflexe = false;
+                trema = false;
             }
         }
     }
