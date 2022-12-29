@@ -19,6 +19,7 @@ import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 public class Serveur {
     private static ParametrePartie parametrePartie = new ParametrePartie(false, "Français");
@@ -210,7 +211,7 @@ class ClientThread implements Runnable {
     private void envoiMessage(Socket socket, Message message) throws IOException {
         Gson gson = new Gson();
         String json = gson.toJson(message);
-        PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
+        PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"),true);
         out.println(json);
     }
 

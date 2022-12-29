@@ -3,6 +3,7 @@ package projet.cpoo.Controller;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.charset.CharsetDecoder;
 import java.util.List;
 
 import com.google.common.graph.ElementOrder.Type;
@@ -22,6 +23,7 @@ import projet.cpoo.Transmission;
 import projet.cpoo.TypeMot;
 
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
@@ -102,7 +104,7 @@ public final class MultijoueurController extends SoloController{
         System.out.println("Message envoye " + socket);
         Gson gson = new Gson();
         String json = gson.toJson(message);
-        PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
+        PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"),true);
         out.println(json);
         System.out.println("Fin Message envoye ");
 
@@ -150,7 +152,7 @@ class ReceptionJeux implements Runnable {
     @Override
     public void run() {
         try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(multijoueurController.getSocket().getInputStream()));
+            BufferedReader in = new BufferedReader(new InputStreamReader(multijoueurController.getSocket().getInputStream(), "UTF-8"));
             String line;
             while ((line = in.readLine()) != null) {
                 // System.out.println(line);
