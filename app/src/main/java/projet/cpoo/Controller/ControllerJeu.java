@@ -38,7 +38,6 @@ public abstract class ControllerJeu {
     protected Iterator<String> stringIter;
     protected String tmpIter =  null;
     private String regAcc ="^*[a-zA-Z-]*";
-    // private String regAcc ="^*[^âàéèêëêïîôöùû]*";
     @FXML
     protected HBox ligne_1;
 
@@ -87,7 +86,6 @@ public abstract class ControllerJeu {
             }
             if (!Settings.isAccents()) list = list.stream().filter((x) -> Pattern.matches(regAcc,x)).collect(Collectors.toList());
             Collections.shuffle(list);
-            // list.stream().forEach(System.out::println);
             initializeGame(list);
             pos = 0;
             reader.close();
@@ -153,8 +151,8 @@ public abstract class ControllerJeu {
             case "i" : if (circonflexe) return "\u00ee";
             else if (trema) return "\u00ef";
             break;
-            case "o" : if (circonflexe) return "u00f4";
-            else if (trema) return "u00f6";
+            case "o" : if (circonflexe) return "\u00f4";
+            else if (trema) return "\u00f6";
             break;
             default : break;
         }

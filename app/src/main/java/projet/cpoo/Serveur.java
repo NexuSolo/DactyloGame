@@ -345,8 +345,8 @@ class ClientThread implements Runnable {
             case "i" : if (circonflexe) return "\u00ee";
             else if (trema) return "\u00ef";
             break;
-            case "o" : if (circonflexe) return "u00f4";
-            else if (trema) return "u00f6";
+            case "o" : if (circonflexe) return "\u00f4";
+            else if (trema) return "\u00f6";
             break;
             default : break;
         }
