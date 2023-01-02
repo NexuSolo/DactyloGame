@@ -24,7 +24,7 @@ public abstract class StatsController {
     Button button;
 
     @FXML
-    Text congrats;
+    Text congrats; 
 
     @FXML 
     protected void initialize() {
@@ -35,8 +35,16 @@ public abstract class StatsController {
         setText();
     }
 
+    /**
+     * Cette fonction appelle toutes les fonctions de graphiques à créer pour 
+     * l'écran de statistiques.
+     */
     protected abstract void setGraph();
 
+   /**
+    * Cette fonction écrit le texte de l'étiquette de félicitations sur une chaîne contenant le
+    * nombre de mots saisis, le temps nécessaire pour les saisir et le nombre de mots par minute.
+    */
     protected void setText(){
         int mots = GameData.getMotComplete();
         int temps = (int)(GameData.getTempsFinal()/10);

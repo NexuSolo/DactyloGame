@@ -45,6 +45,8 @@ public class OptionsController {
     @FXML
     private Spinner spin;
     @FXML
+    private Spinner spinLevel;
+    @FXML
     private Text nombreDeText;
 
     private void testConnect(String ip, int port) {
@@ -85,6 +87,7 @@ public class OptionsController {
         accentCheckBox.setSelected(Settings.isAccents());
         msCheckBox.setSelected(Settings.isMortSubite());
         spin.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 300, 60));
+        spinLevel.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 300, 60));
         if (Settings.isModeTemps()) {
             tempsRadioButton.setSelected(true);
             nombreDeText.setText("Nombre de secondes :");
@@ -94,12 +97,17 @@ public class OptionsController {
             nombreDeText.setText("Nombre de mots :");
             spin.getValueFactory().setValue(Settings.getLIMITE_MAX());
         }
+        spinLevel.getValueFactory().setValue(Settings.getNiveau());
         spin.valueProperty().addListener((obs, oldValue, newValue) -> {
             int val = ((Integer) newValue).intValue();
             if (Settings.isModeTemps())
                 val *= 10;
             System.out.println("Set val : " + val);
             Settings.setLIMITE_MAX(val);
+        });
+        spinLevel.valueProperty().addListener((obs, oldValue, newValue) -> {
+            int val = ((Integer) newValue).intValue();
+            Settings.setNiveau(val);
         });
 
         pseudoField.textProperty().addListener((observable, oldValue, newValue) -> Settings.setPseudo(newValue));

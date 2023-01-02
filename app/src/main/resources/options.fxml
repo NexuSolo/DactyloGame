@@ -69,86 +69,119 @@
                                       </columnConstraints>
                                       <rowConstraints>
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                       </rowConstraints>
                                        <children>
-                                          <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="25.0" GridPane.columnIndex="1">
+                                          <GridPane>
+                                            <columnConstraints>
+                                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                            </rowConstraints>
                                              <children>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Langue :">
+                                                <Text fill="#e0b414" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="TextModeDeJeu" text="Entrainement">
                                                    <font>
-                                                      <Font size="25.0" />
+                                                      <Font size="45.0" />
                                                    </font>
                                                 </Text>
-                                                <MenuButton fx:id="langueMenuButton" contentDisplay="CENTER" mnemonicParsing="false" text="Français">
-                                                   <items>
-                                                      <MenuItem mnemonicParsing="false" onAction="#langueFrancais" text="Français" />
-                                                      <MenuItem mnemonicParsing="false" onAction="#langueEnglish" text="English" />
-                                                   </items>
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </MenuButton>
-                                             </children>
-                                          </VBox>
-                                          <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="25.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                             <children>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Accents :">
-                                                   <font>
-                                                      <Font size="25.0" />
-                                                   </font>
-                                                </Text>
-                                                <CheckBox fx:id="accentCheckBox" mnemonicParsing="false" onAction="#accent" />
-                                             </children>
-                                          </VBox>
-                                          <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="25.0" GridPane.rowIndex="1">
-                                             <children>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Mode :">
-                                                   <font>
-                                                      <Font size="25.0" />
-                                                   </font>
-                                                </Text>
-                                                <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
+                                                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="25.0" GridPane.rowIndex="1">
                                                    <children>
-                                                      <RadioButton fx:id="tempsRadioButton" mnemonicParsing="false" onAction="#temps" text="Temps" textFill="#000001">
+                                                      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Mode :">
                                                          <font>
-                                                            <Font size="15.0" />
+                                                            <Font size="25.0" />
                                                          </font>
-                                                      </RadioButton>
-                                                      <RadioButton fx:id="MotsRadioButton" mnemonicParsing="false" onAction="#mots" text="Mots" textFill="#000001">
-                                                         <font>
-                                                            <Font size="15.0" />
-                                                         </font>
-                                                      </RadioButton>
+                                                      </Text>
+                                                      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
+                                                         <children>
+                                                            <RadioButton fx:id="tempsRadioButton" mnemonicParsing="false" onAction="#temps" text="Temps" textFill="#000001">
+                                                               <font>
+                                                                  <Font size="15.0" />
+                                                               </font>
+                                                            </RadioButton>
+                                                            <RadioButton fx:id="MotsRadioButton" mnemonicParsing="false" onAction="#mots" text="Mots" textFill="#000001">
+                                                               <font>
+                                                                  <Font size="15.0" />
+                                                               </font>
+                                                            </RadioButton>
+                                                         </children>
+                                                      </HBox>
                                                    </children>
-                                                </HBox>
+                                                </VBox>
+                                                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="25.0" GridPane.rowIndex="2">
+                                                   <children>
+                                                      <Text fx:id="nombreDeText" strokeType="OUTSIDE" strokeWidth="0.0" text="Nombre de mots :">
+                                                         <font>
+                                                            <Font size="25.0" />
+                                                         </font>
+                                                      </Text>
+                                                      <Spinner fx:id="spin" />
+                                                   </children>
+                                                </VBox>
                                              </children>
-                                          </VBox>
-                                          <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="25.0" GridPane.rowIndex="2">
+                                          </GridPane>
+                                          <GridPane GridPane.columnIndex="1">
+                                            <columnConstraints>
+                                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                            </rowConstraints>
                                              <children>
-                                                <Text fx:id="nombreDeText" strokeType="OUTSIDE" strokeWidth="0.0" text="Nombre de mots :">
-                                                   <font>
-                                                      <Font size="25.0" />
-                                                   </font>
-                                                </Text>
-                                                <Spinner fx:id="spin" />
+                                                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="25.0">
+                                                   <children>
+                                                      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Langue :">
+                                                         <font>
+                                                            <Font size="25.0" />
+                                                         </font>
+                                                      </Text>
+                                                      <MenuButton fx:id="langueMenuButton" contentDisplay="CENTER" mnemonicParsing="false" text="Français">
+                                                         <items>
+                                                            <MenuItem mnemonicParsing="false" onAction="#langueFrancais" text="Français" />
+                                                            <MenuItem mnemonicParsing="false" onAction="#langueEnglish" text="English" />
+                                                         </items>
+                                                         <font>
+                                                            <Font size="16.0" />
+                                                         </font>
+                                                      </MenuButton>
+                                                   </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="25.0" GridPane.rowIndex="1">
+                                                   <children>
+                                                      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Accents :">
+                                                         <font>
+                                                            <Font size="25.0" />
+                                                         </font>
+                                                      </Text>
+                                                      <CheckBox fx:id="accentCheckBox" mnemonicParsing="false" onAction="#accent" />
+                                                   </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="25.0" GridPane.rowIndex="2">
+                                                   <children>
+                                                      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Mode mort subite">
+                                                         <font>
+                                                            <Font size="25.0" />
+                                                         </font>
+                                                      </Text>
+                                                      <CheckBox fx:id="msCheckBox" mnemonicParsing="false" onAction="#mortSubite" />
+                                                   </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="25.0" GridPane.rowIndex="3">
+                                                   <children>
+                                                      <Text fx:id="nombreDeText1" strokeType="OUTSIDE" strokeWidth="0.0" text="Niveau de départ">
+                                                         <font>
+                                                            <Font size="25.0" />
+                                                         </font>
+                                                      </Text>
+                                                      <Spinner fx:id="spinLevel" />
+                                                   </children>
+                                                </VBox>
                                              </children>
-                                          </VBox>
-                                          <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="25.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                                             <children>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Mode mort subite">
-                                                   <font>
-                                                      <Font size="25.0" />
-                                                   </font>
-                                                </Text>
-                                                <CheckBox fx:id="msCheckBox" mnemonicParsing="false" onAction="#mortSubite" />
-                                             </children>
-                                          </VBox>
-                                          <Text fill="#e0b414" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="TextModeDeJeu" text="Entrainement">
-                                             <font>
-                                                <Font size="45.0" />
-                                             </font>
-                                          </Text>
+                                          </GridPane>
                                        </children>
                                     </GridPane>
                                  </children>

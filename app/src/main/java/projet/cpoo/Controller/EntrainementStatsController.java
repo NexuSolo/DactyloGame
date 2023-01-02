@@ -1,6 +1,5 @@
 package projet.cpoo.Controller;
 
-import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -11,17 +10,14 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Button;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
-import projet.cpoo.App;
 import projet.cpoo.GameData;
 import projet.cpoo.Settings;
 
 @SuppressWarnings ("unchecked")
-public class EntrainementStatsController extends StatsController {
+public final class EntrainementStatsController extends StatsController {
 
     @FXML
     AnchorPane anchor;
@@ -36,7 +32,7 @@ public class EntrainementStatsController extends StatsController {
     Text congrats;
 
     @FXML
-    public void initialize() {
+    public final void initialize() {
         button.setFocusTraversable(false);
         anchor.setFocusTraversable(true);
         anchor.requestFocus();
@@ -44,13 +40,18 @@ public class EntrainementStatsController extends StatsController {
         setText();
     }
 
+  /**
+   * Cette fonction appelle les 3 fonctions de création de graphique.
+   */
     protected void setGraph() {
-        //TODO : faire en fonction du temps
         setMotGraph();
         setPrecGraph();
         setFreqGraph();
     }
 
+    /**
+     * Crée un graphique avec le nombre de mots écrits par minute
+     */
     private void setMotGraph() {
         List<Integer> wordTab = GameData.getWordList();
         final NumberAxis yAxis;
@@ -73,7 +74,7 @@ public class EntrainementStatsController extends StatsController {
         xAxis.setMinorTickVisible(false);
         final AreaChart<Number, Number> motChart = new AreaChart<Number, Number>(xAxis, yAxis);
 
-        XYChart.Series serie1 = new Series<>();
+        XYChart.Series<Number, Number> serie1 = new Series<>();
         serie1.getData().add(new XYChart.Data<>(0, 0));
         if (Settings.isModeTemps()) {
             for (int i = 0; i < wordTab.size(); i++) {
@@ -94,6 +95,7 @@ public class EntrainementStatsController extends StatsController {
         gridPane.add(motChart, 1,1);
     }
 
+    // Création du graphique de précision moyenne du joueur.
     private void setPrecGraph() {
         List<Integer> precList = GameData.getPrecList();
         String s = (Settings.isModeTemps())?"Temps en s":"Nombre de mots";
@@ -108,7 +110,7 @@ public class EntrainementStatsController extends StatsController {
         yAxis.setTickMarkVisible(false);
         final AreaChart<Number, Number> precChart = new AreaChart<Number, Number>(xAxis, yAxis);
         
-        XYChart.Series serie1 = new Series<>();
+        XYChart.Series<Number, Number> serie1 = new Series<>();
         serie1.getData().add(new XYChart.Data<>(0, 100));
         for (int i = 0; i < precList.size(); i++) {
             serie1.getData().add(new XYChart.Data<>(i + 1, precList.get(i)));
@@ -120,6 +122,9 @@ public class EntrainementStatsController extends StatsController {
 
     }
 
+    /**
+     * Création d'un graphique de la fréquence d'appui de touches avec les données de la partie du joueur
+     */
     private void setFreqGraph () {
         List<Integer> freqList = GameData.getFreqList();
         Optional<Integer> opt = freqList.stream().max(Comparator.naturalOrder());
@@ -134,7 +139,7 @@ public class EntrainementStatsController extends StatsController {
         xAxis.setMinorTickVisible(false);
 
         freqChart.setTitle("Fluidit\u00e9 lors de la partie");
-        XYChart.Series serieFreq = new Series<>();
+        XYChart.Series<Number,Number> serieFreq = new Series<>();
         createGraph(freqList, serieFreq);
         serieFreq.setName("Fluidit\u00e9 en moyenne");
         freqChart.getData().addAll(serieFreq);
@@ -145,7 +150,7 @@ public class EntrainementStatsController extends StatsController {
         gridPane.add(freqChart, 1,2);
     }
 
-    private void createGraph(List<Integer> freqList,XYChart.Series serieFreq) {
+    private void createGraph(List<Integer> freqList,XYChart.Series<Number,Number> serieFreq) {
         if (freqList.size() <= 15) {
             for (int i = 0; i < freqList.size(); i++) {
             serieFreq.getData().add(new XYChart.Data<>(i,freqList.get(i)));

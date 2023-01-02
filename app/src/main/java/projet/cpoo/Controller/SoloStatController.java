@@ -7,7 +7,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import projet.cpoo.GameData;
 
-public class SoloStatController extends StatsController {
+public final class SoloStatController extends StatsController {
 
     
     @FXML
