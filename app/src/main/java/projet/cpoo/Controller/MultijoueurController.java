@@ -3,10 +3,8 @@ package projet.cpoo.Controller;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.Socket;
-import java.nio.charset.CharsetDecoder;
 import java.util.List;
 
-import com.google.common.graph.ElementOrder.Type;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 
@@ -23,7 +21,6 @@ import projet.cpoo.Transmission;
 import projet.cpoo.TypeMot;
 
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
@@ -295,14 +292,13 @@ class ReceptionJeux implements Runnable {
 
     @SuppressWarnings("unchecked")
     private void finDePartie(boolean gagner, LinkedTreeMap<String, Object> t) {
-        List<String> listeJoueurs = (List<String>) t.get("listeJoueurs");
-        List<Integer> listeScore = (List<Integer>) t.get("listeScore");
+        List<String> listeJoueurs = (List<String>) t.get("classement");
         try {
             if(gagner) {
-                ClassementController c = new ClassementController(listeJoueurs,listeScore,true);
+                ClassementController c = new ClassementController(listeJoueurs,true);
                 App.setRoot("classement",c);
             } else {
-                ClassementController c = new ClassementController(listeJoueurs,listeScore,false);
+                ClassementController c = new ClassementController(listeJoueurs,false);
                 App.setRoot("classement",c);
             }
         } catch (IOException e) {

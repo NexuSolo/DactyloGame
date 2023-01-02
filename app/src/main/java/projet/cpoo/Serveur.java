@@ -8,10 +8,10 @@ import java.net.SocketException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Pattern;
@@ -26,7 +26,8 @@ import java.io.PrintWriter;
 public class Serveur {
     private static ParametrePartie parametrePartie = new ParametrePartie(false, "Français");
     protected static boolean partieEnCours = false;
-    protected static Stack<String> classementStack = new Stack<String>();
+    protected static List<String> classement = new LinkedList<String>();
+    protected static int positionDernier = 0;
     public static void main (String[] args) {
         Map<Socket,ClientThread> sockets = new HashMap<Socket,ClientThread>();
         try {
@@ -142,11 +143,8 @@ class ClientThread implements Runnable {
             miseAJourOptions();
         }
         if(message.getTransmition() == Transmission.CLIENT_LANCER) {
-            if(true || sockets.keySet().size() > 1) {
+            if(sockets.keySet().size() > 1) {
                 lancementPartie();
-            }
-            else {
-                //envoyer un message d'erreur
             }
         }
         if(message.getTransmition() == Transmission.CLIENT_LETTRE) {
@@ -160,7 +158,6 @@ class ClientThread implements Runnable {
             Message m = new Message(Transmission.CHANGEMENT_VIE,map);
             envoiMessage(client, m);
             resetMot();
-            
             Message m2 = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
             envoiMessage(client, m2);
         }
@@ -211,6 +208,7 @@ class ClientThread implements Runnable {
     private void envoiMessage(Socket socket, Message message) throws IOException {
         Gson gson = new Gson();
         String json = gson.toJson(message);
+        System.out.println("envoie : " + json);
         PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"),true);
         out.println(json);
     }
@@ -246,6 +244,8 @@ class ClientThread implements Runnable {
         for(Socket socket : sockets.keySet()) {
             Message m = new Message(Transmission.SERVEUR_LANCER, null);
             envoiMessage(socket, m);
+            Serveur.positionDernier++;
+            Serveur.classement.add(Serveur.positionDernier + " : ");
         }
         creationPartie();
         Timer timer = new Timer();
@@ -468,44 +468,39 @@ class ClientThread implements Runnable {
         vie += i;
         if(vie <= 0) {
             enJeu = false;
-            LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
-            List<String> listeJoueurs = sockets.keySet().stream().map(x -> sockets.get(x).pseudo).toList();
-            map.put("listeJoueurs", listeJoueurs);
-            List<Integer> listeScore = sockets.keySet().stream().map(x -> sockets.get(x).vie).toList();
-            map.put("listeScore", listeScore);
-            Message m = new Message(Transmission.SERVEUR_PERDU, map);
-            envoiMessage(client, m);
-            int enVie = sockets.keySet().stream().map(x -> sockets.get(x).enJeu).filter(x -> x).toList().size();
-            if(enVie == 1 ) {
-                LinkedTreeMap<String, Object> map2 = new LinkedTreeMap<String, Object>();
-                List<String> listeJoueurs2 = sockets.keySet().stream().map(x -> sockets.get(x).pseudo).toList();
-                map2.put("listeJoueurs", listeJoueurs2);
-                List<Integer> listeScore2 = sockets.keySet().stream().map(x -> sockets.get(x).vie).toList();
-                map2.put("listeScore", listeScore2);
-                Message m3 = new Message(Transmission.SERVEUR_GAGNER, map2);
-                for(Socket socket : sockets.keySet()) {
-                    if(sockets.get(socket).enJeu) {
-                        sockets.get(socket).enJeu = false;
-                        envoiMessage(socket, m3);
+            Serveur.classement.set(Serveur.positionDernier - 1, Serveur.classement.get(Serveur.positionDernier - 1) + pseudo);
+            Serveur.positionDernier--;
+            Socket dernierjoueur= null;
+            for(Socket socket : sockets.keySet()) {
+                if(sockets.get(socket).enJeu) {
+                    if(dernierjoueur == null) {
+                        dernierjoueur = socket;
                     }
-                    if(!socket.isClosed()) {
-                        socket.close();
+                    else {
+                        dernierjoueur = null;
+                        break;
                     }
                 }
+            }
+            if(dernierjoueur != null) {
+                Serveur.classement.set(0, Serveur.classement.get(0) + sockets.get(dernierjoueur).pseudo);
+                Serveur.positionDernier--;
+                LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
+                map.put("classement", Serveur.classement);
+                Message m = new Message(Transmission.SERVEUR_GAGNER, map);
+                envoiMessage(dernierjoueur, m);
+            }
+            LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
+            map.put("classement", Serveur.classement);
+            Message m = new Message(Transmission.SERVEUR_PERDU, map);
+            for(Socket socket : sockets.keySet()) {
+                if(!sockets.get(socket).enJeu) {
+                    envoiMessage(socket, m);
+                }
+            }
+            if(dernierjoueur != null) {
                 resetServeur();
             }
-            else {
-                LinkedTreeMap<String, Object> map2 = new LinkedTreeMap<String, Object>();
-                List<String> liste = sockets.keySet().stream().sorted((x,y) -> sockets.get(x).vie - sockets.get(y).vie).filter(x -> sockets.get(x).enJeu).map(x -> sockets.get(x).pseudo + " : " + sockets.get(x).vie).toList();
-                map2.put("liste", liste);
-                Message m2 = new Message(Transmission.SERVEUR_CLASSEMENT, map2);
-                for(Socket socket : sockets.keySet()) {
-                   if(sockets.get(socket).enJeu) {
-                       envoiMessage(socket, m2);
-                   }
-                }
-            }
-
         }
         else {
             LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
@@ -513,9 +508,10 @@ class ClientThread implements Runnable {
             map.put("liste", liste);
             Message m = new Message(Transmission.SERVEUR_CLASSEMENT, map);
             for(Socket socket : sockets.keySet()) {
-                envoiMessage(socket, m);
+                if(sockets.get(socket).enJeu) {
+                    envoiMessage(socket, m);
+                }
             }
-            
         }
     }
 

@@ -18,7 +18,6 @@ import projet.cpoo.Transmission;
 
 public class ClassementController implements Initializable {
     List<String> classement;
-    List<Integer> score;
     boolean gagner;
 
     @FXML
@@ -30,9 +29,8 @@ public class ClassementController implements Initializable {
     @FXML
     Button retourButton;
 
-    public ClassementController(List<String> classement, List<Integer> score, boolean gagner) {
+    public ClassementController(List<String> classement, boolean gagner) {
         this.classement = classement;
-        this.score = score;
         this.gagner = gagner;
     }
 
@@ -45,7 +43,7 @@ public class ClassementController implements Initializable {
             vousAvezText.setText("Vous avez perdu !");
         }
         for(int i = 0; i < classement.size(); i++) {
-            Text text = new Text(classement.get(i) + " : " + score.get(i));
+            Text text = new Text(classement.get(i));
             text.getStyleClass().add("textListeJoueur");
             classementVBox.getChildren().add(text);
         }
@@ -57,7 +55,7 @@ public class ClassementController implements Initializable {
             }
         });
     }
-    
+
     @FXML
     private void retour() throws IOException {
         Message m = new Message(Transmission.CLIENT_DECONNEXION,null);
