@@ -38,8 +38,11 @@ public class EntrainementController extends ControllerJeu {
 
 
 
+    /* (non-Javadoc)
+     * @see projet.cpoo.Controller.ControllerJeu#initialize()
+     */
     @FXML
-    protected void initialize() {
+    protected final void initialize() {
         ligne_act = ligne_1;
         TEMPS_MAX = Settings.getLIMITE_MAX();
         motMax = Settings.getLIMITE_MAX();
@@ -49,7 +52,10 @@ public class EntrainementController extends ControllerJeu {
 
     }
 
-    protected void initializeGame(List<String> list) {
+    /* (non-Javadoc)
+     * @see projet.cpoo.Controller.ControllerJeu#initializeGame(java.util.List)
+     */
+    protected final void initializeGame(List<String> list) {
         String text;
         stringIter = list.iterator();
         while(stringIter.hasNext()) {
@@ -68,7 +74,10 @@ public class EntrainementController extends ControllerJeu {
         }
     }
 
-    protected void initializeText() {
+    /* (non-Javadoc)
+     * @see projet.cpoo.Controller.ControllerJeu#initializeText()
+     */
+    protected final void initializeText() {
         textHG.setText("Mot compl\u00e9t\u00e9s");
         textHM.setText("Pr\u00e9cision");
         if(modeTemps){ 
@@ -81,13 +90,15 @@ public class EntrainementController extends ControllerJeu {
         }
     }
 
-    private void timerStart() {
-        start = true;
-        
+    /**
+     * Démarre le timer qui permet de compter le temps passé.
+     */
+    private final void timerStart() {
+        start = true;        
         timer.schedule(new TimerTask() {
             
             @Override
-            public void run() {
+            public final void run() {
                 Platform.runLater( () -> {
                 temps+= 1;
                 if (modeTemps) updateModeTemps();
@@ -97,7 +108,10 @@ public class EntrainementController extends ControllerJeu {
         if(modeTemps) textBG.setText("0");
     }
 
-    private void updateModeTemps() {
+    /**
+     * Met à jour les statistiques et vérifie si le temps est écoulé.
+     */
+    private final void updateModeTemps() {
         updateTempsRestant();
         if (temps % (TEMPS_MAX/10) == 0) updateData();
         try {
@@ -107,11 +121,11 @@ public class EntrainementController extends ControllerJeu {
             ex.printStackTrace();
         }
     }
-
-    private int addWordtoLine(String s,HBox line) {
-        return addWordtoLine(s, line,false);
-    }
-
+ 
+    
+    /* (non-Javadoc)
+     * @see projet.cpoo.Controller.ControllerJeu#addWordtoLine(java.lang.String, javafx.scene.layout.HBox, boolean)
+     */
     protected int addWordtoLine(String s,HBox line,boolean soin) {
         int pos = 0;
         for(char c : s.toCharArray()) {
@@ -123,11 +137,20 @@ public class EntrainementController extends ControllerJeu {
         return pos;
     }
 
+    // Appel raccourci de addWordtoLine 
+    private final int addWordtoLine(String s,HBox line) {
+        return addWordtoLine(s, line,false);
+    }
   
 
    
 
-    private boolean motCorrect(int finMot){
+    /**
+     * Vérifie si le dernier mot passé est correctement tapé
+     * @param finMot représente la position de la fin du mot à traiter
+     * @return true si le dernier mot a bien été tapé et false sinon
+     */
+    private final boolean motCorrect(int finMot){
         int i = finMot;
         while (i >=0) {
             Text t = (Text) ligne_act.getChildren().get(i);
@@ -138,26 +161,29 @@ public class EntrainementController extends ControllerJeu {
         return true;
     }
 
-    private void updatePrecision() {
+    private final void updatePrecision() {
         double ratio = lettresCorrectes/entreesClavier;
         textBM.setText(String.valueOf((int)(ratio*100) + "%"));
     }
 
-    private void updateMotComplete() {
+    private final void updateMotComplete() {
         textBG.setText(String.valueOf(motComplete));
     }
 
-    private void updateMotRestant() {
+    private final void updateMotRestant() {
         textBD.setText(String.valueOf(motMax-motComplete));
     }
 
-    private void updateTempsRestant() {
+    private final void updateTempsRestant() {
         textBD.setText(String.valueOf((TEMPS_MAX-temps)/10));
     }
 
   
 
-    private void updateData() {
+    /**
+     * Met à jour les statistiques et les stocke pour l'écran de fin
+     */
+    private final void updateData() {
         if(modeTemps) {
             int diviseur = TEMPS_MAX/100;
             if (diviseur == 0) diviseur = 1;
@@ -179,7 +205,11 @@ public class EntrainementController extends ControllerJeu {
         }
     }
 
-    private int skipMot() {
+    /**
+     * Déplace le curseur jusqu'au début du prochain mot
+     * @return la position du prochain mot
+     */
+    private final int skipMot() {
         int tmp = pos;
         while (tmp <= CHAR_PER_LINE) {
             Text t = (Text) ligne_act.getChildren().get(tmp);
@@ -192,7 +222,11 @@ public class EntrainementController extends ControllerJeu {
         return tmp;
     }
 
-    private void finDuJeu() throws IOException {
+    /**
+     * Met fin au jeu et passe à l'écran de fin si les conditions sont remplies
+     * @throws IOException
+     */
+    private final void finDuJeu() throws IOException {
         if ( ( modeTemps && temps >= TEMPS_MAX) || (!modeTemps && motMax - motComplete  == 0) ) {
             timer.cancel();
             if(modeTemps) {
@@ -206,7 +240,11 @@ public class EntrainementController extends ControllerJeu {
         }
     }
 
-    private int posBack() {
+    /**
+     * Recule le curseur tant que le curseur est sur un caractère qui a été passé
+     * @return
+     */
+    private final int posBack() {
         Text t = (Text) ligne_act.getChildren().get(pos);
         System.out.println("texte = " + t.getText() + "contains " + t.getStyleClass().contains("text-skipped"));
         if(t.getStyleClass().contains("text-skipped")) {
@@ -221,7 +259,10 @@ public class EntrainementController extends ControllerJeu {
         else return 1;
     }
 
-    private void changeLine() {
+    /**
+     * Place le curseur au début de la prochaine ligne et met à jour les lignes affichées si nécéssaire. 
+     */
+    private final void changeLine() {
         if(pos >= CHAR_PER_LINE || pos >= ligne_act.getChildren().size() ) {
             pos = 0;
             posMin = 0;
@@ -238,8 +279,12 @@ public class EntrainementController extends ControllerJeu {
         }
     }
 
+    /**
+     * Prend un appui de touche, le compare avec le caractère qui est attendu et met à jour l'affichage en conséquence
+     * @param e l'évenement qui correspond à l'appui de touche
+     */
     @FXML
-    private void keyDetect(KeyEvent e) {
+    private final void keyDetect(KeyEvent e) {
         if(e.getCode().isLetterKey() || isAccentedChar(inputToChars(e)) || inputToChars(e) == "-"){
             if (!start) timerStart();
             entreesClavier++;
@@ -324,8 +369,11 @@ public class EntrainementController extends ControllerJeu {
         updatePrecision();
     }
 
+    /* (non-Javadoc)
+     * @see projet.cpoo.Controller.ControllerJeu#validationMot(boolean)
+     */
     @Override
-    protected void validationMot(boolean solo) {
+    protected final void validationMot(boolean solo) {
         return;
     }
 

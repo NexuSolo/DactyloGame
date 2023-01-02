@@ -2,7 +2,17 @@ package projet.cpoo;
 
 public abstract class Settings {
 
-    public static enum language { FR,EN };
+    public static enum language { FR,EN;
+        public static String languageToString(language language) {
+            switch (language) {
+                case FR:
+                    return "Français";
+                case EN:
+                    return "English";
+                default : return "English";
+            }
+        }
+    };
 
     private static language langue = language.FR;
 
@@ -58,5 +68,16 @@ public abstract class Settings {
     public static void setAccents(boolean accents) {
         Settings.accents = accents;
     }
+
+    private static boolean mortSubite = false;
+
+    public static boolean isMortSubite() {
+        return mortSubite;
+    }
+
+    public static void setMortSubite(boolean mortSubite) {
+        Settings.mortSubite = mortSubite;
+    }
+
 
 }

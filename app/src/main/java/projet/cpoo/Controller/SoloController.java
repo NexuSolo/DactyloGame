@@ -23,6 +23,7 @@ public class SoloController extends ControllerJeu{
     private int nombreMots = 0;
     private int motRestant = 10;
     private int niveau = Settings.getNiveau();
+    private boolean mortSubite = Settings.isMortSubite();
     
     protected int nombreMotLigne_1 = 0;
 
@@ -35,13 +36,14 @@ public class SoloController extends ControllerJeu{
     @FXML
     protected void initialize() {
         ligne_act = ligne_1;
+        if(mortSubite) vies = 1;
         super.initialize();
         ligne_act = ligne_1;
         pos = 0;
 
     }
 
-    private void upNiveau() {
+    private final void upNiveau() {
         niveau++;
         updateNiveau();
         timer.cancel();
@@ -51,14 +53,14 @@ public class SoloController extends ControllerJeu{
     }
 
 
-    private void setStats() {
+    private final void setStats() {
         updateVies();
         updateMotNiveau();
         updateMotComplete();
         updateNiveau();
     } 
 
-    private void updateNiveau() {
+    private final void updateNiveau() {
         textBM.setText(String.valueOf(niveau));
     }
 
@@ -66,20 +68,20 @@ public class SoloController extends ControllerJeu{
         textBG.setText(String.valueOf(vies));
     }
 
-    private void updateMotNiveau() {
+    private final void updateMotNiveau() {
         textBD.setText(String.valueOf(motRestant));
     }
 
-    private void updateMotComplete() {
+    private final void updateMotComplete() {
         textMotComplete.setText("Mot compl\u00e9t\u00e9s " + String.valueOf(motComplete));
     }
 
-    private void timerStart() {
+    private final void timerStart() {
         start = true;
         double coeff = 3000 *  Math.pow(0.9,niveau);
         timer.schedule(new TimerTask() {
             @Override
-            public void run() {
+            public final void run() {
                 Platform.runLater( () -> {
                     
                 if (stringIter.hasNext()) {
@@ -118,7 +120,7 @@ public class SoloController extends ControllerJeu{
     }
 
     
-    protected void removeMot(){
+    protected final void removeMot(){
         int i = 0;
         Text t = (Text) ligne_1.getChildren().get(i);
         while (!t.getText().equals(" ")) {
@@ -138,7 +140,7 @@ public class SoloController extends ControllerJeu{
         }
     }
 
-    protected void incrementeMotComplete(boolean b) {
+    protected final void incrementeMotComplete(boolean b) {
         if (b) {
             motRestant--;
             motComplete++;
@@ -146,20 +148,20 @@ public class SoloController extends ControllerJeu{
         }
     }
 
-    protected void monteeNiveau() {
+    protected final void monteeNiveau() {
         if(motRestant <= 0) {
             motRestant = 10;
             upNiveau();
         }
     }
 
-    protected void resetPos(){
+    protected final void resetPos(){
         pos = 0;
         firstTry = true;
         if(ligne_1.getChildren().size() != 0) soin = ligne_1.getChildren().get(0).getStyleClass().contains("text-life");
     }
 
-    protected void end() {
+    protected final void end() {
         if (vies <= 0) {
             try {
                 finDuJeu();
@@ -169,7 +171,7 @@ public class SoloController extends ControllerJeu{
         }
     }
     
-    protected void validationMot(boolean solo) {
+    protected final void validationMot(boolean solo) {
         if(jeuVide()) return;
         nombreMots--;
         boolean b = motDegats();
@@ -185,7 +187,7 @@ public class SoloController extends ControllerJeu{
         end();
     }
 
-    private void finDuJeu() throws IOException {
+    private final void finDuJeu() throws IOException {
             timer.cancel();
             GameData.setMotComplete(motComplete);
             GameData.setTempsFinal((System.currentTimeMillis()-temps)*0.01);
@@ -194,6 +196,7 @@ public class SoloController extends ControllerJeu{
     }
 
     protected int addWordtoLine(String s,HBox line,boolean soin) {
+        if(mortSubite) soin = false;
         if (nombreMots >= 15) validationMot(true);
         nombreMots++;
         int pos = 0;
@@ -275,7 +278,7 @@ public class SoloController extends ControllerJeu{
     
 
     @Override
-    protected void initializeGame(List<String> list) {
+    protected final void initializeGame(List<String> list) {
         String text;
         stringIter = list.iterator();
         for (int i = 0; i < 5 ; i++) {
@@ -295,20 +298,20 @@ public class SoloController extends ControllerJeu{
     }
 
     @Override
-    protected void initializeText() {
+    protected final void initializeText() {
         textHG.setText(" Vies restantes");
         textHD.setText(" Mots avant prochain niveau ");
         textHM.setText(" Niveau ");
         setStats();
     }
 
-    private void decrementeNombreLigne(HBox ligne) {
+    private final void decrementeNombreLigne(HBox ligne) {
         if (ligne == ligne_1) nombreMotLigne_1--;
         else if (ligne == ligne_2) nombreMotLigne_2--;
         else nombreMotLigne_3--;
     }
 
-    private void incrementeNombreLigne(HBox ligne) {
+    private final void incrementeNombreLigne(HBox ligne) {
         if (ligne == ligne_1) {nombreMotLigne_1++;
             System.out.println("Add l1  incrNbr : " + nombreMotLigne_1 );
         }
@@ -316,7 +319,7 @@ public class SoloController extends ControllerJeu{
         else nombreMotLigne_3++;
     }
 
-    private void popMot(HBox ligne_bas,HBox ligne_haut) {
+    private final void popMot(HBox ligne_bas,HBox ligne_haut) {
         int i = 0;
         Text t = (Text) ligne_bas.getChildren().get(i);
         List <Node> list = new LinkedList<>();
@@ -332,7 +335,7 @@ public class SoloController extends ControllerJeu{
         incrementeNombreLigne(ligne_haut);
     }   
 
-    protected void rearrangeCol() {
+    protected final void rearrangeCol() {
         if(nombreMotLigne_2 > 0) popMot(ligne_2, ligne_1);
         if(nombreMotLigne_3 > 0) popMot(ligne_3, ligne_2);
     }

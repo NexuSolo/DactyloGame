@@ -135,7 +135,7 @@ public class MenuController {
 
     @FXML
     private void switchToOptions() throws IOException {
-        App.setRoot("options");
+        App.setRoot("opt2");
     }
 
     @FXML

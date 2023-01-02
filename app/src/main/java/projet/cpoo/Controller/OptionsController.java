@@ -24,7 +24,9 @@ public class OptionsController {
     @FXML
     private MenuButton langueMenuButton;
     @FXML
-    private CheckBox accentCheckBox;
+    private CheckBox accentCheckBox; 
+    @FXML
+    private CheckBox msCheckBox;
     @FXML
     private RadioButton tempsRadioButton;
     @FXML
@@ -79,8 +81,9 @@ public class OptionsController {
         ipField.setText(App.getIp());
         portField.setText(Integer.toString(App.getPort()));
         testConnect(App.getIp(), App.getPort());
-        langueMenuButton.setText(App.getLangue());
-        accentCheckBox.setSelected(App.isAccent());
+        langueMenuButton.setText(Settings.language.languageToString(Settings.getLangue()));
+        accentCheckBox.setSelected(Settings.isAccents());
+        msCheckBox.setSelected(Settings.isMortSubite());
         if (Settings.isModeTemps()) {
             tempsRadioButton.setSelected(true);
             nombreDeText.setText("Nombre de secondes :");
@@ -149,6 +152,17 @@ public class OptionsController {
         else {
             Settings.setAccents(false);
         }
+    }
+
+    @FXML
+    private void mortSubite() {
+        if(msCheckBox.isSelected()) {
+            Settings.setMortSubite(true);
+        }
+        else {
+            Settings.setMortSubite(false);
+        }
+        System.out.println("Mort subite = " + Settings.isMortSubite());
     }
 
     @FXML

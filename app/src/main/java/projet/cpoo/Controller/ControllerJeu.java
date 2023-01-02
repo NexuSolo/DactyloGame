@@ -38,6 +38,8 @@ public abstract class ControllerJeu {
     protected Iterator<String> stringIter;
     protected String tmpIter =  null;
     private String regAcc ="^*[a-zA-Z-]*";
+
+
     @FXML
     protected HBox ligne_1;
 
@@ -70,8 +72,11 @@ public abstract class ControllerJeu {
 
 
 
-
-
+    /**
+     * Fonction d'initialisation de la liste des mots pour la partie en cours
+     * Cette liste est choisie en fonction de la langue et de la présence des accents
+     * Ces options sont toutes les deux sélectionnables dans les Options 
+     */
     @FXML
     protected void initialize() {
         try {
@@ -95,16 +100,20 @@ public abstract class ControllerJeu {
         }
     }
 
+    //Fonction abstraite qui crée une configuration de base à partir d'une liste de mots triée dans l'ordre voulu
     protected abstract void initializeGame(List<String> list);
 
+    //Fonction abstraite qui initialise les textes de statistiques
     protected abstract void initializeText();
 
-    protected String formatString(String text,boolean shift) {
+    //Fonction qui prend un charactère et le modifie si certaines conditions sont remplies
+    protected final String formatString(String text,boolean shift) {
         if (shift) return toAccent(text).toUpperCase();
         else return toAccent(text);
     }
 
-    protected boolean updateActualLine(){
+    //Fonction change quelle ligne référence l'attribut "ligne_act"
+    protected final boolean updateActualLine(){
         pos = 0;
         if (ligne_act == ligne_1) ligne_act = ligne_2;
         else if (ligne_act == ligne_2) ligne_act = ligne_3;
@@ -112,9 +121,11 @@ public abstract class ControllerJeu {
         return true;
     }
 
+    //Fonction abstraite qui a pour but de traiter le mot actuel et de passer au mot suivant
     protected abstract void validationMot(boolean solo);
 
-    protected String inputToChars(KeyEvent e) {
+    //Fonction qui prend une entrée de clavier et renvoie un String correspondant au charactère voulu
+    protected final String inputToChars(KeyEvent e) {
         switch(e.getCode()) {
             case DIGIT2 : return "\u00e9";
             case DIGIT7 : return "\u00e8";
@@ -127,7 +138,8 @@ public abstract class ControllerJeu {
         }
     }
 
-    protected void isAccent(KeyEvent e) {
+    //Fonction qui met à jour les booleens d'accents en fonction de la touche appuyée
+    protected final void isAccent(KeyEvent e) {
         KeyCode code = e.getCode();
         switch (code) {
             case DEAD_CIRCUMFLEX : if (!e.isShiftDown()) circonflexe = true;
@@ -137,7 +149,8 @@ public abstract class ControllerJeu {
         }
     }
 
-    protected String toAccent(String text) {
+    //Fonction qui prend un charactère et renvoie sa version avec accent si la touche précédente était un accent
+    protected final String toAccent(String text) {
         switch (text) {
             case "a" : if (circonflexe) return "\u00e2";
             else if (trema) return "\u00e4";
@@ -159,9 +172,19 @@ public abstract class ControllerJeu {
         return text;
     }
 
+    /**
+     * Fonction qui rajoute un mot à la ligne d'affichage
+     * @param s String a ajouter
+     * @param line HBox d'affichage dans laquelle le mot va être ajouté
+     * @param soin booléen pour la coloration du mot 
+     */
     protected abstract int addWordtoLine(String s,HBox line,boolean soin);
 
-    protected boolean addLine() {
+    /**
+     * Fonction qui fait défiler du jeu et affiche la prochaine ligne de texte 
+     * @return true une ligne a pu être ajoutée et remplie et false sinon
+     */
+    protected final boolean addLine() {
         int pos = 0;
         ligne_1.getChildren().clear();
         ligne_1.getChildren().addAll(ligne_2.getChildren());
@@ -187,7 +210,11 @@ public abstract class ControllerJeu {
     }
 
 
-    protected boolean isAccentedChar(String s) {
+    /** Prend une chaine de caractère et dit si elle correspond à un des caractères {é,è,à,ç,ù}
+     * @param s La chaine de caractère a tester
+     * @return true si s appartient au caractères mentionné
+     */
+    protected final boolean isAccentedChar(String s) {
         switch (s) {
             case "\u00f9" : return true;
             case "\u00e0" : return true;
