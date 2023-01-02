@@ -84,24 +84,24 @@ public class OptionsController {
         langueMenuButton.setText(Settings.Language.languageToString(Settings.getLangue()));
         accentCheckBox.setSelected(Settings.isAccents());
         msCheckBox.setSelected(Settings.isMortSubite());
+        spin.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 300, 60));
         if (Settings.isModeTemps()) {
             tempsRadioButton.setSelected(true);
             nombreDeText.setText("Nombre de secondes :");
-        }
-        else {
+            spin.getValueFactory().setValue(Settings.getLIMITE_MAX() / 10);
+        } else {
             MotsRadioButton.setSelected(true);
             nombreDeText.setText("Nombre de mots :");
+            spin.getValueFactory().setValue(Settings.getLIMITE_MAX());
         }
-        spin.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 300, 60));
-        if (Settings.isModeTemps()) spin.getValueFactory().setValue(Settings.getLIMITE_MAX()/10);
-        else spin.getValueFactory().setValue(Settings.getLIMITE_MAX());
-        spin.valueProperty().addListener((obs, oldValue, newValue) -> { int val = ((Integer) newValue).intValue();
+        spin.valueProperty().addListener((obs, oldValue, newValue) -> {
+            int val = ((Integer) newValue).intValue();
             if (Settings.isModeTemps())
                 val *= 10;
             System.out.println("Set val : " + val);
             Settings.setLIMITE_MAX(val);
         });
-        
+
         pseudoField.textProperty().addListener((observable, oldValue, newValue) -> Settings.setPseudo(newValue));
 
         ipField.setOnAction(event -> {

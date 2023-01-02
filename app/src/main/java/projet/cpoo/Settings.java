@@ -77,7 +77,7 @@ public abstract class Settings {
                 Settings.setAccents(true);
             }
             try {
-                Settings.setModeTemps(Boolean.parseBoolean(prop.getProperty("momodeTempsde", "true")));
+                Settings.setModeTemps(Boolean.parseBoolean(prop.getProperty("modeTemps", "true")));
             } catch (NumberFormatException e) {
                 prop.setProperty("modeTemps", "true");
                 Settings.setModeTemps(true);
