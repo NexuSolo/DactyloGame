@@ -39,184 +39,218 @@
                <center>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="200.0" BorderPane.alignment="CENTER">
                      <children>
-                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                        <GridPane prefHeight="609.0" prefWidth="1360.0">
+                          <columnConstraints>
+                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="66.0" prefWidth="100.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
                            <children>
-                              <GridPane prefHeight="536.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                 <columnConstraints>
-                                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                 </columnConstraints>
-                                 <rowConstraints>
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-                                    <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="5.0" prefHeight="5.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-                                    <RowConstraints minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                 </rowConstraints>
+                              <GridPane>
+                                <columnConstraints>
+                                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" percentHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
                                  <children>
                                     <Text fill="#e0b414" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="TextModeDeJeu" text="Solo">
                                        <font>
                                           <Font size="45.0" />
                                        </font>
                                     </Text>
-                                    <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="8">
+                                    <GridPane GridPane.rowIndex="1">
+                                      <columnConstraints>
+                                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                      </columnConstraints>
+                                      <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                      </rowConstraints>
                                        <children>
-                                          <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
+                                          <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="25.0" GridPane.columnIndex="1">
                                              <children>
-                                                <RadioButton fx:id="tempsRadioButton" mnemonicParsing="false" onAction="#temps" text="Temps" textFill="#000001">
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Langue :">
                                                    <font>
-                                                      <Font size="15.0" />
+                                                      <Font size="25.0" />
                                                    </font>
-                                                </RadioButton>
-                                                <RadioButton fx:id="MotsRadioButton" mnemonicParsing="false" onAction="#mots" text="Mots" textFill="#000001">
+                                                </Text>
+                                                <MenuButton fx:id="langueMenuButton" contentDisplay="CENTER" mnemonicParsing="false" text="Français">
+                                                   <items>
+                                                      <MenuItem mnemonicParsing="false" onAction="#langueFrancais" text="Français" />
+                                                      <MenuItem mnemonicParsing="false" onAction="#langueEnglish" text="English" />
+                                                   </items>
                                                    <font>
-                                                      <Font size="15.0" />
+                                                      <Font size="16.0" />
                                                    </font>
-                                                </RadioButton>
+                                                </MenuButton>
                                              </children>
-                                          </HBox>
-                                       </children></HBox>
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Langue :" GridPane.rowIndex="1">
-                                       <font>
-                                          <Font size="25.0" />
-                                       </font>
-                                    </Text>
-                                    <MenuButton fx:id="langueMenuButton" contentDisplay="CENTER" mnemonicParsing="false" text="Français" GridPane.rowIndex="2">
-                                       <items>
-                                          <MenuItem mnemonicParsing="false" onAction="#langueFrancais" text="Français" />
-                                          <MenuItem mnemonicParsing="false" onAction="#langueEnglish" text="English" />
-                                       </items>
-                                       <font>
-                                          <Font size="16.0" />
-                                       </font>
-                                    </MenuButton>
-                                    <Line endX="100.0" opacity="0.66" startX="-100.0" stroke="#6b6b6b" GridPane.rowIndex="3" />
-                                    <Line endX="100.0" opacity="0.66" startX="-100.0" stroke="#6b6b6b" GridPane.rowIndex="6" />
-                                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="20.0" GridPane.rowIndex="5">
-                                       <children>
-                                          <CheckBox fx:id="accentCheckBox" mnemonicParsing="false" onAction="#accent" />
+                                          </VBox>
+                                          <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="25.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                             <children>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Accents :">
+                                                   <font>
+                                                      <Font size="25.0" />
+                                                   </font>
+                                                </Text>
+                                                <CheckBox fx:id="accentCheckBox" mnemonicParsing="false" onAction="#accent" />
+                                             </children>
+                                          </VBox>
+                                          <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="25.0" GridPane.rowIndex="1">
+                                             <children>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Mode :">
+                                                   <font>
+                                                      <Font size="25.0" />
+                                                   </font>
+                                                </Text>
+                                                <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
+                                                   <children>
+                                                      <RadioButton fx:id="tempsRadioButton" mnemonicParsing="false" onAction="#temps" text="Temps" textFill="#000001">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </RadioButton>
+                                                      <RadioButton fx:id="MotsRadioButton" mnemonicParsing="false" onAction="#mots" text="Mots" textFill="#000001">
+                                                         <font>
+                                                            <Font size="15.0" />
+                                                         </font>
+                                                      </RadioButton>
+                                                   </children>
+                                                </HBox>
+                                             </children>
+                                          </VBox>
+                                          <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="25.0" GridPane.rowIndex="2">
+                                             <children>
+                                                <Text fx:id="nombreDeText" strokeType="OUTSIDE" strokeWidth="0.0" text="Nombre de mots :">
+                                                   <font>
+                                                      <Font size="25.0" />
+                                                   </font>
+                                                </Text>
+                                                <Spinner fx:id="spin" />
+                                             </children>
+                                          </VBox>
+                                          <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="25.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                             <children>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Mode mort subite">
+                                                   <font>
+                                                      <Font size="25.0" />
+                                                   </font>
+                                                </Text>
+                                                <CheckBox fx:id="msCheckBox" mnemonicParsing="false" onAction="#mortSubite" />
+                                             </children>
+                                          </VBox>
+                                          <Text fill="#e0b414" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="TextModeDeJeu" text="Entrainement">
+                                             <font>
+                                                <Font size="45.0" />
+                                             </font>
+                                          </Text>
                                        </children>
-                                    </VBox>
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Accents :" GridPane.rowIndex="4">
-                                       <font>
-                                          <Font size="25.0" />
-                                       </font>
-                                    </Text>
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Mode :" GridPane.rowIndex="7">
-                                       <font>
-                                          <Font size="25.0" />
-                                       </font>
-                                    </Text>
-                                    <Line endX="100.0" opacity="0.66" startX="-100.0" stroke="#6b6b6b" GridPane.rowIndex="9" />
-                                    <Text fx:id="nombreDeText" strokeType="OUTSIDE" strokeWidth="0.0" text="Nombre de mots :" GridPane.rowIndex="10">
-                                       <font>
-                                          <Font size="25.0" />
-                                       </font>
-                                    </Text>
-                                    <Spinner fx:id="spin" GridPane.rowIndex="11" />
+                                    </GridPane>
                                  </children>
                               </GridPane>
-                           </children>
-                        </AnchorPane>
-                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
-                           <children>
-                              <GridPane prefHeight="536.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                <columnConstraints>
-                                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                </columnConstraints>
-                                <rowConstraints>
-                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                </rowConstraints>
+                              <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1">
                                  <children>
-                                    <Text fill="#e0b414" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="TextModeDeJeu" text="Multijoueur">
-                                       <font>
-                                          <Font size="45.0" />
-                                       </font>
-                                    </Text>
-                                    <TextField fx:id="ipField" promptText="localhost" GridPane.rowIndex="5">
-                                       <font>
-                                          <Font size="16.0" />
-                                       </font>
-                                    </TextField>
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="IP :" GridPane.rowIndex="4">
-                                       <font>
-                                          <Font size="25.0" />
-                                       </font>
-                                    </Text>
-                                    <Line endX="100.0" opacity="0.66" startX="-100.0" stroke="#6b6b6b" GridPane.rowIndex="6" />
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Port :" GridPane.rowIndex="7">
-                                       <font>
-                                          <Font size="25.0" />
-                                       </font>
-                                    </Text>
-                                    <TextField fx:id="portField" promptText="5000" GridPane.rowIndex="8">
-                                       <font>
-                                          <Font size="16.0" />
-                                       </font>
-                                    </TextField>
-                                    <Line endX="100.0" opacity="0.66" startX="-100.0" stroke="#6b6b6b" GridPane.rowIndex="9" />
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Serveur :" GridPane.rowIndex="10">
-                                       <font>
-                                          <Font size="25.0" />
-                                       </font>
-                                    </Text>
-                                    <MenuButton fx:id="serveurMenuButton" contentDisplay="CENTER" mnemonicParsing="false" GridPane.rowIndex="11">
-                                       <items>
-                                          <MenuItem mnemonicParsing="false" onAction="#serveurOVH" text="Serveur OVH" />
-                                       </items>
-                                       <font>
-                                          <Font size="16.0" />
-                                       </font>
-                                    </MenuButton>
-                                    <Line endX="100.0" opacity="0.66" startX="-100.0" stroke="#6b6b6b" GridPane.rowIndex="12" />
-                                    <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="13">
+                                    <GridPane prefHeight="536.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <columnConstraints>
+                                          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                       </columnConstraints>
+                                       <rowConstraints>
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                       </rowConstraints>
                                        <children>
-                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Etat : ">
+                                          <Text fill="#e0b414" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="TextModeDeJeu" text="Multijoueur">
+                                             <font>
+                                                <Font size="45.0" />
+                                             </font>
+                                          </Text>
+                                          <TextField fx:id="ipField" promptText="localhost" GridPane.rowIndex="5">
+                                             <font>
+                                                <Font size="16.0" />
+                                             </font>
+                                          </TextField>
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="IP :" GridPane.rowIndex="4">
                                              <font>
                                                 <Font size="25.0" />
                                              </font>
                                           </Text>
-                                          <Circle fx:id="circleEtat" fill="#ea0000" radius="12.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="2.0">
-                                             <HBox.margin>
-                                                <Insets top="6.0" />
-                                             </HBox.margin>
-                                          </Circle>
+                                          <Line endX="100.0" opacity="0.66" startX="-100.0" stroke="#6b6b6b" GridPane.rowIndex="6" />
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Port :" GridPane.rowIndex="7">
+                                             <font>
+                                                <Font size="25.0" />
+                                             </font>
+                                          </Text>
+                                          <TextField fx:id="portField" promptText="5000" GridPane.rowIndex="8">
+                                             <font>
+                                                <Font size="16.0" />
+                                             </font>
+                                          </TextField>
+                                          <Line endX="100.0" opacity="0.66" startX="-100.0" stroke="#6b6b6b" GridPane.rowIndex="9" />
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Serveur :" GridPane.rowIndex="10">
+                                             <font>
+                                                <Font size="25.0" />
+                                             </font>
+                                          </Text>
+                                          <MenuButton fx:id="serveurMenuButton" contentDisplay="CENTER" mnemonicParsing="false" GridPane.rowIndex="11">
+                                             <items>
+                                                <MenuItem mnemonicParsing="false" onAction="#serveurOVH" text="Serveur OVH" />
+                                             </items>
+                                             <font>
+                                                <Font size="16.0" />
+                                             </font>
+                                          </MenuButton>
+                                          <Line endX="100.0" opacity="0.66" startX="-100.0" stroke="#6b6b6b" GridPane.rowIndex="12" />
+                                          <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="13">
+                                             <children>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Etat : ">
+                                                   <font>
+                                                      <Font size="25.0" />
+                                                   </font>
+                                                </Text>
+                                                <Circle fx:id="circleEtat" fill="#ea0000" radius="12.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="2.0">
+                                                   <HBox.margin>
+                                                      <Insets top="6.0" />
+                                                   </HBox.margin>
+                                                </Circle>
+                                             </children>
+                                          </HBox>
+                                          <Line endX="100.0" opacity="0.66" startX="-100.0" stroke="#6b6b6b" GridPane.rowIndex="3" />
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Pseudo :" GridPane.rowIndex="1">
+                                             <font>
+                                                <Font size="25.0" />
+                                             </font>
+                                          </Text>
+                                          <TextField fx:id="pseudoField" promptText="Joueur" GridPane.rowIndex="2">
+                                             <font>
+                                                <Font size="16.0" />
+                                             </font>
+                                          </TextField>
                                        </children>
-                                    </HBox>
-                                    <Line endX="100.0" opacity="0.66" startX="-100.0" stroke="#6b6b6b" GridPane.rowIndex="3" />
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Pseudo :" GridPane.rowIndex="1">
-                                       <font>
-                                          <Font size="25.0" />
-                                       </font>
-                                    </Text>
-                                    <TextField fx:id="pseudoField" promptText="Joueur" GridPane.rowIndex="2">
-                                       <font>
-                                          <Font size="16.0" />
-                                       </font>
-                                    </TextField>
+                                    </GridPane>
                                  </children>
-                              </GridPane>
+                                 <GridPane.margin>
+                                    <Insets left="100.0" right="100.0" />
+                                 </GridPane.margin>
+                              </AnchorPane>
                            </children>
-                        </AnchorPane>
+                        </GridPane>
                      </children>
                   </HBox>
                </center>

@@ -16,6 +16,7 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.text.Text;
 import projet.cpoo.App;
 import projet.cpoo.Message;
+import projet.cpoo.Settings;
 import projet.cpoo.Transmission;
 
 public class MenuController {
@@ -94,7 +95,7 @@ public class MenuController {
 
     @FXML
     private void switchToMultijoueur() throws IOException {
-        try(Socket socket = new Socket(App.getIp(), App.getPort())) {
+        try(Socket socket = new Socket(Settings.getIp(), Settings.getPort())) {
             Message message = new Message(Transmission.CLIENT_CONNEXION_SERVER_RUN, null);
             Gson gson = new Gson();
             String json = gson.toJson(message);
@@ -135,7 +136,7 @@ public class MenuController {
 
     @FXML
     private void switchToOptions() throws IOException {
-        App.setRoot("opt2");
+        App.setRoot("options");
     }
 
     @FXML

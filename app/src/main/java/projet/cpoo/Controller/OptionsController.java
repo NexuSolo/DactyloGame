@@ -77,10 +77,10 @@ public class OptionsController {
     @SuppressWarnings("unchecked")
     @FXML
     private void initialize() {
-        pseudoField.setText(App.getPseudo());
-        ipField.setText(App.getIp());
-        portField.setText(Integer.toString(App.getPort()));
-        testConnect(App.getIp(), App.getPort());
+        pseudoField.setText(Settings.getPseudo());
+        ipField.setText(Settings.getIp());
+        portField.setText(Integer.toString(Settings.getPort()));
+        testConnect(Settings.getIp(), Settings.getPort());
         langueMenuButton.setText(Settings.Language.languageToString(Settings.getLangue()));
         accentCheckBox.setSelected(Settings.isAccents());
         msCheckBox.setSelected(Settings.isMortSubite());
@@ -99,26 +99,26 @@ public class OptionsController {
             if (Settings.isModeTemps())
                 val *= 10;
             System.out.println("Set val : " + val);
-            App.setLIMITE_MAX(val);
+            Settings.setLIMITE_MAX(val);
         });
         
-        pseudoField.textProperty().addListener((observable, oldValue, newValue) -> App.setPseudo(newValue));
+        pseudoField.textProperty().addListener((observable, oldValue, newValue) -> Settings.setPseudo(newValue));
 
         ipField.setOnAction(event -> {
-            App.setIp(ipField.getText());
-            testConnect(App.getIp(), App.getPort());
+            Settings.setIp(ipField.getText());
+            testConnect(Settings.getIp(), Settings.getPort());
         });
 
         portField.textProperty().addListener((observable, oldValue, newValue) -> {
             try {
                 if(newValue.equals("") || Integer.parseInt(newValue) < 0 || Integer.parseInt(newValue) > 65535)
-                    App.setPort(5000);
+                Settings.setPort(5000);
                 else
-                    App.setPort(Integer.parseInt(newValue));
+                Settings.setPort(Integer.parseInt(newValue));
             } catch (NumberFormatException e) {
-                App.setPort(5000);
+                Settings.setPort(5000);
             }
-            testConnect(App.getIp(), App.getPort());
+            testConnect(Settings.getIp(), Settings.getPort());
         });
     }
 
@@ -127,36 +127,36 @@ public class OptionsController {
         serveurMenuButton.setText("Serveur OVH");
         ipField.setText("vps-1fb525ee.vps.ovh.net");
         portField.setText("5000");
-        App.setIp("vps-1fb525ee.vps.ovh.net");
-        App.setPort(5000);
-        testConnect(App.getIp(), App.getPort());
+        Settings.setIp("vps-1fb525ee.vps.ovh.net");
+        Settings.setPort(5000);
+        testConnect(Settings.getIp(), Settings.getPort());
     }
 
     @FXML
     private void langueFrancais() throws UnsupportedEncodingException {
-        App.setLangue(Language.FR);
+        Settings.setLangue(Language.FR);
         String s = new String("Français".getBytes(), "utf-8");
         langueMenuButton.setText(s);
     }
 
     @FXML
     private void langueEnglish() {
-        App.setLangue(Language.EN);
+        Settings.setLangue(Language.EN);
         langueMenuButton.setText("English");
     }
 
     @FXML
     private void accent() {
-        App.setAccent(accentCheckBox.isSelected());
+        Settings.setAccents(accentCheckBox.isSelected());
     }
 
     @FXML
     private void mortSubite() {
         if(msCheckBox.isSelected()) {
-            App.setMortSubite(true);
+            Settings.setMortSubite(true);
         }
         else {
-            App.setMortSubite(false);
+            Settings.setMortSubite(false);
         }
         System.out.println("Mort subite = " + Settings.isMortSubite());
     }
@@ -167,8 +167,8 @@ public class OptionsController {
         tempsRadioButton.setSelected(true);
         MotsRadioButton.setSelected(false);
         nombreDeText.setText("Nombre de secondes :");
-        App.setMode(true);
-        App.setLIMITE_MAX(60);
+        Settings.setModeTemps();
+        Settings.setLIMITE_MAX(60);
         spin.getValueFactory().setValue(Settings.getLIMITE_MAX()/10);
     }
 
@@ -178,15 +178,15 @@ public class OptionsController {
         tempsRadioButton.setSelected(false);
         MotsRadioButton.setSelected(true);
         nombreDeText.setText("Nombre de mots :");
-        App.setMode(false);
-        App.setLIMITE_MAX(30);
+        Settings.setModeMots();
+        Settings.setLIMITE_MAX(30);
         spin.getValueFactory().setValue(Settings.getLIMITE_MAX());
     }
     
     @FXML
     private void retour() throws IOException {
-        if(App.getPseudo().equals("")) {
-            App.setPseudo("Joueur");
+        if(Settings.getPseudo().equals("")) {
+            Settings.setPseudo("Joueur");
         }
         App.setRoot("menu");
     }

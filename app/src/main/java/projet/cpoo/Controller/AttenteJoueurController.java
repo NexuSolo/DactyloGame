@@ -24,6 +24,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import projet.cpoo.App;
 import projet.cpoo.Message;
+import projet.cpoo.Settings;
 import projet.cpoo.Transmission;
 
 public class AttenteJoueurController {
@@ -49,13 +50,13 @@ public class AttenteJoueurController {
     @FXML
     private void initialize() {
         try {
-            socket = new Socket(App.getIp(), App.getPort());
+            socket = new Socket(Settings.getIp(), Settings.getPort());
             reception = new Thread(new Reception(this,socket));
             reception.start();
             //envoyer un message au serveur pour dire que le client est connecté
             PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
             LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
-            map.put("pseudo", App.getPseudo());
+            map.put("pseudo", Settings.getPseudo());
             Message message = new Message(Transmission.CLIENT_CONNEXION, map);
             Gson gson = new Gson();
             String json = gson.toJson(message);
@@ -88,7 +89,7 @@ public class AttenteJoueurController {
     @FXML
     private void retour() throws IOException, InterruptedException {
         LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
-        map.put("pseudo", App.getPseudo());
+        map.put("pseudo", Settings.getPseudo());
         Message message = new Message(Transmission.CLIENT_DECONNEXION, map);
         envoiMessage(message);
         reception.interrupt();
