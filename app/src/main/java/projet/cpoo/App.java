@@ -3,6 +3,7 @@
  */
 package projet.cpoo;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -15,17 +16,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import projet.cpoo.Settings.Language;
 
 public class App extends Application {
 
     private static Scene scene;
-    private static String pseudo = "Joueur";
-    private static String ip = "localhost";
-    private static int port = 5000;
-    private static String langue = "Français";
-    private static boolean accent = true;
-    private static String mode = "Temps";
-    private static int modenbr = 60;
     private static Socket socket;
 
     public static void main(String[] args) {
@@ -35,44 +30,68 @@ public class App extends Application {
 
     private static void loadProperties() {
         try {
+            File file = new File(System.getProperty("user.home") + File.separator + ".Dactylo");
+            if(!file.exists()) {
+                file.mkdir();
+            }
+            file = new File(System.getProperty("user.home") + File.separator + ".Dactylo/config.properties");
+            if(!file.exists()) {
+                file.createNewFile();
+                createProperties();
+            }
             Properties prop = new Properties();
-            prop.load(new FileInputStream("config.properties"));
-            pseudo = prop.getProperty("pseudo", "joueur");
-            ip = prop.getProperty("ip", "localhost");
+            prop.load(new FileInputStream(System.getProperty("user.home") + File.separator + ".Dactylo/config.properties"));
+            Settings.setPseudo(prop.getProperty("pseudo", "joueur"));
+            Settings.setIp(prop.getProperty("ip", "localhost"));
             try {
-                port = Integer.parseInt(prop.getProperty("port", "5000"));
-                if(port < 0 || port > 65535) {
+                Settings.setPort(Integer.parseInt(prop.getProperty("port", "5000")));
+                if(Settings.getPort() < 0 || Settings.getPort() > 65535) {
                     prop.setProperty("port", "5000");
-                    port = 5000;
+                    Settings.setPort(5000);
                 }
             } catch (NumberFormatException e) {
                 prop.setProperty("port", "5000");
-                port = 5000;
+                Settings.setPort(5000);
             }
-            langue = prop.getProperty("langue", "Français");
-            if(!langue.equals("Français") && !langue.equals("English")) {
-                prop.setProperty("langue", "Français");
-                langue = "Français";
+            String langue = prop.getProperty("langue", "FR");
+            if(langue.equals("FR")) {
+                Settings.setLangue(Settings.Language.FR);
+            } else if(langue.equals("EN")) {
+                Settings.setLangue(Settings.Language.EN);
+            } else {
+                prop.setProperty("langue", "FR");
+                Settings.setLangue(Settings.Language.FR);
             }
             try {
-                accent = Boolean.parseBoolean(prop.getProperty("accent", "true"));
+                Settings.setAccents(Boolean.parseBoolean(prop.getProperty("accent", "true")));
             } catch (NumberFormatException e) {
                 prop.setProperty("accent", "true");
-                accent = true;
-            }
-            if(!mode.equals("Temps") && !mode.equals("Points")) {
-                prop.setProperty("mode", "Temps");
-                mode = "Temps";
-            }
-            else {
-                mode = prop.getProperty("mode", "Temps");
+                Settings.setAccents(true);
             }
             try {
-                modenbr = Integer.parseInt(prop.getProperty("modenbr", "60"));
+                Settings.setModeTemps(Boolean.parseBoolean(prop.getProperty("momodeTempsde", "true")));
             } catch (NumberFormatException e) {
-                prop.setProperty("modenbr", "60");
-                modenbr = 60;
+                prop.setProperty("modeTemps", "true");
+                Settings.setModeTemps(true);
             }
+            try {
+                Settings.setLIMITE_MAX(Integer.parseInt(prop.getProperty("LIMITE_MAX", "60")));
+                if(Settings.getLIMITE_MAX() < 0) {
+                    prop.setProperty("LIMITE_MAX", "60");
+                    Settings.setLIMITE_MAX(60);
+                }
+            }
+            catch (NumberFormatException e) {
+                prop.setProperty("LIMITE_MAX", "60");
+                Settings.setLIMITE_MAX(60);
+            }
+            try {
+                Settings.setMortSubite(Boolean.parseBoolean(prop.getProperty("mort_subite", "false")));
+            } catch (NumberFormatException e) {
+                prop.setProperty("mort_subite", "false");
+                Settings.setMortSubite(false);
+            }
+            createProperties();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -81,14 +100,15 @@ public class App extends Application {
     private static void createProperties() {
         Properties prop = new Properties();
         try {
-            prop.setProperty("pseudo", pseudo);
-            prop.setProperty("ip", ip);
-            prop.setProperty("port", String.valueOf(port));
-            prop.setProperty("langue", langue);
-            prop.setProperty("accent", String.valueOf(accent));
-            prop.setProperty("mode", mode);
-            prop.setProperty("modenbr", String.valueOf(modenbr));
-            prop.store(new FileOutputStream("config.properties"), "Configuration du jeu");
+            prop.setProperty("pseudo", Settings.getPseudo());
+            prop.setProperty("ip", Settings.getIp());
+            prop.setProperty("port", String.valueOf(Settings.getPort()));
+            prop.setProperty("langue", Settings.getLangue().toString());
+            prop.setProperty("accent", String.valueOf(Settings.isAccents()));
+            prop.setProperty("modeTemps", String.valueOf(Settings.isModeTemps()));
+            prop.setProperty("LIMITE_MAX", String.valueOf(Settings.getLIMITE_MAX()));
+            prop.setProperty("mort_subite", String.valueOf(Settings.isMortSubite()));
+            prop.store(new FileOutputStream(System.getProperty("user.home") + File.separator + ".Dactylo/config.properties"), "Configuration du jeu");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -138,65 +158,65 @@ public class App extends Application {
     }
 
     public static String getPseudo() {
-        return pseudo;
+        return Settings.getPseudo();
     }
 
     public static void setPseudo(String pseudo) {
-        App.pseudo = pseudo;
+        Settings.setPseudo(pseudo);
         createProperties();
     }
 
     public static String getIp() {
-        return ip;
+        return Settings.getIp();
     }
 
     public static void setIp(String ip) {
-        App.ip = ip;
+        Settings.setIp(ip);
         createProperties();
     }
 
     public static int getPort() {
-        return port;
+        return Settings.getPort();
     }
 
     public static void setPort(int port) {
-        App.port = port;
+        Settings.setPort(port);
         createProperties();
     }
 
     public static String getLangue() {
-        return langue;
+        return Settings.getLangue().toString();
     }
 
-    public static void setLangue(String langue) {
-        App.langue = langue;
+    public static void setLangue(Language langue) {
+        Settings.setLangue(langue);
         createProperties();
     }
 
     public static boolean isAccent() {
-        return accent;
+        return Settings.isAccents();
     }
 
     public static void setAccent(boolean accent) {
-        App.accent = accent;
+        Settings.setAccents(accent);
         createProperties();
     }
 
-    public static String getMode() {
-        return mode;
+    public static boolean getMode() {
+        return Settings.isModeTemps();
     }
 
-    public static void setMode(String mode) {
-        App.mode = mode;
+    public static void setMode(Boolean mode) {
+        Settings.setModeTemps(mode);
         createProperties();
     }
 
-    public static int getModenbr() {
-        return modenbr;
+    public static int getLIMITE_MAX() {
+        return Settings.getLIMITE_MAX();
     }
 
-    public static void setModenbr(int modenbr) {
-        App.modenbr = modenbr;
+    public static void setLIMITE_MAX(int n) {
+        Settings.setLIMITE_MAX(n);
         createProperties();
     }
 
@@ -206,6 +226,15 @@ public class App extends Application {
 
     public static void setSocket(Socket socket) {
         App.socket = socket;
+    }
+
+    public static boolean isMortSubite() {
+        return Settings.isMortSubite();
+    }
+
+    public static void setMortSubite(boolean mortSubite) {
+        Settings.setMortSubite(mortSubite);
+        createProperties();
     }
 
 }

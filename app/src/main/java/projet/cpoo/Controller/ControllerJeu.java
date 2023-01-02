@@ -80,7 +80,7 @@ public abstract class ControllerJeu {
     @FXML
     protected void initialize() {
         try {
-            String fic = (Settings.getLangue() == Settings.language.FR)?"liste_mots/liste_francais.txt":"liste_mots/liste_anglais.txt";
+            String fic = (Settings.getLangue() == Settings.Language.FR)?"liste_mots/liste_francais.txt":"liste_mots/liste_anglais.txt";
             BufferedReader reader = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResource(fic).openStream()));
             List<String> list = new ArrayList<String>();
             String text = reader.readLine();

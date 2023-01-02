@@ -2,30 +2,67 @@ package projet.cpoo;
 
 public abstract class Settings {
 
-    public static enum language { FR,EN;
-        public static String languageToString(language language) {
+    private static boolean modeTemps = true;
+    private static int LIMITE_MAX = 50;
+    private static Language langue = Language.FR;
+    private static boolean accents = true;
+    private static boolean mortSubite = false;
+    private static String pseudo = "Joueur";
+    private static String ip = "localhost";
+    private static int port = 5000;
+
+    private static int niveau = 1;
+
+    public static void setModeTemps(boolean modeTemps) {
+        Settings.modeTemps = modeTemps;
+    }
+
+    public static String getPseudo() {
+        return pseudo;
+    }
+
+    public static void setPseudo(String pseudo) {
+        Settings.pseudo = pseudo;
+    }
+
+    public static String getIp() {
+        return ip;
+    }
+
+    public static void setIp(String ip) {
+        Settings.ip = ip;
+    }
+
+    public static int getPort() {
+        return port;
+    }
+
+    public static void setPort(int port) {
+        Settings.port = port;
+    }    
+    
+    public static enum Language { FR,EN;
+        public static String languageToString(Language language) {
             switch (language) {
                 case FR:
                     return "Français";
-                case EN:
+                    case EN:
                     return "English";
-                default : return "English";
+                default : return "Français";
             }
         }
     };
 
-    private static language langue = language.FR;
 
-    public static language getLangue() {
+    public static Language getLangue() {
         return langue;
     }
 
-    public static void setLangue(language langue) {
+    public static void setLangue(Language langue) {
         Settings.langue = langue;
         System.out.println("langue set to " + langue);
     }
 
-    private static boolean modeTemps = true;
 
     public static boolean isModeTemps() {
         return modeTemps;
@@ -39,7 +76,6 @@ public abstract class Settings {
         Settings.modeTemps = false;
     }
 
-    private static int LIMITE_MAX = 50;
 
     public static int getLIMITE_MAX() {
         return LIMITE_MAX;
@@ -49,7 +85,6 @@ public abstract class Settings {
         Settings.LIMITE_MAX = LIMITE_MAX;
     }
 
-    private static int niveau = 1;
 
     public static void setNiveau(int niveau) {
         Settings.niveau = niveau;
@@ -59,7 +94,6 @@ public abstract class Settings {
         return Settings.niveau;
     }
     
-    private static boolean accents = true;
 
     public static boolean isAccents() {
         return accents;
@@ -69,7 +103,6 @@ public abstract class Settings {
         Settings.accents = accents;
     }
 
-    private static boolean mortSubite = false;
 
     public static boolean isMortSubite() {
         return mortSubite;

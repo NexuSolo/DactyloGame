@@ -15,8 +15,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import projet.cpoo.App;
-import projet.cpoo.GameData;
 import projet.cpoo.Settings;
+import projet.cpoo.Settings.Language;
 
 public class OptionsController {
     private Socket socket;
@@ -81,7 +81,7 @@ public class OptionsController {
         ipField.setText(App.getIp());
         portField.setText(Integer.toString(App.getPort()));
         testConnect(App.getIp(), App.getPort());
-        langueMenuButton.setText(Settings.language.languageToString(Settings.getLangue()));
+        langueMenuButton.setText(Settings.Language.languageToString(Settings.getLangue()));
         accentCheckBox.setSelected(Settings.isAccents());
         msCheckBox.setSelected(Settings.isMortSubite());
         if (Settings.isModeTemps()) {
@@ -96,9 +96,11 @@ public class OptionsController {
         if (Settings.isModeTemps()) spin.getValueFactory().setValue(Settings.getLIMITE_MAX()/10);
         else spin.getValueFactory().setValue(Settings.getLIMITE_MAX());
         spin.valueProperty().addListener((obs, oldValue, newValue) -> { int val = ((Integer) newValue).intValue();
-        if (Settings.isModeTemps()) val *= 10;
-        System.out.println("Set val : " + val);
-        Settings.setLIMITE_MAX(val);});
+            if (Settings.isModeTemps())
+                val *= 10;
+            System.out.println("Set val : " + val);
+            App.setLIMITE_MAX(val);
+        });
         
         pseudoField.textProperty().addListener((observable, oldValue, newValue) -> App.setPseudo(newValue));
 
@@ -132,59 +134,53 @@ public class OptionsController {
 
     @FXML
     private void langueFrancais() throws UnsupportedEncodingException {
+        App.setLangue(Language.FR);
         String s = new String("Français".getBytes(), "utf-8");
-        Settings.setLangue(Settings.language.FR);
         langueMenuButton.setText(s);
-        App.setLangue(s);
     }
 
     @FXML
     private void langueEnglish() {
+        App.setLangue(Language.EN);
         langueMenuButton.setText("English");
-        Settings.setLangue(Settings.language.EN);
     }
 
     @FXML
     private void accent() {
-        if(accentCheckBox.isSelected()) {
-            Settings.setAccents(true);
-        }
-        else {
-            Settings.setAccents(false);
-        }
+        App.setAccent(accentCheckBox.isSelected());
     }
 
     @FXML
     private void mortSubite() {
         if(msCheckBox.isSelected()) {
-            Settings.setMortSubite(true);
+            App.setMortSubite(true);
         }
         else {
-            Settings.setMortSubite(false);
+            App.setMortSubite(false);
         }
         System.out.println("Mort subite = " + Settings.isMortSubite());
     }
 
     @FXML
+    @SuppressWarnings("unchecked")
     private void temps() {
         tempsRadioButton.setSelected(true);
         MotsRadioButton.setSelected(false);
         nombreDeText.setText("Nombre de secondes :");
-        Settings.setModeTemps();
-        Settings.setLIMITE_MAX(300);
+        App.setMode(true);
+        App.setLIMITE_MAX(60);
         spin.getValueFactory().setValue(Settings.getLIMITE_MAX()/10);
-        // App.setMode("temps");
     }
 
     @FXML
+    @SuppressWarnings("unchecked")
     private void mots() {
         tempsRadioButton.setSelected(false);
         MotsRadioButton.setSelected(true);
         nombreDeText.setText("Nombre de mots :");
-        Settings.setModeMots();
-        Settings.setLIMITE_MAX(30);
+        App.setMode(false);
+        App.setLIMITE_MAX(30);
         spin.getValueFactory().setValue(Settings.getLIMITE_MAX());
-        // App.setMode("mots");
     }
     
     @FXML
