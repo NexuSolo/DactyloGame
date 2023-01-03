@@ -12,6 +12,7 @@ plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
     id("org.openjfx.javafxplugin") version "0.0.13"
+    id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
 repositories {
@@ -43,7 +44,7 @@ dependencies {
 
 application {
     // Define the main class for the application.
-    mainClass.set("projet.cpoo.App")
+    mainClass.set("projet.cpoo.Main")
 }
 
 tasks.register("serveur", JavaExec::class) {
@@ -51,4 +52,13 @@ tasks.register("serveur", JavaExec::class) {
     args = listOf(port)
     main = "projet.cpoo.Serveur"
     classpath = sourceSets["main"].runtimeClasspath
+}
+
+tasks {
+    
+    shadowJar {
+        archiveBaseName.set("DactyloGame")
+        archiveClassifier.set("")
+    }
+
 }

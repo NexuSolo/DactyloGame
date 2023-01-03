@@ -214,29 +214,31 @@ class ClientThread implements Runnable {
     }
 
     private void nouveauMot(Socket socket,String s) throws IOException {
-        if (s == null) s = motAleatoire();
-        if (listeMots.size() > 15) validationMot(socket);
-        System.out.println(s + " " + socket);
-        LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
-        Random rand = new Random();
-        int nombreAleatoire = rand.nextInt(10 * sockets.size());
-        if(nombreAleatoire == 0 ) {
-            map.put(s,TypeMot.WORD_ATTACK);
+        if(enJeu) {
+            if (s == null) s = motAleatoire();
+            if (listeMots.size() > 15) validationMot(socket);
+            System.out.println(s + " " + socket);
+            LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
+            Random rand = new Random();
+            int nombreAleatoire = rand.nextInt(10 * sockets.size());
+            if(nombreAleatoire == 0 ) {
+                map.put(s,TypeMot.WORD_ATTACK);
+            }
+            else if(nombreAleatoire == 1) {
+                map.put(s,TypeMot.WORD_LIFE);
+            }
+            else {
+                map.put(s,TypeMot.WORD_TO_DO);
+            }
+            sockets.get(socket).listeMots.add(s);
+            sockets.get(socket).listeTypeMots.add((TypeMot) map.get(s));
+            if(listeMots.size() == 1) {
+                soin = nombreAleatoire == 1;
+                attaque = nombreAleatoire == 0;
+            }
+            Message m = new Message(Transmission.SERVEUR_MOT, map);
+            envoiMessage(socket, m);
         }
-        else if(nombreAleatoire == 1) {
-            map.put(s,TypeMot.WORD_LIFE);
-        }
-        else {
-            map.put(s,TypeMot.WORD_TO_DO);
-        }
-        sockets.get(socket).listeMots.add(s);
-        sockets.get(socket).listeTypeMots.add((TypeMot) map.get(s));
-        if(listeMots.size() == 1) {
-            soin = nombreAleatoire == 1;
-            attaque = nombreAleatoire == 0;
-        }
-        Message m = new Message(Transmission.SERVEUR_MOT, map);
-        envoiMessage(socket, m);
     }
 
     private void lancementPartie() throws IOException {
@@ -499,6 +501,7 @@ class ClientThread implements Runnable {
                 }
             }
             if(dernierjoueur != null) {
+                sockets.get(dernierjoueur).enJeu = false;
                 resetServeur();
             }
         }
@@ -519,6 +522,8 @@ class ClientThread implements Runnable {
         Serveur.setParametrePartie(new ParametrePartie(false, "Français"));
         Serveur.partieEnCours = false;
         sockets.clear();
+        Serveur.classement.clear();
+        Serveur.positionDernier = 0;
     }
 
 }
