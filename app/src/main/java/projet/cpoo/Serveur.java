@@ -217,6 +217,7 @@ class ClientThread implements Runnable {
         if (s == null) s = motAleatoire();
         if (listeMots.size() > 15) validationMot(socket);
         System.out.println(s + " " + socket);
+        System.out.println("sock size : " + sockets.size());
         LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
         Random rand = new Random();
         int nombreAleatoire = rand.nextInt(10 * sockets.size());
@@ -470,7 +471,7 @@ class ClientThread implements Runnable {
             enJeu = false;
             Serveur.classement.set(Serveur.positionDernier - 1, Serveur.classement.get(Serveur.positionDernier - 1) + pseudo);
             Serveur.positionDernier--;
-            Socket dernierjoueur= null;
+            Socket dernierjoueur = null;
             for(Socket socket : sockets.keySet()) {
                 if(sockets.get(socket).enJeu) {
                     if(dernierjoueur == null) {
@@ -518,7 +519,9 @@ class ClientThread implements Runnable {
     private void resetServeur() throws IOException {
         Serveur.setParametrePartie(new ParametrePartie(false, "Français"));
         Serveur.partieEnCours = false;
-        sockets.clear();
+        Serveur.classement.clear();
+        Serveur.positionDernier = 0;
+        // sockets.clear();
     }
 
 }

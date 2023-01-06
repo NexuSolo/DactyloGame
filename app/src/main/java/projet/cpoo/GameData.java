@@ -119,8 +119,8 @@ public abstract class GameData {
         GameData.niveauFinal = niveauFinal;
     }
 
-    // Une méthode qui réinitialise la valeur de la variable niveauFinal à la valeur de la variable
-    // niveau dans la classe Settings.
+    // Une méthode qui réinitialise la valeur de la variable niveauFinal à la
+    // valeur définie niveau dans la classe Settings.
     public static void resetNiveauFinal() {
         GameData.niveauFinal = Settings.getNiveau();
     }

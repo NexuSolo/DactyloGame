@@ -48,6 +48,7 @@ public abstract class StatsController {
     protected void setText(){
         int mots = GameData.getMotComplete();
         int temps = (int)(GameData.getTempsFinal()/10);
+        if (temps == 0) temps = 1;
         int mpm = (int) ((60*mots)/temps);
         String s = "Bravo vous avez tape " + mots + " mots en " + temps + " secondes";
         s += "\nCela fait donc " + mpm + " mots par minute"; 

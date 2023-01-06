@@ -37,7 +37,6 @@ public final class SoloStatController extends StatsController {
     protected final void setText() {
         super.setText();
         statsText.setText("Vous avez surv\u00e9cu "+ GameData.getTempsFinal()/10 + " secondes et atteint le niveau " + GameData.getNiveauFinal() +  " f\u00e9lictiations ");
-
     }
 
     protected final void setGraph() {
