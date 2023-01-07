@@ -472,7 +472,7 @@ class ClientThread implements Runnable {
             enJeu = false;
             Serveur.classement.set(Serveur.positionDernier - 1, Serveur.classement.get(Serveur.positionDernier - 1) + pseudo);
             Serveur.positionDernier--;
-            Socket dernierjoueur= null;
+            Socket dernierjoueur = null;
             for(Socket socket : sockets.keySet()) {
                 if(sockets.get(socket).enJeu) {
                     if(dernierjoueur == null) {

@@ -6,10 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Observer;
 import java.util.Timer;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javafx.fxml.FXML;
@@ -18,8 +17,9 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import projet.cpoo.Settings;
+import projet.cpoo.Model.JeuModel;
 
-public abstract class ControllerJeu {
+public abstract class ControllerJeu implements Observer {
     protected static int CHAR_PER_LINE = 30;
     protected int pos = 0;
     protected int motComplete = 0;
@@ -34,10 +34,13 @@ public abstract class ControllerJeu {
     protected boolean trema = false;
     protected boolean soin = false;
     protected boolean firstTry = true;
-
+    protected List<String> dictionnaire;
+    protected List<String> listeMots = new ArrayList<String>();
+    protected String motAct = "";
     protected Iterator<String> stringIter;
     protected String tmpIter =  null;
     private String regAcc ="^*[a-zA-Z-]*";
+    protected JeuModel model;
 
 
     @FXML
@@ -80,20 +83,7 @@ public abstract class ControllerJeu {
     @FXML
     protected void initialize() {
         try {
-            String fic = (Settings.getLangue() == Settings.Language.FR)?"liste_mots/liste_francais.txt":"liste_mots/liste_anglais.txt";
-            BufferedReader reader = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResource(fic).openStream()));
-            List<String> list = new ArrayList<String>();
-            String text = reader.readLine();
-            while (text != null) {
-                text = new String(text.getBytes(),"UTF-8");
-                list.add(text);
-                text = reader.readLine();
-            }
-            if (!Settings.isAccents()) list = list.stream().filter((x) -> Pattern.matches(regAcc,x)).collect(Collectors.toList());
-            Collections.shuffle(list);
-            initializeGame(list);
-            pos = 0;
-            reader.close();
+            initializeGame(dictionnaire);
             initializeText();
         } catch (Exception e) {
             e.printStackTrace();

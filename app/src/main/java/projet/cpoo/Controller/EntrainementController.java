@@ -12,6 +12,7 @@ import projet.cpoo.Settings;
 
 import java.io.*;
 import java.util.List;
+import java.util.Observable;
 import java.util.TimerTask;
 
 
@@ -289,6 +290,80 @@ public class EntrainementController extends ControllerJeu {
             if (!start) timerStart();
             entreesClavier++;
             changeLine();
+            //
+        //     String s = formatString(e.getText(),e.isShiftDown());
+        //     String mot = listeMots.get(0);
+        //     String nextChar = mot.substring(motAct.length(),motAct.length() + 1 );
+        //     if (mot.length() >= motAct.length() + 2 ) {
+        //         try {
+        //             String tmp = new String(mot.substring(motAct.length(),motAct.length() + 2).getBytes(),"UTF-8");
+        //             if (isAccentedChar(tmp)) {
+        //                 nextChar = tmp;
+        //             }
+        //         } catch (Exception ex) {
+        //             ex.printStackTrace();
+        //         }
+        //     }
+        //     if(s.equals(nextChar)) {
+        //         motAct += nextChar;
+        //     }
+        //     else {
+        //         motAct += s;
+        //     }
+        //     circonflexe = false;
+        //     trema = false;
+        // }
+        // else if(e.getCode() == KeyCode.SPACE) {
+        //     circonflexe = false;
+        //     trema = false;
+        //     changeLine();
+        //     String mot = listeMots.get(0);
+        //     if(mot.length() >= motAct.length()) {
+        //         int tmp = skipMot();
+        //         System.out.println("Tmp " + tmp);
+        //         pos = tmp;
+        //     }
+        //     else {
+        //         if (motCorrect(pos-1)) {
+        //             posMin = pos + 1;
+        //             motComplete++;
+        //             if (!modeTemps) {
+        //                 updateData();
+        //             }
+        //         }
+        //         updateMotComplete();
+        //         if (!modeTemps) updateMotRestant();
+        //         try {
+        //             finDuJeu();
+        //         }
+        //         catch (Exception ex) {
+        //             ex.printStackTrace();
+        //         }
+        //     }
+        //         pos++;
+        // }
+        // circonflexe = false;
+        // trema = false;
+        // if (e.getCode().equals(KeyCode.BACK_SPACE)) {
+        //     System.out.println("Pos = " + pos + "Pos min = " + posMin);
+        //     if (motAct)
+        //     if(pos > 0 && pos > posMin) {
+        //         pos--;
+        //         posBack();
+        //         Text t = (Text) ligne_act.getChildren().get(pos);
+        //         if(t.getStyleClass().contains("text-done")) lettresCorrectes--;
+        //         t.getStyleClass().remove("text-skipped");
+        //         t.getStyleClass().remove("text-done");
+        //         t.getStyleClass().remove("text-error");
+        //         t.getStyleClass().remove("space-error");
+        //         t.getStyleClass().add("text-to-do");
+        //     }
+        // }
+        // else isAccent(e);
+
+
+
+        
             Text t = (Text) ligne_act.getChildren().get(pos);
             if(t.getText().equals(formatString(e.getText(),e.isShiftDown()))) {
                 t.getStyleClass().remove("text-to-do");
@@ -375,6 +450,12 @@ public class EntrainementController extends ControllerJeu {
     @Override
     protected final void validationMot(boolean solo) {
         return;
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

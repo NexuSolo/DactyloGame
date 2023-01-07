@@ -44,6 +44,7 @@ public class OptionsController {
     @SuppressWarnings("rawtypes")
     @FXML
     private Spinner spin;
+    @SuppressWarnings("rawtypes")
     @FXML
     private Spinner spinLevel;
     @FXML
@@ -78,6 +79,8 @@ public class OptionsController {
 
     @SuppressWarnings("unchecked")
     @FXML
+    // Méthode appelée lors de la création du contrôleur.
+    // Elle initialise tout les champs modifiables par le joueur.
     private void initialize() {
         pseudoField.setText(Settings.getPseudo());
         ipField.setText(Settings.getIp());
