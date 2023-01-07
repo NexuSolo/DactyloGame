@@ -40,6 +40,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation("com.google.code.gson:gson:2.10")
+
 }
 
 application {
@@ -61,4 +62,9 @@ tasks {
         archiveClassifier.set("")
     }
 
+}
+
+tasks.named<Test>("test") {
+    // Use JUnit Platform for unit tests.
+    useJUnitPlatform()
 }
