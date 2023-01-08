@@ -51,6 +51,7 @@ Nous avons décidé pour le mode multijoueurs que le client ne servirait que d'i
 Des fichiers de configurations sont sauvegardés dans le dossier home/.Dactylo
 ## Tests
 
+Si vous voulez lancer les tests il faut décommenter la ligne 48 de SoloModel.java et la ligne 45 de EntrainementModel.java
 Pour lancer les tests, utilisez la commande suivante :
 
 ```bash
