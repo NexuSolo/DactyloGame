@@ -20,6 +20,15 @@ public abstract class JeuModel extends Observable {
     public void setTemps(long temps) {
         this.temps = temps;
     }
+    protected boolean validation = false;
+
+    public void setValidation(boolean validation) {
+        this.validation = validation;
+    }
+
+    public boolean isValidation() {
+        return validation;
+    }
 
     protected Timer timer = new Timer();
     protected int vies = 50;
@@ -57,6 +66,8 @@ public abstract class JeuModel extends Observable {
         return listeMots;
     }
 
+    public abstract void initialize();
+
     //Fonction abstraite qui crée une configuration de base à partir d'une liste de mots triée dans l'ordre voulu
     protected abstract void initializeGame(List<String> list);
 
@@ -83,6 +94,13 @@ public abstract class JeuModel extends Observable {
             firstTry = false;
             motAct = motAct.substring(0, motAct.length() - 1);
         }
+    }
+
+    public abstract void timerStart();
+
+    protected void updateView() {
+        setChanged();
+        notifyObservers();
     }
 
     public int getMotComplete() {

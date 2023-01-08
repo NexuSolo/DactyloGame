@@ -9,6 +9,7 @@ import javafx.scene.text.Text;
 import projet.cpoo.App;
 import projet.cpoo.GameData;
 import projet.cpoo.Settings;
+import projet.cpoo.Model.EntrainementModel;
 
 import java.io.*;
 import java.util.List;
@@ -18,26 +19,7 @@ import java.util.TimerTask;
 
 
 public class EntrainementController extends ControllerJeu {
-    private static int CHAR_PER_LINE = 30;
-    private boolean modeTemps;
-    private int posMin = 0;
-    private int motComplete = 0;
-    private double entreesClavier = 0;
-    private double lettresCorrectes = 0;
-    private int motMax = Settings.getLIMITE_MAX();
-    private int tmpTemps = 0;
-    private int derCharUtile = 0;
-    private static int TEMPS_MAX = Settings.getLIMITE_MAX();
-    protected int temps;
-
-    
-
-    
-
-
-    
-
-
+    private int tmpMots = 0;
 
     /* (non-Javadoc)
      * @see projet.cpoo.Controller.ControllerJeu#initialize()
@@ -45,12 +27,9 @@ public class EntrainementController extends ControllerJeu {
     @FXML
     protected final void initialize() {
         ligne_act = ligne_1;
-        TEMPS_MAX = Settings.getLIMITE_MAX();
-        motMax = Settings.getLIMITE_MAX();
-        modeTemps = Settings.isModeTemps();
-        super.initialize();
-        ligne_act = ligne_1;
-
+        model = new EntrainementModel(this);
+        model.initialize();
+        initializeText();
     }
 
     /* (non-Javadoc)
@@ -62,7 +41,6 @@ public class EntrainementController extends ControllerJeu {
         while(stringIter.hasNext()) {
             text = stringIter.next();
             if(pos + text.length() > CHAR_PER_LINE) {
-                System.out.println("pos = " + pos);
                 pos = 0;
                 if (!updateActualLine()) {
                     tmpIter = text;
@@ -79,9 +57,10 @@ public class EntrainementController extends ControllerJeu {
      * @see projet.cpoo.Controller.ControllerJeu#initializeText()
      */
     protected final void initializeText() {
-        textHG.setText("Mot compl\u00e9t\u00e9s");
+        if(((EntrainementModel)model).isModeTemps()) textHG.setText("Mot compl\u00e9t\u00e9s");
+        else textHG.setText("Temps pass\u00e9");
         textHM.setText("Pr\u00e9cision");
-        if(modeTemps){ 
+        if(((EntrainementModel) model).isModeTemps()){
             updateTempsRestant();
             textHD.setText("Temps restant");
         }
@@ -91,39 +70,8 @@ public class EntrainementController extends ControllerJeu {
         }
     }
 
-    /**
-     * Démarre le timer qui permet de compter le temps passé.
-     */
-    private final void timerStart() {
-        start = true;        
-        timer.schedule(new TimerTask() {
-            
-            @Override
-            public final void run() {
-                Platform.runLater( () -> {
-                temps+= 1;
-                if (modeTemps) updateModeTemps();
-                });
-            }
-        },0,100);
-        if(modeTemps) textBG.setText("0");
-    }
 
-    /**
-     * Met à jour les statistiques et vérifie si le temps est écoulé.
-     */
-    private final void updateModeTemps() {
-        updateTempsRestant();
-        if (temps % (TEMPS_MAX/10) == 0) updateData();
-        try {
-            finDuJeu();
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
- 
-    
+
     /* (non-Javadoc)
      * @see projet.cpoo.Controller.ControllerJeu#addWordtoLine(java.lang.String, javafx.scene.layout.HBox, boolean)
      */
@@ -132,317 +80,112 @@ public class EntrainementController extends ControllerJeu {
         for(char c : s.toCharArray()) {
                 Text t = new Text(String.valueOf(c));
                 t.getStyleClass().add("text-to-do");
+                if (soin) t.getStyleClass().add("text-life");
                 line.getChildren().add(t);
                 pos++;
         }
+        line.getChildren().add(new Text(" "));
+        if (line == ligne_1) nombreMotLigne_1++;
+        else if (line == ligne_2) nombreMotLigne_2++;
+        else nombreMotLigne_3++;
         return pos;
     }
 
-    // Appel raccourci de addWordtoLine 
+    // Appel raccourci de addWordtoLine
     private final int addWordtoLine(String s,HBox line) {
         return addWordtoLine(s, line,false);
     }
-  
-
-   
-
-    /**
-     * Vérifie si le dernier mot passé est correctement tapé
-     * @param finMot représente la position de la fin du mot à traiter
-     * @return true si le dernier mot a bien été tapé et false sinon
-     */
-    private final boolean motCorrect(int finMot){
-        int i = finMot;
-        while (i >=0) {
-            Text t = (Text) ligne_act.getChildren().get(i);
-            if (t.getText().equals(" ")) return true;
-            if (t.getStyleClass().contains("text-error") || t.getStyleClass().contains("text-skipped")) return false;
-            i--;
-        }
-        return true;
-    }
 
     private final void updatePrecision() {
-        double ratio = lettresCorrectes/entreesClavier;
+        double ratio = ((EntrainementModel) model).getLettresCorrectes()/((EntrainementModel) model).getEntreesClavier();
         textBM.setText(String.valueOf((int)(ratio*100) + "%"));
     }
 
     private final void updateMotComplete() {
-        textBG.setText(String.valueOf(motComplete));
+        textBG.setText(String.valueOf(((EntrainementModel) model).getMotCorrect()));
+    }
+    private final void updateTempsPasse() {
+        textBG.setText(String.valueOf((int)(model.getTemps() * 0.1)));
     }
 
     private final void updateMotRestant() {
-        textBD.setText(String.valueOf(motMax-motComplete));
+        textBD.setText(String.valueOf(((EntrainementModel) model).getMotMax() - ((EntrainementModel) model).getMotCorrect()));
     }
 
     private final void updateTempsRestant() {
-        textBD.setText(String.valueOf((TEMPS_MAX-temps)/10));
-    }
-
-  
-
-    /**
-     * Met à jour les statistiques et les stocke pour l'écran de fin
-     */
-    private final void updateData() {
-        if(modeTemps) {
-            int diviseur = TEMPS_MAX/100;
-            if (diviseur == 0) diviseur = 1;
-            if(temps % diviseur == 0) {
-                double ratio = lettresCorrectes/entreesClavier;
-                GameData.addPrecList((int)(ratio*100));
-                GameData.addWordList(motComplete);
-            }
-        }
-        else {
-            int diviseur =(motMax/10);
-            if (diviseur == 0) diviseur = 1;
-            if (motComplete % diviseur == 0) {
-                double ratio = lettresCorrectes/entreesClavier;
-                System.out.println("case print : " + (motComplete) + " Temps = " + temps);
-                GameData.addPrecList((int)(ratio*100));
-                GameData.addWordList(temps/10);
-            }
-        }
+        textBD.setText(String.valueOf((((EntrainementModel) model).getTEMPS_MAX()-((EntrainementModel) model).getTemps())/10));
     }
 
     /**
-     * Déplace le curseur jusqu'au début du prochain mot
-     * @return la position du prochain mot
-     */
-    private final int skipMot() {
-        int tmp = pos;
-        while (tmp <= CHAR_PER_LINE) {
-            Text t = (Text) ligne_act.getChildren().get(tmp);
-            t.getStyleClass().remove("text-to-do");
-            t.getStyleClass().add("text-skipped");
-            System.out.print(" " + t.getText());
-            if (t.getText().equals(" ")) return tmp;
-            tmp++;
-        }
-        return tmp;
-    }
-
-    /**
-     * Met fin au jeu et passe à l'écran de fin si les conditions sont remplies
+     * Met fin au jeu et passe à l'écran de fin 
      * @throws IOException
      */
     private final void finDuJeu() throws IOException {
-        if ( ( modeTemps && temps >= TEMPS_MAX) || (!modeTemps && motMax - motComplete  == 0) ) {
-            timer.cancel();
-            if(modeTemps) {
-                GameData.addWordList(motComplete);
-                double a = temps - tmpTemps;
-                if (GameData.getFreqList().size() > 1 && a > GameData.getFreqList().get(GameData.getFreqList().size() - 1)) GameData.addFreqList(temps-tmpTemps);
-            }
-            GameData.setMotComplete(motComplete);
-            GameData.setTempsFinal(temps);
-            App.setRoot("statsEntrainement");
-        }
-    }
-
-    /**
-     * Recule le curseur tant que le curseur est sur un caractère qui a été passé
-     * @return
-     */
-    private final int posBack() {
-        Text t = (Text) ligne_act.getChildren().get(pos);
-        System.out.println("texte = " + t.getText() + "contains " + t.getStyleClass().contains("text-skipped"));
-        if(t.getStyleClass().contains("text-skipped")) {
-            System.out.println("skipped");
-            int tmp = pos;
-            while (t.getStyleClass().contains("text-skipped")) {
-                tmp--; 
-                t = (Text) ligne_act.getChildren().get(tmp);
-            }
-            return pos-tmp; 
-        }
-        else return 1;
-    }
-
-    /**
-     * Place le curseur au début de la prochaine ligne et met à jour les lignes affichées si nécéssaire. 
-     */
-    private final void changeLine() {
-        if(pos >= CHAR_PER_LINE || pos >= ligne_act.getChildren().size() ) {
-            pos = 0;
-            posMin = 0;
-            derCharUtile = 0;
-            if (!updateActualLine()) {
-                if (!addLine()) {
-                    return;
-                }
-            }
-            else if (ligne_act == ligne_3) {
-                addLine();
-                ligne_act = ligne_2;
-            }
-        }
+        App.setRoot("statsEntrainement");
     }
 
     /**
      * Prend un appui de touche, le compare avec le caractère qui est attendu et met à jour l'affichage en conséquence
      * @param e l'évenement qui correspond à l'appui de touche
      */
-    @FXML
-    private final void keyDetect(KeyEvent e) {
+    public void keyDetect(KeyEvent e) {
+        if(!model.isStart()) {
+            model.timerStart();
+        }
         if(e.getCode().isLetterKey() || isAccentedChar(inputToChars(e)) || inputToChars(e) == "-"){
-            if (!start) timerStart();
-            entreesClavier++;
-            changeLine();
-            //
-        //     String s = formatString(e.getText(),e.isShiftDown());
-        //     String mot = listeMots.get(0);
-        //     String nextChar = mot.substring(motAct.length(),motAct.length() + 1 );
-        //     if (mot.length() >= motAct.length() + 2 ) {
-        //         try {
-        //             String tmp = new String(mot.substring(motAct.length(),motAct.length() + 2).getBytes(),"UTF-8");
-        //             if (isAccentedChar(tmp)) {
-        //                 nextChar = tmp;
-        //             }
-        //         } catch (Exception ex) {
-        //             ex.printStackTrace();
-        //         }
-        //     }
-        //     if(s.equals(nextChar)) {
-        //         motAct += nextChar;
-        //     }
-        //     else {
-        //         motAct += s;
-        //     }
-        //     circonflexe = false;
-        //     trema = false;
-        // }
-        // else if(e.getCode() == KeyCode.SPACE) {
-        //     circonflexe = false;
-        //     trema = false;
-        //     changeLine();
-        //     String mot = listeMots.get(0);
-        //     if(mot.length() >= motAct.length()) {
-        //         int tmp = skipMot();
-        //         System.out.println("Tmp " + tmp);
-        //         pos = tmp;
-        //     }
-        //     else {
-        //         if (motCorrect(pos-1)) {
-        //             posMin = pos + 1;
-        //             motComplete++;
-        //             if (!modeTemps) {
-        //                 updateData();
-        //             }
-        //         }
-        //         updateMotComplete();
-        //         if (!modeTemps) updateMotRestant();
-        //         try {
-        //             finDuJeu();
-        //         }
-        //         catch (Exception ex) {
-        //             ex.printStackTrace();
-        //         }
-        //     }
-        //         pos++;
-        // }
-        // circonflexe = false;
-        // trema = false;
-        // if (e.getCode().equals(KeyCode.BACK_SPACE)) {
-        //     System.out.println("Pos = " + pos + "Pos min = " + posMin);
-        //     if (motAct)
-        //     if(pos > 0 && pos > posMin) {
-        //         pos--;
-        //         posBack();
-        //         Text t = (Text) ligne_act.getChildren().get(pos);
-        //         if(t.getStyleClass().contains("text-done")) lettresCorrectes--;
-        //         t.getStyleClass().remove("text-skipped");
-        //         t.getStyleClass().remove("text-done");
-        //         t.getStyleClass().remove("text-error");
-        //         t.getStyleClass().remove("space-error");
-        //         t.getStyleClass().add("text-to-do");
-        //     }
-        // }
-        // else isAccent(e);
-
-
-
-        
-            Text t = (Text) ligne_act.getChildren().get(pos);
-            if(t.getText().equals(formatString(e.getText(),e.isShiftDown()))) {
-                t.getStyleClass().remove("text-to-do");
-                t.getStyleClass().add("text-done");
-                pos++;
-                if (derCharUtile < pos) {
-                    lettresCorrectes++;
-                    derCharUtile = pos;
-                    //Pour avoir le temps en secondes
-                    int a = temps - tmpTemps;
-                    tmpTemps = temps;
-                    GameData.addFreqList(a);
-                }
-            }
-            else if (t.getText().equals(" ")) {
-                t.getStyleClass().remove("text-to-do");
-                t.getStyleClass().add("space-error");
-                pos++;
-            }
-            else {
-                t.getStyleClass().remove("text-to-do");
-                t.getStyleClass().add("text-error");
-                pos++;
-            }
+            String s = formatString(e.getText(),e.isShiftDown());
+            model.ajoutChar(s);
             circonflexe = false;
             trema = false;
         }
         else if(e.getCode() == KeyCode.SPACE) {
             circonflexe = false;
             trema = false;
-            changeLine();
-            Text t = (Text) ligne_act.getChildren().get(pos);
-            if(!t.getText().equals(" ")) {
-                // t.getStyleClass().remove("text-to-do");
-                int tmp = skipMot();
-                System.out.println("Tmp " + tmp);
-                pos = tmp;
-                System.out.println("pos min = " + posMin) ;
-                // t.getStyleClass().add("text-error");
-            }
-            else {
-                if (motCorrect(pos-1)) {
-                    posMin = pos + 1;
-                    motComplete++;
-                    if (!modeTemps) {
-                        updateData();
-                    }
-                }
-                updateMotComplete();
-                if (!modeTemps) updateMotRestant();
-                try {
-                    finDuJeu();
-                }
-                catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-                pos++;
-        } else {
+            if(model.validationMot(true))validationMot(true);
+            return;
+        }
+        else {
             circonflexe = false;
             trema = false;
             if (e.getCode().equals(KeyCode.BACK_SPACE)) {
-                System.out.println("Pos = " + pos + "Pos min = " + posMin);
-                if(pos > 0 && pos > posMin) {
-                    pos--;
-                    posBack();
-                    Text t = (Text) ligne_act.getChildren().get(pos);
-                    if(t.getStyleClass().contains("text-done")) lettresCorrectes--;
-                    t.getStyleClass().remove("text-skipped");
-                    t.getStyleClass().remove("text-done");
-                    t.getStyleClass().remove("text-error");
-                    t.getStyleClass().remove("space-error");
+                model.retireChar();
+                retireChar();
+            } else isAccent(e);
+        }
+        updateMot();
+    }
+
+    private void updateMot() {
+        String mot = model.getListeMots().get(((EntrainementModel) model).getPosMin());
+        String motAct = model.getMotAct();
+        for (int i = 0; i < mot.length(); i++) {
+            HBox ligne;
+            int nbMot = model.getMotComplete();
+            if (nbMot < 5) ligne = ligne_1;
+            else ligne = ligne_2;
+            int pos = ((EntrainementModel) model).getDerCharUtile() + i;
+            if (pos >= ligne.getChildren().size()) return;
+            Text t = (Text) ligne.getChildren().get(pos);
+            t.getStyleClass().clear();
+            if (i >= motAct.length()) {
                     t.getStyleClass().add("text-to-do");
+            }
+            else {
+                t.getStyleClass().remove("text-to-do");
+                String s1 = motAct.substring(i, i + 1);
+                String s2 = mot.substring(i, i + 1);
+                if(!s1.equals(s2)) {
+                    t.getStyleClass().add("text-error");
+                }
+                else {
+                    t.getStyleClass().add("text-done");
                 }
             }
-            else isAccent(e);
         }
-        updatePrecision();
     }
+
+    
+    
 
     /* (non-Javadoc)
      * @see projet.cpoo.Controller.ControllerJeu#validationMot(boolean)
@@ -454,8 +197,59 @@ public class EntrainementController extends ControllerJeu {
 
     @Override
     public void update(Observable o, Object arg) {
+        if (model.isEnJeu()) {
+            updateActualLine();
+            int nbMot = model.getMotComplete();
+            if (nbMot >= 5 && ligne_act != ligne_2) updateActualLine();
+            if (nbMot >= 10 && nbMot % 5 == 0 && tmpMots != nbMot) addLine();
+            updateListeMots();
+            tmpMots = nbMot;
+            if(((EntrainementModel) model).isModeTemps()){
+                updateMotComplete();
+                updateTempsRestant();
+            }
+            else{ 
+                updateMotRestant();
+                updateTempsPasse();
+            }
+            updatePrecision();
+        }
+        else {
+            try {
+                finDuJeu();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         // TODO Auto-generated method stub
-        
+
     }
 
+    private void updateListeMots() {
+        int size = model.getListeMots().size();
+        if (tailleListTMP < size) {
+            List<String> toAdd = model.getListeMots().subList(tailleListTMP, size);
+            for (int i = 0; i < toAdd.size(); i++) {
+                HBox ligne = selectLine();
+                addWordtoLine(toAdd.get(i), ligne, false);
+            }
+        }
+        tailleListTMP = model.getListeMots().size();
+    }
+
+    public void retireChar() {
+        if (motAct.length() > 0) {
+            HBox ligne;
+            int nbMot = model.getMotComplete();
+            if (nbMot < 5) ligne = ligne_1;
+            else if (nbMot < 10) ligne = ligne_2;
+            else ligne = ligne_3;
+            Text t = (Text) ligne.getChildren().get(((EntrainementModel) model).getDerCharUtile() + motAct.length());
+            t.getStyleClass().remove("text-done");
+            t.getStyleClass().remove("text-error");
+            t.getStyleClass().remove("space-error");
+            t.getStyleClass().add("text-to-do");
+        }
+    }
 }

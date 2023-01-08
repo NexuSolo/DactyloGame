@@ -26,7 +26,6 @@ public class SoloModel extends JeuModel {
     private int niveau = Settings.getNiveau();
     private boolean mortSubite = Settings.isMortSubite();
     protected List<TypeMot> listeTypeMots = new LinkedList<TypeMot>();
-    protected boolean validation = false;
 
     public int getVies() {
         return vies;
@@ -44,13 +43,7 @@ public class SoloModel extends JeuModel {
         return nombreMots;
     }
 
-    public void setValidation(boolean validation) {
-        this.validation = validation;
-    }
-
-    public boolean isValidation() {
-        return validation;
-    }
+    
 
     public List<TypeMot> getListeTypeMots() {
         return listeTypeMots;
@@ -110,10 +103,7 @@ public class SoloModel extends JeuModel {
             }  
     }
 
-    private void updateView() {
-        setChanged();
-        notifyObservers();
-    }
+    
 
     private void removeMot() {
         Platform.runLater( () -> {
@@ -123,10 +113,9 @@ public class SoloModel extends JeuModel {
             updateView();
             System.out.println(listeTypeMots.get(0));
         });
-    }
+    }   
     protected void remplirMots() {
         if (nombreMots < 8) {
-            System.out.println("rpm");
             ajouteMot();
         }
     }
@@ -215,7 +204,6 @@ public class SoloModel extends JeuModel {
         resetPos();
         end();
         updateView();
-        notifyObservers();
         return true;
     }
 

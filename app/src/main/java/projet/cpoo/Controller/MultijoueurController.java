@@ -25,6 +25,8 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
 public final class MultijoueurController extends SoloController{
+    protected int vies = 500;
+    private int nombreMots = 0;
     private Socket socket;
     protected int positionMot = 0;
     @FXML
@@ -37,6 +39,55 @@ public final class MultijoueurController extends SoloController{
         reception = new Thread(new ReceptionJeux(this));
         initializeText();
         reception.start();
+    }
+
+    protected final void resetPos(){
+        motAct = "";
+        pos = 0;
+        firstTry = true;
+        if(ligne_1.getChildren().size() != 0) soin = ligne_1.getChildren().get(0).getStyleClass().contains("text-life");
+    }
+
+    protected boolean jeuVide() {
+        return (nombreMotLigne_1 == 0);
+    }
+
+    @Override
+    protected final void updateMotNiveau() {
+
+    }
+
+    protected final void validationMot(boolean solo) {
+        motDegats();
+        removeMot();
+        rearrangeCol();
+        updateMotNiveau();
+        updateVies();
+    }
+
+    // protected final void validationMot(boolean solo) {
+    //     if(jeuVide()) return;
+    //     nombreMots--;
+    //     boolean b = motDegats();
+    //     removeMot();
+    //     remplirMots();
+    //     incrementeMotComplete(b);
+    //     rearrangeCol();
+    //     resetPos();
+    //     updateVies();
+    // }
+
+    protected final void removeMot(){
+        System.out.println("appel removeMot");
+        int i = 0;
+        Text t = (Text) ligne_1.getChildren().get(i);
+        while (!t.getText().equals(" ")) {
+            t.getStyleClass().clear();
+            i++;
+            t = (Text) ligne_1.getChildren().get(i);
+        }
+        ligne_1.getChildren().remove(0, i+1);
+        nombreMotLigne_1--;
     }
 
     protected Socket getSocket() {
@@ -90,6 +141,7 @@ public final class MultijoueurController extends SoloController{
         Message m;
         m = new Message(Transmission.CLIENT_VALIDATION,null);
         try {
+            System.out.println("CV SEND");
             envoiMessage(socket, m);
         } catch (Exception e) {
             e.printStackTrace();
@@ -105,6 +157,15 @@ public final class MultijoueurController extends SoloController{
         out.println(json);
         System.out.println("Fin Message envoye ");
 
+    }
+
+    @Override
+    protected final void setStats() {
+        updateVies();
+    }
+
+    protected final void updateVies() {
+        textBG.setText(String.valueOf(vies));
     }
 
     protected final void remplirMots() {

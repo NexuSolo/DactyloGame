@@ -27,14 +27,8 @@ public class SoloController extends ControllerJeu{
     private int niveau = Settings.getNiveau();
     private boolean mortSubite = Settings.isMortSubite();
     protected List<TypeMot> listeTypeMots = new LinkedList<TypeMot>();
-    protected SoloModel model;
-    protected int tailleListTMP = 0;
     
-    protected int nombreMotLigne_1 = 0;
-
-    protected int nombreMotLigne_2 = 0;
-
-    protected int nombreMotLigne_3 = 0;
+    
     @FXML
     private Text textMotComplete;
 
@@ -56,7 +50,7 @@ public class SoloController extends ControllerJeu{
         ligne_act = ligne_1;
     }
 
-    private final void setStats() {
+    protected void setStats() {
         updateVies();
         updateMotNiveau();
         updateMotComplete();
@@ -64,15 +58,15 @@ public class SoloController extends ControllerJeu{
     } 
 
     private final void updateNiveau() {
-        textBM.setText(String.valueOf(model.getNiveau()));
+        textBM.setText(String.valueOf(((SoloModel) model).getNiveau()));
     }
 
-    protected final void updateVies() {
-        textBG.setText(String.valueOf(model.getVies()));
+    protected  void updateVies() {
+        textBG.setText(String.valueOf(((SoloModel) model).getVies()));
     }
 
-    private final void updateMotNiveau() {
-        textBD.setText(String.valueOf(model.getMotRestant()));
+    protected void updateMotNiveau() {
+        textBD.setText(String.valueOf(((SoloModel) model).getMotRestant()));
     }
 
     private final void updateMotComplete() {
@@ -80,13 +74,13 @@ public class SoloController extends ControllerJeu{
     }
 
 
-    private HBox selectLine() {
-        if (nombreMotLigne_1 < 5 ) return ligne_1;
-        if (nombreMotLigne_2 < 5) return ligne_2;
-        return ligne_3;
-    }
+    // private HBox selectLine() {
+    //     if (nombreMotLigne_1 < 5 ) return ligne_1;
+    //     if (nombreMotLigne_2 < 5) return ligne_2;
+    //     return ligne_3;
+    // }
 
-    protected final void removeMot(){
+    protected  void removeMot(){
         int i = 0;
         Text t = (Text) ligne_1.getChildren().get(i);
         while (!t.getText().equals(" ")) {
@@ -101,7 +95,7 @@ public class SoloController extends ControllerJeu{
 
 
     
-    protected final void validationMot(boolean solo) {
+    protected  void validationMot(boolean solo) {
         removeMot();
         rearrangeCol();
         updateMotNiveau();
@@ -140,7 +134,7 @@ public class SoloController extends ControllerJeu{
     private void updateMot() {
         String mot = model.getListeMots().get(0);
         String motAct = model.getMotAct();
-        boolean soin = model.getListeTypeMots().get(0) == TypeMot.WORD_LIFE;
+        boolean soin = ((SoloModel) model).getListeTypeMots().get(0) == TypeMot.WORD_LIFE;
         for (int i = 0; i < mot.length(); i++) {
             Text t = (Text) ligne_1.getChildren().get(i);
             t.getStyleClass().clear();
@@ -166,18 +160,7 @@ public class SoloController extends ControllerJeu{
         }
     }
 
-    private void retireChar() {
-        String motAct = model.getMotAct();
-        if (motAct.length() > 0) {
-            Text t = (Text) ligne_1.getChildren().get(pos);
-            t.getStyleClass().remove("text-skipped");
-            t.getStyleClass().remove("text-done");
-            t.getStyleClass().remove("text-error");
-            t.getStyleClass().remove("space-error");
-            t.getStyleClass().add("text-to-do");
-            if (soin) t.getStyleClass().add("text-life");
-        }
-    }
+    
 
     public void keyDetect(KeyEvent e) {
         if(!model.isStart()) {
@@ -220,7 +203,7 @@ public class SoloController extends ControllerJeu{
         TypeMot type;
         for (int i = 0; i < 5 ; i++) {
             text = model.getListeMots().get(i);
-            type = model.getListeTypeMots().get(i);
+            type = ((SoloModel) model).getListeTypeMots().get(i);
             if(ligneFull(ligne_act)) {
                 pos = 0;
                 if (!updateActualLine()) {
@@ -302,33 +285,32 @@ public class SoloController extends ControllerJeu{
 
     @Override
     public void update(Observable o, Object arg) {
-            if (model.isEnJeu()) {
-                if(model.isValidation()){validationMot(true); 
-                    model.setValidation(false); }
-                    updateListeMots();
-                    updateMot();
-                    updateMotComplete();
-                    updateMotNiveau();
-                    updateVies();
-                    updateNiveau();
-                }
-                else {
-                    try {
-                        finDuJeu();
-                    } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
-            // TODO Auto-generated method stub
-        
+        if (model.isEnJeu()) {
+            if(model.isValidation()){
+                validationMot(true); 
+                model.setValidation(false);
+            }
+            updateListeMots();
+            updateMot();
+            updateMotComplete();
+            updateMotNiveau();
+            updateVies();
+            updateNiveau();
+        }
+        else {
+            try {
+                finDuJeu();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void updateListeMots() {
         int size = model.getListeMots().size();
         if (tailleListTMP < size) {
             List<String> toAdd = model.getListeMots().subList(tailleListTMP, size);
-            List<TypeMot> toAddType = model.getListeTypeMots().subList(tailleListTMP, model.getListeTypeMots().size());
+            List<TypeMot> toAddType = ((SoloModel) model).getListeTypeMots().subList(tailleListTMP, ((SoloModel) model).getListeTypeMots().size());
             for (int i = 0; i < toAdd.size(); i++) {
                 HBox ligne = selectLine();
                 addWordtoLine(toAdd.get(i), ligne, toAddType.get(i) == TypeMot.WORD_LIFE);

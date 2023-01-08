@@ -152,6 +152,7 @@ class ClientThread implements Runnable {
             receptionLettre((String) map.get("lettre"));
         }
         if(message.getTransmition() == Transmission.CLIENT_VALIDATION) {
+            System.out.println("CV RECU");
             updateVie();
             LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
             map.put("vie",vie);

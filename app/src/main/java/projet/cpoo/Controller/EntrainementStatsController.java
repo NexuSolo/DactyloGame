@@ -56,6 +56,7 @@ public final class EntrainementStatsController extends StatsController {
         List<Integer> wordTab = GameData.getWordList();
         final NumberAxis yAxis;
         final NumberAxis xAxis;
+        System.out.println("mode temps : " + Settings.isModeTemps());
         if (Settings.isModeTemps()) {
             yAxis = new NumberAxis(0, GameData.getMotComplete(), 1);
             xAxis = new NumberAxis(0, GameData.getTempsFinal()*.1,GameData.getTempsFinal()*.01);
@@ -65,8 +66,8 @@ public final class EntrainementStatsController extends StatsController {
         else {
             yAxis = new NumberAxis(0, GameData.getMotComplete(), 1);
             xAxis = new NumberAxis(0, GameData.getTempsFinal()*.1,GameData.getTempsFinal()*.01);
-            xAxis.setLabel("Nombre de mots");
-            yAxis.setLabel("Temps en s");
+            yAxis.setLabel("Nombre de mots");
+            xAxis.setLabel("Temps en s");
         }
        
         
@@ -151,7 +152,7 @@ public final class EntrainementStatsController extends StatsController {
     }
 
     private void createGraph(List<Integer> freqList,XYChart.Series<Number,Number> serieFreq) {
-        if (freqList.size() <= 15) {
+        if (freqList.size() <= 20) {
             for (int i = 0; i < freqList.size(); i++) {
             serieFreq.getData().add(new XYChart.Data<>(i,freqList.get(i)));
             }

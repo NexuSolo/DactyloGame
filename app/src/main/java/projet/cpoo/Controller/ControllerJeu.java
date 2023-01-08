@@ -40,7 +40,11 @@ public abstract class ControllerJeu implements Observer {
     protected Iterator<String> stringIter;
     protected String tmpIter =  null;
     private String regAcc ="^*[a-zA-Z-]*";
-    protected JeuModel model;
+    protected int tailleListTMP = 0;
+    protected int nombreMotLigne_1 = 0;
+    protected int nombreMotLigne_2 = 0;
+    protected int nombreMotLigne_3 = 0;
+    protected JeuModel model = null;
 
 
     @FXML
@@ -104,7 +108,6 @@ public abstract class ControllerJeu implements Observer {
 
     //Fonction change quelle ligne référence l'attribut "ligne_act"
     protected final boolean updateActualLine(){
-        pos = 0;
         if (ligne_act == ligne_1) ligne_act = ligne_2;
         else if (ligne_act == ligne_2) ligne_act = ligne_3;
         else return false;
@@ -175,27 +178,31 @@ public abstract class ControllerJeu implements Observer {
      * @return true une ligne a pu être ajoutée et remplie et false sinon
      */
     protected final boolean addLine() {
+        System.out.println("appel addline");
         int pos = 0;
         ligne_1.getChildren().clear();
+        // System.out.println("clear L1 " +  ligne_1.getChildren().get(0));
         ligne_1.getChildren().addAll(ligne_2.getChildren());
+        System.out.println("L1 SIZE " + ligne_1.getChildren().size());
         ligne_2.getChildren().clear();
+        System.out.println("L2 SIZE " + ligne_2.getChildren().size());
         ligne_2.getChildren().addAll(ligne_3.getChildren());
         ligne_3.getChildren().clear();
-        if (tmpIter != null) {
-            pos += addWordtoLine(tmpIter,ligne_3,false);
-            ligne_act.getChildren().add(new Text(" "));
-            pos++;
-        }
-        while(stringIter.hasNext()) {
-            String text = stringIter.next();
-            if(pos + text.length() > CHAR_PER_LINE) {
-                tmpIter = text;
-                return true;
-            }
-            pos += addWordtoLine(text,ligne_3,false);
-            ligne_act.getChildren().add(new Text(" "));
-            pos++;
-        }
+        // if (tmpIter != null) {
+        //     pos += addWordtoLine(tmpIter,ligne_3,false);
+        //     ligne_act.getChildren().add(new Text(" "));
+        //     pos++;
+        // }
+        // while(stringIter.hasNext()) {
+        //     String text = stringIter.next();
+        //     if(pos + text.length() > CHAR_PER_LINE) {
+        //         tmpIter = text;
+        //         return true;
+        //     }
+        //     pos += addWordtoLine(text,ligne_3,false);
+        //     ligne_act.getChildren().add(new Text(" "));
+        //     pos++;
+        // }
         return false;
     }
 
@@ -213,6 +220,25 @@ public abstract class ControllerJeu implements Observer {
             case "\u00e7" : return true;
             default : return false;
         }
+    }
+
+    protected void retireChar() {
+        String motAct = model.getMotAct();
+        if (motAct.length() > 0) {
+            Text t = (Text) ligne_1.getChildren().get(pos);
+            t.getStyleClass().remove("text-skipped");
+            t.getStyleClass().remove("text-done");
+            t.getStyleClass().remove("text-error");
+            t.getStyleClass().remove("space-error");
+            t.getStyleClass().add("text-to-do");
+            if (soin) t.getStyleClass().add("text-life");
+        }
+    }
+
+    protected HBox selectLine() {
+        if (nombreMotLigne_1 < 5 ) return ligne_1;
+        if (nombreMotLigne_2 < 5) return ligne_2;
+        return ligne_3;
     }
 
 }
