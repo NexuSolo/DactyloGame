@@ -13,22 +13,8 @@ public abstract class JeuModel extends Observable {
     protected int pos = 0;
     protected int motComplete = 0;
     protected long temps = 0;
-    public long getTemps() {
-        return temps;
-    }
-
-    public void setTemps(long temps) {
-        this.temps = temps;
-    }
     protected boolean validation = false;
-
-    public void setValidation(boolean validation) {
-        this.validation = validation;
-    }
-
-    public boolean isValidation() {
-        return validation;
-    }
+    
 
     protected Timer timer = new Timer();
     protected int vies = 50;
@@ -36,9 +22,7 @@ public abstract class JeuModel extends Observable {
     protected int motRestant = 1;
     protected int niveau = Settings.getNiveau();
     protected boolean start = false;
-    public boolean isStart() {
-        return start;
-    }
+    
 
     protected boolean circonflexe = false;
     protected boolean trema = false;
@@ -49,37 +33,35 @@ public abstract class JeuModel extends Observable {
   
 
     protected String motAct = "";
-    public String getMotAct() {
-        return motAct;
-    }
+   
 
     protected Iterator<String> stringIter;
-    protected String tmpIter =  null;
     protected String regAcc ="^*[a-zA-Z-]*";
     protected boolean enJeu = true;
 
-    public boolean isEnJeu() {
-        return enJeu;
-    }
-    
-    public List<String> getListeMots() {
-        return listeMots;
-    }
+   
 
+    /**
+     * Initialisation du model avec les valeurs par défaut.
+     */
     public abstract void initialize();
 
     //Fonction abstraite qui crée une configuration de base à partir d'une liste de mots triée dans l'ordre voulu
     protected abstract void initializeGame(List<String> list);
 
     //Fonction abstraite qui a pour but de traiter le mot actuel et de passer au mot suivant
-    public abstract boolean validationMot(boolean solo);
-
+    public abstract boolean validationMot();
+    
+    /**
+     * Ajout d'un caractère à la fin de le chaine actuelle
+     * Valide le mot si nécessaire
+     */
     public void ajoutChar(String c) {
         motAct += c;
         String mot = listeMots.get(0);
         if(motAct.length() > mot.length()) {
             firstTry = false;
-            validationMot(true);
+            validationMot();
             return;
         }
         else {
@@ -89,6 +71,7 @@ public abstract class JeuModel extends Observable {
         }
     }
 
+    //Supprime le dernier caractère de la chaine mot actuel.
     public void retireChar() {
         if (motAct.length() > 0) {
             firstTry = false;
@@ -98,12 +81,56 @@ public abstract class JeuModel extends Observable {
 
     public abstract void timerStart();
 
+    /**
+     * Lorsque le modèle change, informez les observateurs que le modèle a changé.
+     */
     protected void updateView() {
         setChanged();
         notifyObservers();
     }
 
+    public long getTemps() {
+        return temps;
+    }
+
+    public void setTemps(long temps) {
+        this.temps = temps;
+    }
+
+    public void setValidation(boolean validation) {
+        this.validation = validation;
+    }
+
+    public boolean isValidation() {
+        return validation;
+    }
+
+
+    public boolean isStart() {
+        return start;
+    }
+
     public int getMotComplete() {
         return motComplete;
+    }
+
+    public String getMotAct() {
+        return motAct;
+    }
+
+    public boolean isEnJeu() {
+        return enJeu;
+    }
+    
+    public List<String> getListeMots() {
+        return listeMots;
+    }
+
+    public void setFirstTry(boolean firstTry) {
+        this.firstTry = firstTry;
+    }
+    
+    public void setSoin(boolean soin) {
+        this.soin = soin;
     }
 }

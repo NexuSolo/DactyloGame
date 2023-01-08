@@ -60,5 +60,5 @@ Pour lancer les tests, utilisez la commande suivante :
 ## Auteurs
 
 - Theau Nicolas 22011387[@theau](https://gaufre.informatique.univ-paris-diderot.fr/theau)
-- René Tom xxxxxxx [@rene](https://gaufre.informatique.univ-paris-diderot.fr/rene)
+- René Tom 22007185 [@rene](https://gaufre.informatique.univ-paris-diderot.fr/rene)
 

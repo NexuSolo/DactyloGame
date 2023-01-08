@@ -1,20 +1,16 @@
 package projet.cpoo.Controller;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import projet.cpoo.App;
-import projet.cpoo.GameData;
-import projet.cpoo.Settings;
 import projet.cpoo.Model.EntrainementModel;
 
 import java.io.*;
 import java.util.List;
 import java.util.Observable;
-import java.util.TimerTask;
 
 
 
@@ -30,27 +26,6 @@ public class EntrainementController extends ControllerJeu {
         model = new EntrainementModel(this);
         model.initialize();
         initializeText();
-    }
-
-    /* (non-Javadoc)
-     * @see projet.cpoo.Controller.ControllerJeu#initializeGame(java.util.List)
-     */
-    protected final void initializeGame(List<String> list) {
-        String text;
-        stringIter = list.iterator();
-        while(stringIter.hasNext()) {
-            text = stringIter.next();
-            if(pos + text.length() > CHAR_PER_LINE) {
-                pos = 0;
-                if (!updateActualLine()) {
-                    tmpIter = text;
-                    break;
-                }
-            }
-            pos += addWordtoLine(text, ligne_act);
-            ligne_act.getChildren().add(new Text(" "));
-            pos++;
-        }
     }
 
     /* (non-Javadoc)
@@ -89,11 +64,6 @@ public class EntrainementController extends ControllerJeu {
         else if (line == ligne_2) nombreMotLigne_2++;
         else nombreMotLigne_3++;
         return pos;
-    }
-
-    // Appel raccourci de addWordtoLine
-    private final int addWordtoLine(String s,HBox line) {
-        return addWordtoLine(s, line,false);
     }
 
     private final void updatePrecision() {
@@ -141,7 +111,7 @@ public class EntrainementController extends ControllerJeu {
         else if(e.getCode() == KeyCode.SPACE) {
             circonflexe = false;
             trema = false;
-            if(model.validationMot(true))validationMot(true);
+            if(model.validationMot()) validationMot();
             return;
         }
         else {
@@ -155,6 +125,9 @@ public class EntrainementController extends ControllerJeu {
         updateMot();
     }
 
+    /**
+     * Met à jour le texte dans l'interface graphique
+     */
     private void updateMot() {
         String mot = model.getListeMots().get(((EntrainementModel) model).getPosMin());
         String motAct = model.getMotAct();
@@ -184,18 +157,16 @@ public class EntrainementController extends ControllerJeu {
         }
     }
 
-    
-    
-
     /* (non-Javadoc)
      * @see projet.cpoo.Controller.ControllerJeu#validationMot(boolean)
      */
     @Override
-    protected final void validationMot(boolean solo) {
+    protected final void validationMot() {
         return;
     }
 
     @Override
+    // Mise à jour de la vue.
     public void update(Observable o, Object arg) {
         if (model.isEnJeu()) {
             updateActualLine();
@@ -221,11 +192,11 @@ public class EntrainementController extends ControllerJeu {
                 e.printStackTrace();
             }
         }
-
-        // TODO Auto-generated method stub
-
     }
 
+    /**
+     * Ajoute des mots à l'affichage graphique
+     */
     private void updateListeMots() {
         int size = model.getListeMots().size();
         if (tailleListTMP < size) {
@@ -238,7 +209,11 @@ public class EntrainementController extends ControllerJeu {
         tailleListTMP = model.getListeMots().size();
     }
 
-    public void retireChar() {
+    /**
+     * Il supprime le dernier caractère du mot actuel et change la couleur du texte à la couleur par
+     * défaut
+     */
+    protected final void retireChar() {
         if (motAct.length() > 0) {
             HBox ligne;
             int nbMot = model.getMotComplete();

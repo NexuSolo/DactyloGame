@@ -4,11 +4,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
@@ -16,15 +12,12 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import projet.cpoo.App;
-import projet.cpoo.GameData;
 import projet.cpoo.Settings;
 import projet.cpoo.TypeMot;
 import projet.cpoo.Model.SoloModel;
 
 public class SoloController extends ControllerJeu{    
-    protected int vies = 500;
-    private int motRestant = 10;
-    private int niveau = Settings.getNiveau();
+    protected int vies = 50;
     private boolean mortSubite = Settings.isMortSubite();
     protected List<TypeMot> listeTypeMots = new LinkedList<TypeMot>();
     
@@ -33,6 +26,7 @@ public class SoloController extends ControllerJeu{
     private Text textMotComplete;
 
     @FXML
+    // Méthode appelée lors de la création du contrôleur.
     protected void initialize() {
         ligne_act = ligne_1;
         if(mortSubite) vies = 1;
@@ -40,16 +34,20 @@ public class SoloController extends ControllerJeu{
         model.initialize();
         System.out.println("init model "+ model);
         initializeText();
-        // textHG.setText(" Vies restantes");
-        // textHD.setText(" Mots avant prochain niveau ");
-        // textHM.setText(" Niveau ");
-        // updateListeMots();
-        // initializeGame();
-        // initialize();
-        // super.initialize();
         ligne_act = ligne_1;
     }
+    
+    @Override
+    protected final void initializeText() {
+        textHG.setText(" Vies restantes");
+        textHD.setText(" Mots avant prochain niveau ");
+        textHM.setText(" Niveau ");
+        setStats();
+    }
 
+    /**
+     * Cette fonction met à jour les statistiques du jeu.
+     */
     protected void setStats() {
         updateVies();
         updateMotNiveau();
@@ -73,43 +71,66 @@ public class SoloController extends ControllerJeu{
         textMotComplete.setText("Mot compl\u00e9t\u00e9s " + String.valueOf(model.getMotComplete()));
     }
 
-
-    // private HBox selectLine() {
-    //     if (nombreMotLigne_1 < 5 ) return ligne_1;
-    //     if (nombreMotLigne_2 < 5) return ligne_2;
-    //     return ligne_3;
-    // }
-
-    protected  void removeMot(){
-        int i = 0;
-        Text t = (Text) ligne_1.getChildren().get(i);
-        while (!t.getText().equals(" ")) {
-            t.getStyleClass().clear();
-            i++;
-            t = (Text) ligne_1.getChildren().get(i);
-        }
-        ligne_1.getChildren().remove(0, i+1);
-        nombreMotLigne_1--;
+    private final void decrementeNombreLigne(HBox ligne) {
+        if (ligne == ligne_1) nombreMotLigne_1--;
+        else if (ligne == ligne_2) nombreMotLigne_2--;
+        else nombreMotLigne_3--;
     }
 
+    private final void incrementeNombreLigne(HBox ligne) {
+        if (ligne == ligne_1) {nombreMotLigne_1++;
+        }
+        else if (ligne == ligne_2) nombreMotLigne_2++;
+        else nombreMotLigne_3++;
+    }
 
+    /**
+     * Il supprime le premier mot d'une ligne et l'ajoute à la ligne précédente
+     * 
+     * @param ligne_bas la ligne du bas
+     * @param ligne_haut la ligne du haut
+     */
+    private final void popMot(HBox ligne_bas,HBox ligne_haut) {
+        Text t = (Text) ligne_bas.getChildren().get(0);
+        List <Node> list = new LinkedList<>();
+        while (!t.getText().equals(" ") || 0 >= ligne_bas.getChildren().size()) {
+            list.add(t);
+            ligne_bas.getChildren().remove(t);
+            t = (Text) ligne_bas.getChildren().get(0);
+        }
+        ligne_bas.getChildren().remove(t); if (t.getText().equals(" ")) 
+        ligne_haut.getChildren().addAll(list);
+        ligne_haut.getChildren().add(new Text(" "));
+        decrementeNombreLigne(ligne_bas);
+        incrementeNombreLigne(ligne_haut);
+    }   
+    /**
+     * Fait reculer les mots dans l'affichage en faisant passer le premier de la ligne vers la ligne du haut
+     * 
+     */
+    protected final void rearrangeCol() {
+        if(nombreMotLigne_2 > 0) popMot(ligne_2, ligne_1);
+        if(nombreMotLigne_3 > 0) popMot(ligne_3, ligne_2);
+    }
 
-    
-    protected  void validationMot(boolean solo) {
+    /**
+     * Supprime le mot de l'écran, réorganise les colonnes, met à jour le niveau et les vies.
+     */
+    protected void validationMot() {
         removeMot();
         rearrangeCol();
         updateMotNiveau();
         updateVies();
     }
 
+    /**
+     * Passe à l'écran de fin du jeu
+     */
     private final void finDuJeu() throws IOException {
-            // timer.cancel();
-            // GameData.setMotComplete(motComplete);
-            // GameData.setTempsFinal((System.currentTimeMillis()-temps)*0.01);
-            // GameData.setNiveauFinal(niveau);
-            App.setRoot("statsSolo");
+        App.setRoot("statsSolo");
     }
-
+    
+    // Ajouter un mot à une ligne.
     protected int addWordtoLine(String s,HBox line,boolean soin) {
         if(mortSubite) soin = false;
         nombreMots++;
@@ -125,12 +146,13 @@ public class SoloController extends ControllerJeu{
         if (line == ligne_1) nombreMotLigne_1++;
         else if (line == ligne_2) nombreMotLigne_2++;
         else nombreMotLigne_3++;
-        // try {if (!jeuVide()) soin = ligne_1.getChildren().get(0).getStyleClass().contains("text-life");
-        // } catch (Exception e) { e.printStackTrace();}
         return pos;
     }
 
 
+    /**
+    * Met à jour le texte dans l'interface graphique
+    */
     private void updateMot() {
         String mot = model.getListeMots().get(0);
         String motAct = model.getMotAct();
@@ -160,8 +182,38 @@ public class SoloController extends ControllerJeu{
         }
     }
 
-    
+    /**
+     * Supprime le premier mot de la première ligne
+     */
+    protected void removeMot(){
+        int i = 0;
+        Text t = (Text) ligne_1.getChildren().get(i);
+        while (!t.getText().equals(" ")) {
+            t.getStyleClass().clear();
+            i++;
+            t = (Text) ligne_1.getChildren().get(i);
+        }
+        ligne_1.getChildren().remove(0, i+1);
+        nombreMotLigne_1--;
+    }
 
+    private void updateListeMots() {
+        int size = model.getListeMots().size();
+        if (tailleListTMP < size) {
+            List<String> toAdd = model.getListeMots().subList(tailleListTMP, size);
+            List<TypeMot> toAddType = ((SoloModel) model).getListeTypeMots().subList(tailleListTMP, ((SoloModel) model).getListeTypeMots().size());
+            for (int i = 0; i < toAdd.size(); i++) {
+                HBox ligne = selectLine();
+                addWordtoLine(toAdd.get(i), ligne, toAddType.get(i) == TypeMot.WORD_LIFE);
+            }
+        }
+        tailleListTMP = model.getListeMots().size();
+    }
+
+    /**
+     * Prend un appui de touche, le compare avec le caractère qui est attendu et met à jour l'affichage en conséquence
+     * @param e l'évenement qui correspond à l'appui de touche
+     */
     public void keyDetect(KeyEvent e) {
         if(!model.isStart()) {
             model.timerStart();
@@ -176,7 +228,7 @@ public class SoloController extends ControllerJeu{
         else if(e.getCode() == KeyCode.SPACE) {
             circonflexe = false;
             trema = false;
-            if(model.validationMot(true))validationMot(true);
+            if(model.validationMot()) validationMot();
             return;
         }
         else {
@@ -188,106 +240,14 @@ public class SoloController extends ControllerJeu{
             } else isAccent(e);
         }
         updateMot();
-    }
-
-    
-
-    private boolean ligneFull(HBox ligne) {
-        if (ligne == ligne_1) return nombreMotLigne_1 > 5;
-        if (ligne == ligne_2) return nombreMotLigne_2 > 5;
-        return nombreMotLigne_3 > 5;
-    }
-
-    protected final void initializeGame() {
-        String text;
-        TypeMot type;
-        for (int i = 0; i < 5 ; i++) {
-            text = model.getListeMots().get(i);
-            type = ((SoloModel) model).getListeTypeMots().get(i);
-            if(ligneFull(ligne_act)) {
-                pos = 0;
-                if (!updateActualLine()) {
-                    tmpIter = text;
-                    break;
-                }
-            }
-            addWordtoLine(text, ligne_act,type == TypeMot.WORD_LIFE);
-            ligne_act.getChildren().add(new Text(" "));
-        }
-    }
-    
+    } 
 
     @Override
-    protected final void initializeGame(List<String> list) {
-        String text;
-        stringIter = list.iterator();
-        for (int i = 0; i < 5 ; i++) {
-            text = stringIter.next();
-            if(ligneFull(ligne_act)) {
-                if (!updateActualLine()) {
-                    tmpIter = text;
-                    break;
-                }
-            }
-            int r = new Random().nextInt(10);
-            TypeMot type = (r == 0)?TypeMot.WORD_LIFE:TypeMot.WORD_NEUTRAL;
-            listeMots.add(text);
-            listeTypeMots.add(type);
-            addWordtoLine(text, ligne_act,type == TypeMot.WORD_LIFE);
-            ligne_act.getChildren().add(new Text(" "));
-        }
-        soin = listeTypeMots.get(0) == TypeMot.WORD_LIFE;
-    }
-
-    @Override
-    protected final void initializeText() {
-        System.out.println("appl IT");
-        textHG.setText(" Vies restantes");
-        textHD.setText(" Mots avant prochain niveau ");
-        textHM.setText(" Niveau ");
-        setStats();
-    }
-
-    private final void decrementeNombreLigne(HBox ligne) {
-        if (ligne == ligne_1) nombreMotLigne_1--;
-        else if (ligne == ligne_2) nombreMotLigne_2--;
-        else nombreMotLigne_3--;
-    }
-
-    private final void incrementeNombreLigne(HBox ligne) {
-        if (ligne == ligne_1) {nombreMotLigne_1++;
-            System.out.println("Add l1  incrNbr : " + nombreMotLigne_1 );
-        }
-        else if (ligne == ligne_2) nombreMotLigne_2++;
-        else nombreMotLigne_3++;
-    }
-
-    private final void popMot(HBox ligne_bas,HBox ligne_haut) {
-        int i = 0;
-        Text t = (Text) ligne_bas.getChildren().get(i);
-        List <Node> list = new LinkedList<>();
-        while (!t.getText().equals(" ") || i >= ligne_bas.getChildren().size()) {
-            list.add(t);
-            ligne_bas.getChildren().remove(t);
-            t = (Text) ligne_bas.getChildren().get(i);
-        }
-        ligne_bas.getChildren().remove(t); if (t.getText().equals(" ")) 
-        ligne_haut.getChildren().addAll(list);
-        ligne_haut.getChildren().add(new Text(" "));
-        decrementeNombreLigne(ligne_bas);
-        incrementeNombreLigne(ligne_haut);
-    }   
-
-    protected final void rearrangeCol() {
-        if(nombreMotLigne_2 > 0) popMot(ligne_2, ligne_1);
-        if(nombreMotLigne_3 > 0) popMot(ligne_3, ligne_2);
-    }
-
-    @Override
+    // Mise à jour de la vue.
     public void update(Observable o, Object arg) {
         if (model.isEnJeu()) {
             if(model.isValidation()){
-                validationMot(true); 
+                validationMot(); 
                 model.setValidation(false);
             }
             updateListeMots();
@@ -304,18 +264,5 @@ public class SoloController extends ControllerJeu{
                 e.printStackTrace();
             }
         }
-    }
-
-    private void updateListeMots() {
-        int size = model.getListeMots().size();
-        if (tailleListTMP < size) {
-            List<String> toAdd = model.getListeMots().subList(tailleListTMP, size);
-            List<TypeMot> toAddType = ((SoloModel) model).getListeTypeMots().subList(tailleListTMP, ((SoloModel) model).getListeTypeMots().size());
-            for (int i = 0; i < toAdd.size(); i++) {
-                HBox ligne = selectLine();
-                addWordtoLine(toAdd.get(i), ligne, toAddType.get(i) == TypeMot.WORD_LIFE);
-            }
-        }
-        tailleListTMP = model.getListeMots().size();
     }
 }

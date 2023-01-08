@@ -4,74 +4,45 @@ import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Observable;
 import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.io.InputStreamReader;
 import java.util.regex.Pattern;
+import com.sun.javafx.application.PlatformImpl;
 import java.util.stream.Collectors;
 
-import javafx.application.Platform;
 import projet.cpoo.GameData;
 import projet.cpoo.Settings;
 
 public class EntrainementModel extends JeuModel{
 
-    private static int CHAR_PER_LINE = 30;
     private boolean modeTemps = Settings.isModeTemps();
-    public boolean isModeTemps() {
-        return modeTemps;
-    }
-
     private int posMin = 0;
     private int motCorrect;
-    
-    public int getMotCorrect() {
-        return motCorrect;
-    }
-
-    public int getPosMin() {
-        return posMin;
-    }
-
-    // private int motComplete = 0;
     private double entreesClavier = 0;
-    public double getEntreesClavier() {
-        return entreesClavier;
-    }
-
-    private double lettresCorrectes = 0;
-    public double getLettresCorrectes() {
-        return lettresCorrectes;
-    }
-
     private int motMax = Settings.getLIMITE_MAX();
-    public int getMotMax() {
-        return motMax;
-    }
-
     private long tmpTemps = 0;
     private int derCharUtile = 0;
 
-    public int getDerCharUtile() {
-        return derCharUtile;
-    }
 
     private static int TEMPS_MAX = Settings.getLIMITE_MAX();
-    public static int getTEMPS_MAX() {
-        return TEMPS_MAX;
-    }
 
-    
+    public EntrainementModel() {
+    }
 
     
     public EntrainementModel(Observer o) {
         addObserver(o);
     }
 
+    @Override
+    /**
+     * Initialisation du model avec les valeurs par défaut.
+     */
     public void initialize() {
         try {
+            PlatformImpl.startup(() -> {});
             modeTemps = Settings.isModeTemps();
             TEMPS_MAX = Settings.getLIMITE_MAX();
             motMax = Settings.getLIMITE_MAX();
@@ -86,7 +57,6 @@ public class EntrainementModel extends JeuModel{
             }
             if (!Settings.isAccents()) list = list.stream().filter((x) -> Pattern.matches(regAcc,x)).collect(Collectors.toList());
             Collections.shuffle(list);
-            list = list.stream().filter(x -> x.length() == 4).toList();
             dictionnaire = list;
             initializeGame(dictionnaire);
             reader.close();
@@ -98,6 +68,7 @@ public class EntrainementModel extends JeuModel{
     }
 
     @Override
+    // Remplit la liste de mots du jeu à partir d'une liste list
     protected void initializeGame(List<String> list) {
         stringIter = list.iterator();
         for (int i = 0; i < 15 ; i++) {
@@ -105,12 +76,14 @@ public class EntrainementModel extends JeuModel{
         }
     }
 
+    //Ajoute un mot à la liste des mots si elle n'en possède pas assez
     protected void remplirMots() {
         for (int i = 0; i < 5; i++) {
             ajouteMot();
         }
     }
 
+    //Ajoute un mot à la fin de la liste des mots
     private void ajouteMot() {
         if (stringIter.hasNext()) {
             nombreMots++;
@@ -129,11 +102,9 @@ public class EntrainementModel extends JeuModel{
             
             @Override
             public final void run() {
-                Platform.runLater( () -> {
                 temps+= 1;
                 if (modeTemps) updateModeTemps();
                 updateView();
-                });
             
             }
         },0,100);
@@ -157,7 +128,6 @@ public class EntrainementModel extends JeuModel{
         }
         motCorrect++;
         return true;
-        // if(res != 0) changementVie(res);
     }
 
     protected final void incrementeMotComplete() {
@@ -165,7 +135,7 @@ public class EntrainementModel extends JeuModel{
     }
 
     @Override
-    public boolean validationMot(boolean solo) {
+    public boolean validationMot() {
         motCorrect();
         posMin++;
         derCharUtile += listeMots.get(motComplete).length() + 1;
@@ -175,22 +145,13 @@ public class EntrainementModel extends JeuModel{
             if (motComplete >= 10) remplirMots();
         };
         resetPos();
-        // removeMot();
         updateData();
         updateView();
         finDuJeu();
-        // TODO Auto-generated method stub
         return true;
     }
 
-
-    private void removeMot() {
-        Platform.runLater( () -> {
-            // listeMots.remove(0);
-            updateView();
-        });
-    }
-
+    //Reset élément nécessaires pour le parcours d'un nouveau mot
     protected final void resetPos(){
         motAct = "";
         firstTry = true;
@@ -205,8 +166,6 @@ public class EntrainementModel extends JeuModel{
         updateView();
     }
  
-
-
     /**
      * Met à jour les statistiques et les stocke pour l'écran de fin
      */
@@ -230,7 +189,10 @@ public class EntrainementModel extends JeuModel{
             }
         }
     }
-
+    /**
+     * Ajout d'un caractère à la fin de le chaine actuelle
+     * Valide le mot si nécessaire
+     */
     public void ajoutChar(String c) {
         String mot = listeMots.get(motComplete);
         if (c.equals(" ")) {
@@ -240,8 +202,7 @@ public class EntrainementModel extends JeuModel{
         motAct += c;
         entreesClavier++;
         if(motAct.length() > mot.length()) {
-            // validation = true;
-            validationMot(true);
+            validationMot();
             validation = true;
             return;
         }
@@ -257,6 +218,7 @@ public class EntrainementModel extends JeuModel{
         updateView();
     }
 
+    //Supprime le dernier caractère de la chaine mot actuel.
     public void retireChar() {
         if (motAct.length() > 0) {
             motAct = motAct.substring(0, motAct.length() - 1);
@@ -264,8 +226,7 @@ public class EntrainementModel extends JeuModel{
     }
     
     /**
-     * Met fin au jeu et passe à l'écran de fin si les conditions sont remplies
-     * @throws IOException
+     * Met fin au jeu si les conditions sont remplies
      */
     private final void finDuJeu() {
         if ( ( modeTemps && temps >= TEMPS_MAX) || (!modeTemps && motMax - motCorrect  == 0) ) {
@@ -280,6 +241,38 @@ public class EntrainementModel extends JeuModel{
             enJeu = false;
             updateView();
         }
+    }
+
+    public double getEntreesClavier() {
+        return entreesClavier;
+    }
+
+    public boolean isModeTemps() {
+        return modeTemps;
+    }
+    
+    public int getMotCorrect() {
+        return motCorrect;
+    }
+
+    public int getPosMin() {
+        return posMin;
+    }
+    public double getLettresCorrectes() {
+        return lettresCorrectes;
+    }
+    private double lettresCorrectes = 0;
+
+    public int getMotMax() {
+        return motMax;
+    }
+    
+    public int getDerCharUtile() {
+        return derCharUtile;
+    }
+
+    public static int getTEMPS_MAX() {
+        return TEMPS_MAX;
     }
     
 }

@@ -1,26 +1,19 @@
 package projet.cpoo.Controller;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Observer;
 import java.util.Timer;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
-import projet.cpoo.Settings;
 import projet.cpoo.Model.JeuModel;
 
 public abstract class ControllerJeu implements Observer {
-    protected static int CHAR_PER_LINE = 30;
     protected int pos = 0;
     protected int motComplete = 0;
     protected long temps = 0;
@@ -28,7 +21,6 @@ public abstract class ControllerJeu implements Observer {
     protected int vies = 50;
     protected int nombreMots = 0;
     protected int motRestant = 1;
-    protected int niveau = Settings.getNiveau();
     protected boolean start = false;
     protected boolean circonflexe = false;
     protected boolean trema = false;
@@ -38,8 +30,6 @@ public abstract class ControllerJeu implements Observer {
     protected List<String> listeMots = new ArrayList<String>();
     protected String motAct = "";
     protected Iterator<String> stringIter;
-    protected String tmpIter =  null;
-    private String regAcc ="^*[a-zA-Z-]*";
     protected int tailleListTMP = 0;
     protected int nombreMotLigne_1 = 0;
     protected int nombreMotLigne_2 = 0;
@@ -85,17 +75,8 @@ public abstract class ControllerJeu implements Observer {
      * Ces options sont toutes les deux sélectionnables dans les Options 
      */
     @FXML
-    protected void initialize() {
-        try {
-            initializeGame(dictionnaire);
-            initializeText();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    protected abstract void initialize();
 
-    //Fonction abstraite qui crée une configuration de base à partir d'une liste de mots triée dans l'ordre voulu
-    protected abstract void initializeGame(List<String> list);
 
     //Fonction abstraite qui initialise les textes de statistiques
     protected abstract void initializeText();
@@ -115,7 +96,7 @@ public abstract class ControllerJeu implements Observer {
     }
 
     //Fonction abstraite qui a pour but de traiter le mot actuel et de passer au mot suivant
-    protected abstract void validationMot(boolean solo);
+    protected abstract void validationMot();
 
     //Fonction qui prend une entrée de clavier et renvoie un String correspondant au charactère voulu
     protected final String inputToChars(KeyEvent e) {
@@ -179,7 +160,6 @@ public abstract class ControllerJeu implements Observer {
      */
     protected final boolean addLine() {
         System.out.println("appel addline");
-        int pos = 0;
         ligne_1.getChildren().clear();
         // System.out.println("clear L1 " +  ligne_1.getChildren().get(0));
         ligne_1.getChildren().addAll(ligne_2.getChildren());
@@ -188,21 +168,6 @@ public abstract class ControllerJeu implements Observer {
         System.out.println("L2 SIZE " + ligne_2.getChildren().size());
         ligne_2.getChildren().addAll(ligne_3.getChildren());
         ligne_3.getChildren().clear();
-        // if (tmpIter != null) {
-        //     pos += addWordtoLine(tmpIter,ligne_3,false);
-        //     ligne_act.getChildren().add(new Text(" "));
-        //     pos++;
-        // }
-        // while(stringIter.hasNext()) {
-        //     String text = stringIter.next();
-        //     if(pos + text.length() > CHAR_PER_LINE) {
-        //         tmpIter = text;
-        //         return true;
-        //     }
-        //     pos += addWordtoLine(text,ligne_3,false);
-        //     ligne_act.getChildren().add(new Text(" "));
-        //     pos++;
-        // }
         return false;
     }
 
@@ -222,6 +187,7 @@ public abstract class ControllerJeu implements Observer {
         }
     }
 
+    // Retire les classes css d'un caractère.
     protected void retireChar() {
         String motAct = model.getMotAct();
         if (motAct.length() > 0) {
@@ -235,6 +201,7 @@ public abstract class ControllerJeu implements Observer {
         }
     }
 
+    // Une méthode qui renvoie la HBox adéquate en fonction du nombre de mot par ligne.
     protected HBox selectLine() {
         if (nombreMotLigne_1 < 5 ) return ligne_1;
         if (nombreMotLigne_2 < 5) return ligne_2;

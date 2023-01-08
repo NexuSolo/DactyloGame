@@ -25,8 +25,6 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
 public final class MultijoueurController extends SoloController {
-    protected int vies = 500;
-    private int nombreMots = 0;
     private Socket socket;
     protected int positionMot = 0;
     @FXML
@@ -57,25 +55,17 @@ public final class MultijoueurController extends SoloController {
 
     }
 
-    protected final void validationMot(boolean solo) {
+    /**
+     * Fonction qui
+     * 
+     */
+    protected final void validationMot() {
         motDegats();
         removeMot();
         rearrangeCol();
         updateMotNiveau();
         updateVies();
     }
-
-    // protected final void validationMot(boolean solo) {
-    //     if(jeuVide()) return;
-    //     nombreMots--;
-    //     boolean b = motDegats();
-    //     removeMot();
-    //     remplirMots();
-    //     incrementeMotComplete(b);
-    //     rearrangeCol();
-    //     resetPos();
-    //     updateVies();
-    // }
 
     protected final void removeMot(){
         System.out.println("appel removeMot");
@@ -275,7 +265,7 @@ class ReceptionJeux implements Runnable {
                 break;
             case SERVEUR_VALIDATION : 
                 Platform.runLater( () -> {
-                    multijoueurController.validationMot(false);
+                    multijoueurController.validationMot();
                     multijoueurController.updateVies();
                     multijoueurController.positionMot = 0;
                     multijoueurController.pos = 0;

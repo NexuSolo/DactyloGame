@@ -56,7 +56,6 @@ public final class EntrainementStatsController extends StatsController {
         List<Integer> wordTab = GameData.getWordList();
         final NumberAxis yAxis;
         final NumberAxis xAxis;
-        System.out.println("mode temps : " + Settings.isModeTemps());
         if (Settings.isModeTemps()) {
             yAxis = new NumberAxis(0, GameData.getMotComplete(), 1);
             xAxis = new NumberAxis(0, GameData.getTempsFinal()*.1,GameData.getTempsFinal()*.01);

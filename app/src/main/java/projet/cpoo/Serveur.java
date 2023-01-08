@@ -248,7 +248,7 @@ class ClientThread implements Runnable {
     private void nouveauMot(Socket socket,String s) throws IOException {
         if(enJeu) {
             if (s == null) s = motAleatoire();
-            if (listeMots.size() >= 15) validationMot(socket);
+            if (sockets.get(socket).listeMots.size() >= 15) validationMot(socket);
             System.out.println(s + " " + socket);
             LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
             Random rand = new Random();
