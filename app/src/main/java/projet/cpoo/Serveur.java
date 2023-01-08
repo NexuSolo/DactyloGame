@@ -28,6 +28,9 @@ public class Serveur {
     protected static boolean partieEnCours = false;
     protected static List<String> classement = new LinkedList<String>();
     protected static int positionDernier = 0;
+/**
+ * Il crée un nouveau thread pour chaque client qui se connecte au serveur
+ */
     public static void main (String[] args) {
         Map<Socket,ClientThread> sockets = new HashMap<Socket,ClientThread>();
         try {
@@ -77,6 +80,9 @@ class ClientThread implements Runnable {
         this.sockets = sockets;
     }
 
+/**
+ * Il recoit les messages envoyé par le client, puis appelle la fonction traitement()
+ */
     @Override
     public void run() {
         try {
@@ -109,61 +115,73 @@ class ClientThread implements Runnable {
         
     }
 
+    
+    /**
+     * Il reçoit un message du client, et le traite
+     * 
+     * @param message le message reçu du client
+     */
     @SuppressWarnings("unchecked")
     private void traitement(Message message) throws IOException {
-        if(message.getTransmition() == Transmission.CLIENT_CONNEXION_SERVER_RUN) {
-            Message m;
-            if(Serveur.partieEnCours) {
-                LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
-                map.put("bool",true);
-                m = new Message(Transmission.SERVER_CONNEXION_SERVER_RUN, map);
-            }
-            else {
-                LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
-                map.put("bool",false);
-                m = new Message(Transmission.SERVER_CONNEXION_SERVER_RUN, map);
-            }
-            envoiMessage(client, m);
-        }
-        if(message.getTransmition() == Transmission.CLIENT_CONNEXION) {
-            LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) message.getMessage();
-            pseudo = (String) map.get("pseudo");
-            sockets.put(client, this);
-            listeJoueurs();
-            miseAJourOptions();
-        }
-        if(message.getTransmition() == Transmission.CLIENT_DECONNEXION) {
-            sockets.remove(client);
-            client.close();
-            listeJoueurs();
-        }
-        if(message.getTransmition() == Transmission.CLIENT_OPTION) {
-            LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) message.getMessage();
-            Serveur.setParametrePartie(new ParametrePartie((boolean) map.get("accent"), (String) map.get("langue")));
-            miseAJourOptions();
-        }
-        if(message.getTransmition() == Transmission.CLIENT_LANCER) {
-            if(sockets.keySet().size() > 1) {
-                lancementPartie();
-            }
-        }
-        if(message.getTransmition() == Transmission.CLIENT_LETTRE) {
-            LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) message.getMessage();
-            receptionLettre((String) map.get("lettre"));
-        }
-        if(message.getTransmition() == Transmission.CLIENT_VALIDATION) {
-            System.out.println("CV RECU");
-            updateVie();
-            LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
-            map.put("vie",vie);
-            Message m = new Message(Transmission.CHANGEMENT_VIE,map);
-            envoiMessage(client, m);
-            resetMot();
-            Message m2 = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
-            envoiMessage(client, m2);
+        switch (message.getTransmition()) {
+            case CLIENT_CONNEXION_SERVER_RUN:
+                Message m;
+                if (Serveur.partieEnCours) {
+                    LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
+                    map.put("bool", true);
+                    m = new Message(Transmission.SERVER_CONNEXION_SERVER_RUN, map);
+                } else {
+                    LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
+                    map.put("bool", false);
+                    m = new Message(Transmission.SERVER_CONNEXION_SERVER_RUN, map);
+                }
+                envoiMessage(client, m);
+                break;
+            case CLIENT_CONNEXION:
+                LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) message.getMessage();
+                pseudo = (String) map.get("pseudo");
+                sockets.put(client, this);
+                listeJoueurs();
+                miseAJourOptions();
+                break;
+            case CLIENT_DECONNEXION:
+                sockets.remove(client);
+                client.close();
+                listeJoueurs();
+                break;
+            case CLIENT_OPTION:
+                LinkedTreeMap<String, Object> map2 = (LinkedTreeMap<String, Object>) message.getMessage();
+                Serveur.setParametrePartie(new ParametrePartie((boolean) map2.get("accent"), (String) map2.get("langue")));
+                miseAJourOptions();
+                break;
+            case CLIENT_LANCER:
+                if (sockets.keySet().size() > 1) {
+                    lancementPartie();
+                }
+                break;
+            case CLIENT_LETTRE:
+                LinkedTreeMap<String, Object> map3 = (LinkedTreeMap<String, Object>) message.getMessage();
+                receptionLettre((String) map3.get("lettre"));
+                break;
+            case CLIENT_VALIDATION:
+                System.out.println("CV RECU");
+                updateVie();
+                LinkedTreeMap<String, Object> map4 = new LinkedTreeMap<String, Object>();
+                map4.put("vie", vie);
+                Message m2 = new Message(Transmission.CHANGEMENT_VIE, map4);
+                envoiMessage(client, m2);
+                resetMot();
+                Message m3 = new Message(Transmission.SERVEUR_MOT_SUIVANT, null);
+                envoiMessage(client, m3);
+                break;
+            default:
+                break;
         }
     }
 
+/**
+ * Il efface le mot actuel et reset les variables
+ */
     protected final void resetMot() throws IOException{
         listeMots.remove(0);
         listeTypeMots.remove(0);
@@ -177,6 +195,9 @@ class ClientThread implements Runnable {
         attaque = type == TypeMot.WORD_ATTACK;
     }
 
+    /**
+     * Il envoie un message à tous les clients connectés au serveur pour mettre a jour les options
+     */
     private void miseAJourOptions() {
         for(Socket socket : sockets.keySet()) {
             LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
@@ -191,6 +212,9 @@ class ClientThread implements Runnable {
         }
     }
 
+ /**
+  * Il envoie une liste de tous les joueurs à tous les joueurs
+  */
     private void listeJoueurs() throws IOException {
         List<String> joueurs = new ArrayList<String>();
         for(Socket socket : sockets.keySet()) {
@@ -214,6 +238,13 @@ class ClientThread implements Runnable {
         out.println(json);
     }
 
+    /**
+     * Il génère un mot aléatoire si s n'est pas définis, puis l'envoie au client
+     * Sinon il envoie le mot s au client
+     * 
+     * @param socket la prise du client
+     * @param s le mot à envoyer
+     */
     private void nouveauMot(Socket socket,String s) throws IOException {
         if(enJeu) {
             if (s == null) s = motAleatoire();
@@ -242,6 +273,10 @@ class ClientThread implements Runnable {
         }
     }
 
+/**
+ * Il envoie un message à tous les clients pour démarrer le jeu, puis il crée le jeu, puis il envoie un
+ * nouveau mot à tous les clients toutes les 5 secondes
+ */
     private void lancementPartie() throws IOException {
         Serveur.partieEnCours = true;
         for(Socket socket : sockets.keySet()) {
@@ -275,6 +310,9 @@ class ClientThread implements Runnable {
         attaque = type == TypeMot.WORD_ATTACK;
     }
 
+    /**
+     * Il initialize les paramètres de la partie et envoie les premiers mots au joueurs
+     */
     private void creationPartie() throws IOException {
         String fic = (Serveur.getParametrePartie().getLangue().equals("Français"))?"liste_mots/liste_francais.txt":"liste_mots/liste_anglais.txt";
         BufferedReader r = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResource(fic).openStream()));
@@ -317,7 +355,6 @@ class ClientThread implements Runnable {
             Message m2 = new Message(Transmission.SERVEUR_CLASSEMENT, map2);
             envoiMessage(socket, m2);
         }
-        
     }
 
     private String motAleatoire() throws IOException {
@@ -356,6 +393,12 @@ class ClientThread implements Runnable {
         return text;
     }
 
+/**
+ * Il reçoit une lettre du client, vérifie si c'est la bonne, et envoie un message au client pour lui
+ * dire si c'est la bonne ou non
+ * 
+ * @param s la lettre envoyée par le client
+ */
     private void receptionLettre(String s) throws IOException {
         s = toAccent(s);
         if (s.equals(" ")) {
@@ -416,6 +459,9 @@ class ClientThread implements Runnable {
         }
     }
 
+/**
+ * Compare le mot écrit avec le mot a écrire et change la vie en fonction du mot et de ses erreurs
+ */
     private void updateVie() throws IOException {
         String s = motAct;
         int res = 0;
@@ -467,6 +513,13 @@ class ClientThread implements Runnable {
         }
     }
 
+/**
+ * Il modifie la vie du joueur en fonction de la valeur de i et vérifie si le joueur est mort,
+ * Si le joueur est mort, il le supprime de la liste des joueurs en jeu et le met dans le classement
+ * Sinon il met a jour la vie du joueur
+ * 
+ * @param i la durée de vie à ajouter ou à supprimer
+ */
     private void changementVie(int i) throws IOException {
         vie += i;
         if(vie <= 0) {
@@ -519,6 +572,9 @@ class ClientThread implements Runnable {
         }
     }
 
+/**
+ * Il réinitialise le serveur
+ */
     private void resetServeur() throws IOException {
         Serveur.setParametrePartie(new ParametrePartie(false, "Français"));
         Serveur.partieEnCours = false;

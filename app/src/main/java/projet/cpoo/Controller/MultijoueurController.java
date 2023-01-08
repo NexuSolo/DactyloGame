@@ -24,7 +24,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
-public final class MultijoueurController extends SoloController{
+public final class MultijoueurController extends SoloController {
     protected int vies = 500;
     private int nombreMots = 0;
     private Socket socket;
@@ -94,6 +94,12 @@ public final class MultijoueurController extends SoloController{
         return socket;
     }
 
+/**
+ * Il ajoute un mot à l'écran de jeu et le place en fonction du nombre de mot déjà présent
+ * 
+ * @param s le mot à ajouter
+ * @param typeMot le type de mot à ajouter
+ */
     protected void ajoutMot(String s, TypeMot typeMot) throws UnsupportedEncodingException {
         for (char c : s.toCharArray()) {
             Text t = new Text(String.valueOf(c));
@@ -171,6 +177,7 @@ public final class MultijoueurController extends SoloController{
     protected final void remplirMots() {
 
     }
+    
     protected void mapAccent(KeyEvent e,LinkedTreeMap<String, Object> map) {
         KeyCode code = e.getCode();
         switch (code) {
@@ -187,20 +194,15 @@ public final class MultijoueurController extends SoloController{
         if(e.getCode().isLetterKey() || isAccentedChar(inputToChars(e)) || inputToChars(e) == "-"){
             System.out.println("Text = " + formatString(e.getText(),e.isShiftDown()));
             map.put("lettre",formatString(e.getText(),e.isShiftDown()));
-        
         }
         else if (e.getCode() == KeyCode.BACK_SPACE) {
             map.put("lettre","backspace");
         }
         else if(e.getCode() == KeyCode.SPACE){
-            // validationMot(false);
-            // updateVies();
-            // return;
             map.put("lettre"," ");
         }
         else mapAccent(e, map);
         if (map.keySet().size() == 0) return;
-        Text t = (Text) ligne_1.getChildren().get(positionMot);
         m = new Message(Transmission.CLIENT_LETTRE,map);
         try {
             envoiMessage(socket, m);
@@ -299,10 +301,9 @@ class ReceptionJeux implements Runnable {
                 t.getStyleClass().remove("text-error");
                 if (type == TypeMot.WORD_ATTACK) t.getStyleClass().add("text-attack");
                 if (type == TypeMot.WORD_LIFE) t.getStyleClass().add("text-life");
-                
                 break;
             case SERVEUR_CLASSEMENT :
-                    miseAJourClassement((LinkedTreeMap<String, Object>) message.getMessage());
+                miseAJourClassement((LinkedTreeMap<String, Object>) message.getMessage());
                 break;
             case CHANGEMENT_VIE :
                 LinkedTreeMap<String, Object> mapMess = (LinkedTreeMap<String, Object>) message.getMessage();
@@ -320,6 +321,11 @@ class ReceptionJeux implements Runnable {
         }
     }
     
+/**
+ *  Il met a jour l'interface graphique avec le classement
+ * 
+ * @param message le message reçu du serveur
+ */
     @SuppressWarnings("unchecked")
     private void miseAJourClassement(LinkedTreeMap<String, Object> message) {
         Platform.runLater(() -> {
@@ -339,17 +345,27 @@ class ReceptionJeux implements Runnable {
         });
     }
 
+/**
+ * Il permet de faire l'affichage de la liste de mot recu a l'initialisation de la partie
+ * 
+ * @param t LinkedTreeMap<chaîne, objet>
+ */
     @SuppressWarnings("unchecked")
     private void affichageListMot(LinkedTreeMap<String, Object> t) throws UnsupportedEncodingException {
         List<String> listeMot = (List<String>) t.get("listeMot");
         for(int i = 0; i < listeMot.size(); i++) {
-
             TypeMot typeMot = TypeMot.valueOf((String) t.get("" + i));
             System.out.println(listeMot.get(i) + " " + typeMot);
             multijoueurController.ajoutMot(listeMot.get(i), typeMot);
         }
     }
 
+/**
+ * Il chnage la vu pour afficher le classement a la fin de la partie
+ * 
+ * @param gagner booléen, vrai si le joueur a gagné, faux s'il a perdu
+ * @param t l'objet JSON
+ */
     @SuppressWarnings("unchecked")
     private void finDePartie(boolean gagner, LinkedTreeMap<String, Object> t) {
         List<String> listeJoueurs = (List<String>) t.get("classement");

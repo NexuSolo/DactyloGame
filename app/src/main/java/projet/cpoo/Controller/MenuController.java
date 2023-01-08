@@ -109,6 +109,7 @@ public class MenuController {
  * arrive il rentre dans la salle d'attente.
  */
     @FXML
+    @SuppressWarnings("unchecked")
     private void switchToMultijoueur() throws IOException {
         try(Socket socket = new Socket(Settings.getIp(), Settings.getPort())) {
             Message message = new Message(Transmission.CLIENT_CONNEXION_SERVER_RUN, null);
@@ -119,7 +120,7 @@ public class MenuController {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             String s = in.readLine();
             Message m = gson.fromJson(s, Message.class);
-            LinkedTreeMap map = (LinkedTreeMap) m.getMessage();
+            LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) m.getMessage();
             boolean b = (boolean) map.get("bool");
             if(b) {
                 new Thread(() -> {
