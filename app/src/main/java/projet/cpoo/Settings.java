@@ -19,6 +19,9 @@ public abstract class Settings {
 
     private static int niveau = 1;
 
+/**
+ * Il crée un fichier dans le répertoire personnel de l'utilisateur et y écrit certaines propriétés
+ */
     private static void createProperties() {
         Properties prop = new Properties();
         try {
@@ -36,6 +39,9 @@ public abstract class Settings {
         }
     }
 
+    /**
+     * Il charge les propriétés du fichier de propriété, et si le fichier n'existe pas, il le crée
+     */
     public static void loadProperties() {
         try {
             File file = new File(System.getProperty("user.home") + File.separator + ".Dactylo");

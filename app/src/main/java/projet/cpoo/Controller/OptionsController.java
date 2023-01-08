@@ -50,6 +50,13 @@ public class OptionsController {
     @FXML
     private Text nombreDeText;
 
+/**
+ * Il essaie de se connecter à un serveur, s'il réussit, il met le cercle en vert, s'il échoue, il met
+ * le cercle en rouge
+ * 
+ * @param ip l'ip du serveur
+ * @param port le port auquel se connecter
+ */
     private void testConnect(String ip, int port) {
         try {
             Thread t = new Thread(() -> {
@@ -77,10 +84,12 @@ public class OptionsController {
         }
     }
 
+/**
+ * Méthode appelée lors de la création du contrôleur.
+ * Elle initialise tout les champs modifiables par le joueur.
+ */
     @SuppressWarnings("unchecked")
     @FXML
-    // Méthode appelée lors de la création du contrôleur.
-    // Elle initialise tout les champs modifiables par le joueur.
     private void initialize() {
         pseudoField.setText(Settings.getPseudo());
         ipField.setText(Settings.getIp());
@@ -133,6 +142,9 @@ public class OptionsController {
         });
     }
 
+/**
+ * Change l'ip et le port lors du clique sur le serveur OVH
+ */
     @FXML
     private void serveurOVH() {
         serveurMenuButton.setText("Serveur OVH");
@@ -172,6 +184,9 @@ public class OptionsController {
         System.out.println("Mort subite = " + Settings.isMortSubite());
     }
 
+/**
+ * Change le mode de jeu en mode temps
+ */
     @FXML
     @SuppressWarnings("unchecked")
     private void temps() {
@@ -183,6 +198,9 @@ public class OptionsController {
         spin.getValueFactory().setValue(Settings.getLIMITE_MAX()/10);
     }
 
+ /**
+  * Change le mode de jeu en mode mots
+  */
     @FXML
     @SuppressWarnings("unchecked")
     private void mots() {

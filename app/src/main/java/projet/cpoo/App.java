@@ -19,6 +19,11 @@ public class App extends Application {
         launch();
     }
     
+/**
+ * La fonction de démarrage de l'application JavaFX.
+ * 
+ * @param primaryStage L'étape qui est transmise à la méthode de démarrage.
+ */
     @Override
     public void start(Stage primaryStage) throws Exception {
         scene = new Scene(loadFXML("menu"),1280, 720);
@@ -34,6 +39,11 @@ public class App extends Application {
         primaryStage.setAlwaysOnTop(true);
         primaryStage.setAlwaysOnTop(false);
     }
+/**
+ * Il permet de changer la page actuelle par une autre.
+ * 
+ * @param fxml Le nom du fichier FXML à charger.
+ */
 
     public static void setRoot(String fxml) throws IOException {
         Platform.runLater(() -> {
@@ -45,6 +55,12 @@ public class App extends Application {
         });
     }
 
+/**
+ * Il charge le fichier fxml et définit le contrôleur sur celui transmis
+ * 
+ * @param fxml Le nom du fichier fxml que vous souhaitez charger.
+ * @param controller La classe de contrôleur qui sera utilisée pour le fichier fxml.
+ */
     public static void setRoot(String fxml, Object controller) throws IOException {
         Platform.runLater(() -> {
             FXMLLoader fxmlLoader = new FXMLLoader(ClassLoader.getSystemResource(fxml + ".fxml"));

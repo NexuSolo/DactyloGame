@@ -43,6 +43,11 @@ public class MenuController {
     @FXML
     private Text erreurConnexionMenu;
 
+/**
+ * Il met en surbrillance le bouton sur lequel la souris survole et affiche la flèche correspondante.
+ * 
+ * @param e SourisEvénement
+ */
     @FXML
     private void highlightButton(MouseEvent e) throws IOException {
         Button button = (Button) e.getSource();
@@ -63,6 +68,12 @@ public class MenuController {
         }
     }
 
+/**
+ * Il enlève la surbrillance du bouton sur lequel la souris ne survole plus et enlève la flèche correspondante.
+ *
+ * 
+ * @param e SourisEvénement
+ */
     @FXML
     private void removeHighlightButton(MouseEvent e) throws IOException { 
         Button button = (Button) e.getSource();
@@ -93,6 +104,10 @@ public class MenuController {
         App.setRoot("solo");
     }
 
+/**
+ * Il essaie de se connecter à un serveur, s'il n'y arrive pas il affiche un message d'erreur, s'il y
+ * arrive il rentre dans la salle d'attente.
+ */
     @FXML
     private void switchToMultijoueur() throws IOException {
         try(Socket socket = new Socket(Settings.getIp(), Settings.getPort())) {

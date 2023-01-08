@@ -47,6 +47,10 @@ public class AttenteJoueurController {
     @FXML
     private CheckBox accentCheckBox;
     
+/**
+ * Lorsque le client est lancé, il se connecte au serveur et envoie un message au serveur pour dire
+ * qu'il est connecté.
+ */
     @FXML
     private void initialize() {
         try {
@@ -66,12 +70,20 @@ public class AttenteJoueurController {
         }
     }
 
+/**
+ * Il envoie un message au serveur pour dire que la partie doit être lancée.
+ */
     @FXML
     private void lancer() throws IOException {
         Message message = new Message(Transmission.CLIENT_LANCER, null);
         envoiMessage(message);
     }
 
+/**
+ * Il envoie un message au serveur pour lui donner les nouvelles options.
+ * 
+ * @param e ActionÉvénement
+ */
     @FXML
     private void modificationOption(ActionEvent e) throws IOException {
         if(e.getSource() == francaisMenuItem) {
@@ -105,6 +117,12 @@ public class AttenteJoueurController {
         out.println(json);
     }
 
+/**
+ * Il met à jour l'interface graphique avec les valeurs des options
+ * 
+ * @param b booléen
+ * @param langue la langue de la demande
+ */
     void miseAJourOptions(boolean b, String langue) {
         Platform.runLater(() -> {
             accentCheckBox.setSelected(b);
@@ -119,7 +137,10 @@ public class AttenteJoueurController {
     }
 }
 
-//Thread de reception de message du serveur
+/**
+ * C'est un thread qui écoute le serveur et met à jour l'interface graphique lorsqu'il reçoit un
+ * message
+ */
 class Reception implements Runnable {
     AttenteJoueurController attenteJoueurController;
     Object message;
@@ -131,6 +152,9 @@ class Reception implements Runnable {
         App.setSocket(socket);
     }
 
+/**
+ * Il attend de recevoir un message du serveur et appelle la méthode traitement pour le traiter
+ */
     @Override
     public void run() {
         try {
@@ -148,6 +172,11 @@ class Reception implements Runnable {
         }
     }
 
+/**
+ * Il reçoit un message du serveur, et le traite
+ * 
+ * @param message le message reçu du serveur
+ */
     @SuppressWarnings("unchecked")
     private void traitement(Message message) throws IOException {
         switch(message.getTransmition()) {
@@ -173,6 +202,11 @@ class Reception implements Runnable {
         }
     }
 
+/**
+ * Il actualise la liste des joueurs
+ * 
+ * @param l ArrayList of String
+ */
     private void miseAJourListeJoueur(ArrayList<String> l) {
         Platform.runLater(new Runnable() {
             @Override
