@@ -32,7 +32,6 @@ public class SoloController extends ControllerJeu{
         if(mortSubite) vies = 1;
         model = new SoloModel(this);
         model.initialize();
-        System.out.println("init model "+ model);
         initializeText();
         ligne_act = ligne_1;
     }

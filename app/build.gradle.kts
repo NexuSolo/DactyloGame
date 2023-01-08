@@ -22,7 +22,7 @@ repositories {
 
 javafx {
     version = "19"
-    modules("javafx.controls", "javafx.fxml")
+    modules("javafx.controls", "javafx.fxml","javafx.graphics")
 }
 
 dependencies {
@@ -41,6 +41,8 @@ dependencies {
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation("com.google.code.gson:gson:2.10")
 
+   // https://mvnrepository.com/artifact/org.openjfx/javafx-graphics
+    implementation("org.openjfx:javafx-graphics:20-ea+11")
 }
 
 application {

@@ -114,7 +114,6 @@ public class OptionsController {
             int val = ((Integer) newValue).intValue();
             if (Settings.isModeTemps())
                 val *= 10;
-            System.out.println("Set val : " + val);
             Settings.setLIMITE_MAX(val);
         });
         spinLevel.valueProperty().addListener((obs, oldValue, newValue) -> {
@@ -181,7 +180,6 @@ public class OptionsController {
         else {
             Settings.setMortSubite(false);
         }
-        System.out.println("Mort subite = " + Settings.isMortSubite());
     }
 
 /**

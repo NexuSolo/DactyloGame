@@ -159,13 +159,9 @@ public abstract class ControllerJeu implements Observer {
      * @return true une ligne a pu être ajoutée et remplie et false sinon
      */
     protected final boolean addLine() {
-        System.out.println("appel addline");
         ligne_1.getChildren().clear();
-        // System.out.println("clear L1 " +  ligne_1.getChildren().get(0));
         ligne_1.getChildren().addAll(ligne_2.getChildren());
-        System.out.println("L1 SIZE " + ligne_1.getChildren().size());
         ligne_2.getChildren().clear();
-        System.out.println("L2 SIZE " + ligne_2.getChildren().size());
         ligne_2.getChildren().addAll(ligne_3.getChildren());
         ligne_3.getChildren().clear();
         return false;

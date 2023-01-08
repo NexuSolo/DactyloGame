@@ -42,7 +42,7 @@ public class EntrainementModel extends JeuModel{
      */
     public void initialize() {
         try {
-            PlatformImpl.startup(() -> {});
+            // PlatformImpl.startup(() -> {});
             modeTemps = Settings.isModeTemps();
             TEMPS_MAX = Settings.getLIMITE_MAX();
             motMax = Settings.getLIMITE_MAX();

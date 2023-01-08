@@ -56,8 +56,8 @@ public final class MultijoueurController extends SoloController {
     }
 
     /**
-     * Fonction qui
-     * 
+     * Fonction qui requête la validation du mot 
+     * puis met à jour l'affichage du jeu
      */
     protected final void validationMot() {
         motDegats();
@@ -68,7 +68,6 @@ public final class MultijoueurController extends SoloController {
     }
 
     protected final void removeMot(){
-        System.out.println("appel removeMot");
         int i = 0;
         Text t = (Text) ligne_1.getChildren().get(i);
         while (!t.getText().equals(" ")) {
@@ -133,11 +132,13 @@ public final class MultijoueurController extends SoloController {
         }
     }
 
+    /**
+     * Requête de validation du mot au serveur
+     */
     protected final boolean motDegats(){
         Message m;
         m = new Message(Transmission.CLIENT_VALIDATION,null);
         try {
-            System.out.println("CV SEND");
             envoiMessage(socket, m);
         } catch (Exception e) {
             e.printStackTrace();
@@ -146,12 +147,10 @@ public final class MultijoueurController extends SoloController {
     }
 
     private void envoiMessage(Socket socket, Message message) throws IOException {
-        System.out.println("Message envoye " + socket);
         Gson gson = new Gson();
         String json = gson.toJson(message);
         PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
         out.println(json);
-        System.out.println("Fin Message envoye ");
 
     }
 
@@ -182,7 +181,6 @@ public final class MultijoueurController extends SoloController {
         Message m;
         LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
         if(e.getCode().isLetterKey() || isAccentedChar(inputToChars(e)) || inputToChars(e) == "-"){
-            System.out.println("Text = " + formatString(e.getText(),e.isShiftDown()));
             map.put("lettre",formatString(e.getText(),e.isShiftDown()));
         }
         else if (e.getCode() == KeyCode.BACK_SPACE) {
@@ -216,7 +214,6 @@ class ReceptionJeux implements Runnable {
             BufferedReader in = new BufferedReader(new InputStreamReader(multijoueurController.getSocket().getInputStream(), "UTF-8"));
             String line;
             while ((line = in.readLine()) != null) {
-                // System.out.println(line);
                 Gson gson = new Gson();
                 Message message = gson.fromJson(line, Message.class);
                 traitement(message);
@@ -345,7 +342,6 @@ class ReceptionJeux implements Runnable {
         List<String> listeMot = (List<String>) t.get("listeMot");
         for(int i = 0; i < listeMot.size(); i++) {
             TypeMot typeMot = TypeMot.valueOf((String) t.get("" + i));
-            System.out.println(listeMot.get(i) + " " + typeMot);
             multijoueurController.ajoutMot(listeMot.get(i), typeMot);
         }
     }

@@ -44,7 +44,8 @@ public class SoloModel extends JeuModel {
      */
     public void initialize() {
         try {
-            PlatformImpl.startup(() -> {});
+            // A décommenter pour les tests
+            // PlatformImpl.startup(() -> {});
             if(mortSubite) vies = 1;
             String fic = (Settings.getLangue() == Settings.Language.FR)?"liste_mots/liste_francais.txt":"liste_mots/liste_anglais.txt";
             BufferedReader reader = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResource(fic).openStream()));
