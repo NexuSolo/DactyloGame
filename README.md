@@ -1,7 +1,7 @@
 
 # DactyloGame
 
-Projet de CPOO de 3ème année de licence informatique a l'université de Paris Cité.
+Projet de CPOO de 3ᵉ année de licence informatique a l'université de Paris Cité.
 ## Lancement
 
 Pour lancer le projet utiliser la commande :
@@ -10,7 +10,7 @@ Pour lancer le projet utiliser la commande :
   ./gradlew run
 ```
 
-Vous pouvez aussi créer un .jar et l'executer a l'aide de la commande :
+Vous pouvez aussi créer un .jar et l'exécuter à l'aide de la commande :
 
 ```bash
   ./gradlew shadowJar
@@ -28,24 +28,30 @@ Vous pouvez aussi définir un port au lancement de votre serveur :
 ```bash
   ./gradlew serveur -Pport=xxxx
 ```
-## Features
+
+Pour clean le projet :
+
+```bash
+  ./gradlew clean
+  ```
+## Fonctionnalité
 
 - 2 modes d'entrainement
 - Mode solo avec des niveaux de difficulté
 - Mode multijoueurs
-- Design responsives
-- Options sauvegardé
+- Design responsive
+- Options sauvegardées
 - Graphique de statistique en fin de partie
 ## Choix technique
 
-Cette application utilise javaFX, nous avons utilisé [scene Builder](https://gluonhq.com/products/scene-builder/) pour créer les interfaces graphique.
+Cette application utilise javaFX, nous avons utilisé [scene Builder](https://gluonhq.com/products/scene-builder/) pour créer les interfaces graphiques.
 
-Nous avons décidé pour le mode multijouers que le client ne servirai que d'interface et que toutes les actions seront traité du couté serveur.
+Nous avons décidé pour le mode multijoueurs que le client ne servirait que d'interface et que toutes les actions seront traitées du couté serveur.
 
-Des fichiers de configurations sont sauvegardé dans le dossier home/.Dactylo
-## Running Tests
+Des fichiers de configurations sont sauvegardés dans le dossier home/.Dactylo
+## Tests
 
-Pour lancer les tests utilisez la commande suivante :
+Pour lancer les tests, utilisez la commande suivante :
 
 ```bash
   ./gradlew test

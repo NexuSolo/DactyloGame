@@ -11,8 +11,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import projet.cpoo.Controller.MenuController;
 
-public class App extends Application {
+public class App extends MenuController {
 
     private static Scene scene;
     private static Socket socket;

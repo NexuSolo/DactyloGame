@@ -19,7 +19,7 @@ import projet.cpoo.Message;
 import projet.cpoo.Settings;
 import projet.cpoo.Transmission;
 
-public class MenuController {
+public class MenuController extends OptionsController {
     @FXML
     private Button entrainementButton;
     @FXML
