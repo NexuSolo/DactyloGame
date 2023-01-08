@@ -269,7 +269,6 @@ class ReceptionJeux implements Runnable {
                 Platform.runLater( () -> {
                     multijoueurController.positionMot = 0;
                     multijoueurController.pos = 0;
-
                 });
                 break;
             case SERVEUR_VALIDATION : 

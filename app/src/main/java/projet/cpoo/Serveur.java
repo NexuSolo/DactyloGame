@@ -217,7 +217,7 @@ class ClientThread implements Runnable {
     private void nouveauMot(Socket socket,String s) throws IOException {
         if(enJeu) {
             if (s == null) s = motAleatoire();
-            if (listeMots.size() > 15) validationMot(socket);
+            if (listeMots.size() >= 15) validationMot(socket);
             System.out.println(s + " " + socket);
             LinkedTreeMap<String, Object> map = new LinkedTreeMap<String, Object>();
             Random rand = new Random();
@@ -471,7 +471,7 @@ class ClientThread implements Runnable {
         vie += i;
         if(vie <= 0) {
             enJeu = false;
-            Serveur.classement.set(Serveur.positionDernier - 1, Serveur.classement.get(Serveur.positionDernier - 1) + pseudo);
+            Serveur.classement.set(Math.max(0, Serveur.positionDernier - 1), Serveur.classement.get(Math.max(0, Serveur.positionDernier - 1)) + pseudo);
             Serveur.positionDernier--;
             Socket dernierjoueur = null;
             for(Socket socket : sockets.keySet()) {
